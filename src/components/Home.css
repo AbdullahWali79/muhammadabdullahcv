@@ -116,52 +116,7 @@
   color: #B0B0B0;
   line-height: 1.6;
   max-width: 600px;
-  margin-bottom: 30px;
   animation: slideInLeft 1s ease-out 0.3s both;
-}
-
-.hero-buttons {
-  display: flex;
-  gap: 20px;
-  animation: slideInLeft 1s ease-out 0.6s both;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #00CED1, #008B8B);
-  color: white;
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, #00FFFF, #00CED1);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 206, 209, 0.4);
-}
-
-.btn-secondary {
-  background: transparent;
-  color: #00CED1;
-  border: 2px solid #00CED1;
-}
-
-.btn-secondary:hover {
-  background: #00CED1;
-  color: #1A2B2E;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 206, 209, 0.4);
 }
 
 .personal-info {
