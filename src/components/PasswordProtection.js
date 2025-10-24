@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { verifyPagePassword } from '../services/securityService';
 import './PasswordProtection.css';
 
 const PasswordProtection = ({ children, pageName }) => {
@@ -8,14 +9,28 @@ const PasswordProtection = ({ children, pageName }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password === '7337') {
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('Invalid password. Please try again.');
-      setPassword('');
+    setError('');
+    
+    try {
+      const result = await verifyPagePassword(pageName.toLowerCase().replace(' ', ''), password);
+      if (result.success && result.isValid) {
+        setIsAuthenticated(true);
+        setError('');
+      } else {
+        setError('Invalid password. Please try again.');
+        setPassword('');
+      }
+    } catch (error) {
+      // Fallback to default password if database is not available
+      if (password === '7337') {
+        setIsAuthenticated(true);
+        setError('');
+      } else {
+        setError('Invalid password. Please try again.');
+        setPassword('');
+      }
     }
   };
 

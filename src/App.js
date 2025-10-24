@@ -15,6 +15,7 @@ import MakePortfolio from './components/MakePortfolio';
 import MakeNews from './components/MakeNews';
 import MakeContact from './components/MakeContact';
 import SecurityManager from './components/SecurityManager';
+import PasswordProtection from './components/PasswordProtection';
 import './App.css';
 
 function AppContent() {
@@ -86,14 +87,46 @@ function AppContent() {
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/news" element={<News />} />
           <Route path="/contact" element={<Contact userData={userData} />} />
-          <Route path="/makecv" element={<CVForm userData={userData} setUserData={setUserData} />} />
-          <Route path="/makehome" element={<MakeHome />} />
-          <Route path="/makeabout" element={<MakeAbout />} />
-          <Route path="/makeservice" element={<MakeService />} />
-          <Route path="/makeportfolio" element={<MakePortfolio />} />
-          <Route path="/makenews" element={<MakeNews />} />
-          <Route path="/makecontact" element={<MakeContact />} />
-          <Route path="/security" element={<SecurityManager />} />
+          <Route path="/makecv" element={
+            <PasswordProtection pageName="CV Creation">
+              <CVForm userData={userData} setUserData={setUserData} />
+            </PasswordProtection>
+          } />
+          <Route path="/makehome" element={
+            <PasswordProtection pageName="Home Editor">
+              <MakeHome />
+            </PasswordProtection>
+          } />
+          <Route path="/makeabout" element={
+            <PasswordProtection pageName="About Editor">
+              <MakeAbout />
+            </PasswordProtection>
+          } />
+          <Route path="/makeservice" element={
+            <PasswordProtection pageName="Service Editor">
+              <MakeService />
+            </PasswordProtection>
+          } />
+          <Route path="/makeportfolio" element={
+            <PasswordProtection pageName="Portfolio Editor">
+              <MakePortfolio />
+            </PasswordProtection>
+          } />
+          <Route path="/makenews" element={
+            <PasswordProtection pageName="News Editor">
+              <MakeNews />
+            </PasswordProtection>
+          } />
+          <Route path="/makecontact" element={
+            <PasswordProtection pageName="Contact Editor">
+              <MakeContact />
+            </PasswordProtection>
+          } />
+          <Route path="/security" element={
+            <PasswordProtection pageName="Security Manager">
+              <SecurityManager />
+            </PasswordProtection>
+          } />
         </Routes>
       </main>
     </div>
