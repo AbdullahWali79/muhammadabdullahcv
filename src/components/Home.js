@@ -33,14 +33,6 @@ const Home = ({ userData }) => {
             <div className="hero-text">
               <h1 className="hero-title">{userData.firstName} {userData.lastName}</h1>
               <p className="hero-summary">{userData.summary}</p>
-              <div className="hero-buttons">
-                <button className="btn btn-primary" onClick={handleDownloadCV}>
-                  <FaDownload /> Download CV
-                </button>
-                <button className="btn btn-secondary" onClick={handleContactMe}>
-                  <FaEnvelope /> Contact Me
-                </button>
-              </div>
             </div>
           </div>
         </div>
