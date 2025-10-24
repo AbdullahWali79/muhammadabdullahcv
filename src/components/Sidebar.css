@@ -53,6 +53,8 @@
 .toggle-btn:hover {
   background: #00CED1;
   color: #1A2B2E;
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 4px 15px rgba(0, 206, 209, 0.4);
 }
 
 .sidebar-header {
@@ -79,6 +81,22 @@
   transition: all 0.3s ease;
   position: relative;
   z-index: 998;
+  animation: float 3s ease-in-out infinite;
+}
+
+.profile-image:hover {
+  transform: scale(1.1);
+  border-color: #00FFFF;
+  box-shadow: 0 0 20px rgba(0, 206, 209, 0.6);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .sidebar.collapsed .profile-image {
