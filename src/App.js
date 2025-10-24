@@ -45,9 +45,18 @@ function AppContent() {
     try {
       setLoading(true);
       
-      // Add timeout to prevent infinite loading
+      // Try to load from localStorage first (faster)
+      const savedData = localStorage.getItem('portfolioData');
+      if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        setUserData(parsedData);
+        setLoading(false);
+        return;
+      }
+      
+      // If no localStorage data, try database with short timeout
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Database timeout')), 5000)
+        setTimeout(() => reject(new Error('Database timeout')), 3000)
       );
       
       const dataPromise = getUserData();
@@ -56,6 +65,8 @@ function AppContent() {
       
       if (result.success && result.data) {
         setUserData(result.data);
+        // Save to localStorage for faster future loads
+        localStorage.setItem('portfolioData', JSON.stringify(result.data));
       } else {
         // If no data in database, keep default data
         console.log('No data found in database, using default data');
@@ -71,19 +82,26 @@ function AppContent() {
 
   const handleUserDataUpdate = async (updatedData) => {
     try {
-      const result = await saveUserData(updatedData);
-      if (result.success) {
-        setUserData(updatedData);
-        console.log('User data saved successfully');
-      } else {
-        console.error('Error saving user data:', result.error);
-        // Still update local state even if save fails
-        setUserData(updatedData);
-      }
+      // Always update local state first
+      setUserData(updatedData);
+      
+      // Save to localStorage immediately
+      localStorage.setItem('portfolioData', JSON.stringify(updatedData));
+      
+      // Try to save to database (but don't block the UI)
+      saveUserData(updatedData).then(result => {
+        if (result.success) {
+          console.log('User data saved to database successfully');
+        } else {
+          console.log('Database save failed, but data saved locally');
+        }
+      }).catch(error => {
+        console.log('Database save failed, but data saved locally');
+      });
+      
     } catch (error) {
       console.error('Error saving user data:', error);
-      // Still update local state even if save fails
-      setUserData(updatedData);
+      // Data is still saved in localStorage and state
     }
   };
 
