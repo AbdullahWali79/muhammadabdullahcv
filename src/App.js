@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Home from './components/Home';
@@ -33,33 +33,6 @@ function AppContent() {
     profileImage: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Professional.jpeg',
     summary: 'I am a passionate and creative UI/UX Designer with a knack for building elegant and functional user experiences. I specialize in user-centered design and have a strong command of modern design tools.'
   });
-
-  // Load user data from localStorage on component mount
-  useEffect(() => {
-    const savedData = localStorage.getItem('portfolioData');
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        setUserData(parsedData);
-      } catch (error) {
-        console.error('Error parsing saved data:', error);
-        // Keep default data if parsing fails
-      }
-    }
-  }, []);
-
-  const handleUserDataUpdate = (updatedData) => {
-    // Update local state
-    setUserData(updatedData);
-    
-    // Save to localStorage
-    try {
-      localStorage.setItem('portfolioData', JSON.stringify(updatedData));
-      console.log('Data saved to localStorage');
-    } catch (error) {
-      console.error('Error saving to localStorage:', error);
-    }
-  };
 
   const location = useLocation();
   const getActiveSection = () => {
@@ -98,7 +71,6 @@ function AppContent() {
     }
   };
 
-
   return (
     <div className="app">
       <Sidebar 
@@ -117,7 +89,7 @@ function AppContent() {
           <Route path="/contact" element={<Contact userData={userData} />} />
           <Route path="/makecv" element={
             <PasswordProtection pageName="CV Creation">
-              <CVForm userData={userData} setUserData={handleUserDataUpdate} />
+              <CVForm userData={userData} setUserData={setUserData} />
             </PasswordProtection>
           } />
           <Route path="/makehome" element={
