@@ -44,12 +44,26 @@ function AppContent() {
   const loadUserData = async () => {
     try {
       setLoading(true);
-      const result = await getUserData();
+      
+      // Add timeout to prevent infinite loading
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database timeout')), 5000)
+      );
+      
+      const dataPromise = getUserData();
+      
+      const result = await Promise.race([dataPromise, timeoutPromise]);
+      
       if (result.success && result.data) {
         setUserData(result.data);
+      } else {
+        // If no data in database, keep default data
+        console.log('No data found in database, using default data');
       }
     } catch (error) {
       console.error('Error loading user data:', error);
+      // Keep default data if database fails
+      console.log('Database error, using default data');
     } finally {
       setLoading(false);
     }
@@ -63,9 +77,13 @@ function AppContent() {
         console.log('User data saved successfully');
       } else {
         console.error('Error saving user data:', result.error);
+        // Still update local state even if save fails
+        setUserData(updatedData);
       }
     } catch (error) {
       console.error('Error saving user data:', error);
+      // Still update local state even if save fails
+      setUserData(updatedData);
     }
   };
 
