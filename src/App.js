@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { getUserData, saveUserData } from './services/supabaseService';
 import Sidebar from './components/Sidebar';
 import Home from './components/Home';
 import About from './components/About';
@@ -33,6 +34,40 @@ function AppContent() {
     profileImage: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Professional.jpeg',
     summary: 'I am a passionate and creative UI/UX Designer with a knack for building elegant and functional user experiences. I specialize in user-centered design and have a strong command of modern design tools.'
   });
+  const [loading, setLoading] = useState(true);
+
+  // Load user data from database on component mount
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
+    try {
+      setLoading(true);
+      const result = await getUserData();
+      if (result.success && result.data) {
+        setUserData(result.data);
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUserDataUpdate = async (updatedData) => {
+    try {
+      const result = await saveUserData(updatedData);
+      if (result.success) {
+        setUserData(updatedData);
+        console.log('User data saved successfully');
+      } else {
+        console.error('Error saving user data:', result.error);
+      }
+    } catch (error) {
+      console.error('Error saving user data:', error);
+    }
+  };
 
   const location = useLocation();
   const getActiveSection = () => {
@@ -71,6 +106,34 @@ function AppContent() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="app">
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '100vh',
+          background: '#1A2B2E',
+          color: '#ffffff'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ 
+              width: '50px', 
+              height: '50px', 
+              border: '3px solid #00CED1', 
+              borderTop: '3px solid transparent',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 20px'
+            }}></div>
+            <p>Loading your portfolio...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       <Sidebar 
@@ -89,7 +152,7 @@ function AppContent() {
           <Route path="/contact" element={<Contact userData={userData} />} />
           <Route path="/makecv" element={
             <PasswordProtection pageName="CV Creation">
-              <CVForm userData={userData} setUserData={setUserData} />
+              <CVForm userData={userData} setUserData={handleUserDataUpdate} />
             </PasswordProtection>
           } />
           <Route path="/makehome" element={
