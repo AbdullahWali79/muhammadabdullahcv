@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { getUserData, saveUserData } from './services/supabaseService';
 import Sidebar from './components/Sidebar';
 import Home from './components/Home';
 import About from './components/About';
@@ -34,74 +33,31 @@ function AppContent() {
     profileImage: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Professional.jpeg',
     summary: 'I am a passionate and creative UI/UX Designer with a knack for building elegant and functional user experiences. I specialize in user-centered design and have a strong command of modern design tools.'
   });
-  const [loading, setLoading] = useState(true);
 
-  // Load user data from database on component mount
+  // Load user data from localStorage on component mount
   useEffect(() => {
-    loadUserData();
-  }, []);
-
-  const loadUserData = async () => {
-    try {
-      setLoading(true);
-      
-      // Try to load from localStorage first (faster)
-      const savedData = localStorage.getItem('portfolioData');
-      if (savedData) {
+    const savedData = localStorage.getItem('portfolioData');
+    if (savedData) {
+      try {
         const parsedData = JSON.parse(savedData);
         setUserData(parsedData);
-        setLoading(false);
-        return;
+      } catch (error) {
+        console.error('Error parsing saved data:', error);
+        // Keep default data if parsing fails
       }
-      
-      // If no localStorage data, try database with short timeout
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Database timeout')), 3000)
-      );
-      
-      const dataPromise = getUserData();
-      
-      const result = await Promise.race([dataPromise, timeoutPromise]);
-      
-      if (result.success && result.data) {
-        setUserData(result.data);
-        // Save to localStorage for faster future loads
-        localStorage.setItem('portfolioData', JSON.stringify(result.data));
-      } else {
-        // If no data in database, keep default data
-        console.log('No data found in database, using default data');
-      }
-    } catch (error) {
-      console.error('Error loading user data:', error);
-      // Keep default data if database fails
-      console.log('Database error, using default data');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, []);
 
-  const handleUserDataUpdate = async (updatedData) => {
+  const handleUserDataUpdate = (updatedData) => {
+    // Update local state
+    setUserData(updatedData);
+    
+    // Save to localStorage
     try {
-      // Always update local state first
-      setUserData(updatedData);
-      
-      // Save to localStorage immediately
       localStorage.setItem('portfolioData', JSON.stringify(updatedData));
-      
-      // Try to save to database (but don't block the UI)
-      saveUserData(updatedData).then(result => {
-        if (result.success) {
-          console.log('User data saved to database successfully');
-        } else {
-          console.log('Database save failed, but data saved locally');
-        }
-      }).catch(error => {
-        console.log('Database save failed, but data saved locally');
-      });
-      
+      console.log('Data saved to localStorage');
     } catch (error) {
-      console.error('Error saving user data:', error);
-      // Data is still saved in localStorage and state
+      console.error('Error saving to localStorage:', error);
     }
   };
 
@@ -142,33 +98,6 @@ function AppContent() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="app">
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '100vh',
-          background: '#1A2B2E',
-          color: '#ffffff'
-        }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ 
-              width: '50px', 
-              height: '50px', 
-              border: '3px solid #00CED1', 
-              borderTop: '3px solid transparent',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-              margin: '0 auto 20px'
-            }}></div>
-            <p>Loading your portfolio...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="app">
