@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FaLock, FaEye, FaEyeSlash, FaSave, FaShieldAlt } from 'react-icons/fa';
+import { FaLock, FaEye, FaEyeSlash, FaSave, FaShieldAlt, FaDatabase } from 'react-icons/fa';
 import { getSecuritySettings, changeAdminPassword, changePagePassword } from '../services/securityService';
+import { initializeDemoData, checkDemoData } from '../utils/initializeDemoData';
 import './SecurityManager.css';
 
 const SecurityManager = () => {
@@ -14,10 +15,21 @@ const SecurityManager = () => {
     pagePasswords: {}
   });
   const [message, setMessage] = useState('');
+  const [demoDataStatus, setDemoDataStatus] = useState({ hasServiceData: false, hasAllData: false });
 
   useEffect(() => {
     loadSecuritySettings();
+    checkDemoDataStatus();
   }, []);
+
+  const checkDemoDataStatus = async () => {
+    try {
+      const status = await checkDemoData();
+      setDemoDataStatus(status);
+    } catch (error) {
+      console.error('Error checking demo data status:', error);
+    }
+  };
 
   const loadSecuritySettings = async () => {
     try {
@@ -100,6 +112,21 @@ const SecurityManager = () => {
       }
     } catch (error) {
       setMessage('Error updating page password');
+    }
+  };
+
+  const handleInitializeDemoData = async () => {
+    setMessage('Initializing demo data...');
+    try {
+      const result = await initializeDemoData();
+      if (result.success) {
+        setMessage('Demo data initialized successfully! All pages now have content.');
+        checkDemoDataStatus();
+      } else {
+        setMessage('Error initializing demo data: ' + result.error);
+      }
+    } catch (error) {
+      setMessage('Error initializing demo data');
     }
   };
 
@@ -193,6 +220,26 @@ const SecurityManager = () => {
               <FaSave /> Update Admin Password
             </button>
           </form>
+        </div>
+
+        {/* Demo Data Section */}
+        <div className="security-section">
+          <h2>Demo Data Management</h2>
+          <div className="demo-data-status">
+            <p><strong>Database Status:</strong></p>
+            <p>Services Data: {demoDataStatus.hasServiceData ? '✅ Loaded' : '❌ Missing'}</p>
+            <p>All Demo Data: {demoDataStatus.hasAllData ? '✅ Complete' : '❌ Incomplete'}</p>
+          </div>
+          <button 
+            onClick={handleInitializeDemoData}
+            className="btn btn-primary"
+            style={{ marginTop: '15px' }}
+          >
+            <FaDatabase /> Initialize Demo Data
+          </button>
+          <p style={{ fontSize: '14px', color: '#B0B0B0', marginTop: '10px' }}>
+            This will add demo content to all pages (Services, About, Portfolio, News, Contact)
+          </p>
         </div>
 
         {/* Page Passwords Section */}
