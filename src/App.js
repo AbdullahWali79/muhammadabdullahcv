@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { getUserData } from './services/supabaseService';
 import Sidebar from './components/Sidebar';
 import Home from './components/Home';
 import About from './components/About';
@@ -33,6 +34,37 @@ function AppContent() {
     profileImage: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Professional.jpeg',
     summary: 'I am a passionate and creative UI/UX Designer with a knack for building elegant and functional user experiences. I specialize in user-centered design and have a strong command of modern design tools.'
   });
+
+  // Load user data from database on component mount
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const result = await getUserData();
+        if (result.success && result.data) {
+          // Convert database format to component format
+          const dbData = result.data;
+          setUserData({
+            firstName: dbData.first_name || 'Author',
+            lastName: dbData.last_name || 'Name',
+            title: dbData.title || 'UI/UX Designer',
+            dateOfBirth: dbData.date_of_birth || 'October 26, 1995',
+            nationality: dbData.nationality || 'CreativeLand',
+            phone: dbData.phone || '+123 456 7890',
+            email: dbData.email || 'author.name@example.com',
+            address: dbData.address || '123 Design St, Anytown, USA',
+            languages: dbData.languages || 'English, Designish',
+            profileImage: dbData.profile_image || 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Professional.jpeg',
+            summary: dbData.summary || 'I am a passionate and creative UI/UX Designer with a knack for building elegant and functional user experiences. I specialize in user-centered design and have a strong command of modern design tools.'
+          });
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        // Keep default data if database fails
+      }
+    };
+
+    loadUserData();
+  }, []);
 
   const location = useLocation();
   const getActiveSection = () => {
