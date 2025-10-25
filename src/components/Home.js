@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaDownload, FaEnvelope, FaDatabase } from 'react-icons/fa';
 import { generatePDF } from '../utils/pdfGenerator';
-import { initializeDataDirectly } from '../utils/directDataInit';
+import { initializeDataDirectly, testDatabaseConnection } from '../utils/directDataInit';
 import './Home.css';
 
 const Home = ({ userData }) => {
@@ -15,6 +15,20 @@ const Home = ({ userData }) => {
 
   const handleContactMe = () => {
     navigate('/contact');
+  };
+
+  const handleTestConnection = async () => {
+    setInitMessage('Testing database connection...');
+    try {
+      const result = await testDatabaseConnection();
+      if (result.success) {
+        setInitMessage('✅ Database connection successful!');
+      } else {
+        setInitMessage('❌ Connection failed: ' + result.error);
+      }
+    } catch (error) {
+      setInitMessage('❌ Connection error: ' + error.message);
+    }
   };
 
   const handleInitializeData = async () => {
@@ -147,6 +161,10 @@ const Home = ({ userData }) => {
           <button className="btn btn-primary" onClick={handleContactMe}>
             <FaEnvelope className="btn-icon" />
             Contact Me
+          </button>
+          <button className="btn btn-secondary" onClick={handleTestConnection} style={{backgroundColor: '#17a2b8', borderColor: '#17a2b8'}}>
+            <FaDatabase className="btn-icon" />
+            Test Connection
           </button>
           <button className="btn btn-secondary" onClick={handleInitializeData} style={{backgroundColor: '#28a745', borderColor: '#28a745'}}>
             <FaDatabase className="btn-icon" />

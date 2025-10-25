@@ -1,8 +1,35 @@
 import { supabase } from '../config/supabase';
 
+// Test database connection
+export const testDatabaseConnection = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('service_data')
+      .select('count')
+      .limit(1);
+    
+    if (error) {
+      console.error('Database connection test failed:', error);
+      return { success: false, error: error.message };
+    }
+    
+    console.log('Database connection successful');
+    return { success: true };
+  } catch (error) {
+    console.error('Database connection error:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 // Direct data initialization function
 export const initializeDataDirectly = async () => {
   console.log('Starting direct data initialization...');
+
+  // First test database connection
+  const connectionTest = await testDatabaseConnection();
+  if (!connectionTest.success) {
+    throw new Error('Database connection failed: ' + connectionTest.error);
+  }
 
   try {
     // Service Data
@@ -154,8 +181,9 @@ export const initializeDataDirectly = async () => {
     
     if (serviceError) {
       console.error('Service data error:', serviceError);
+      throw new Error('Service data insertion failed: ' + serviceError.message);
     } else {
-      console.log('Service data inserted successfully');
+      console.log('Service data inserted successfully:', serviceResult);
     }
 
     // Insert About Data
@@ -166,8 +194,9 @@ export const initializeDataDirectly = async () => {
     
     if (aboutError) {
       console.error('About data error:', aboutError);
+      throw new Error('About data insertion failed: ' + aboutError.message);
     } else {
-      console.log('About data inserted successfully');
+      console.log('About data inserted successfully:', aboutResult);
     }
 
     // Insert Portfolio Data
