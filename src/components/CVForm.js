@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GitHubImagePicker from './GitHubImagePicker';
 import { saveUserData } from '../services/supabaseService';
-import { FaSave, FaEye, FaDownload } from 'react-icons/fa';
+import { FaSave, FaEye, FaDownload, FaDatabase } from 'react-icons/fa';
 import { generatePDF } from '../utils/pdfGenerator';
+import { initializeDataDirectly, testDatabaseConnection } from '../utils/directDataInit';
 import './CVForm.css';
 
 const CVForm = ({ userData, setUserData }) => {
   const [formData, setFormData] = useState(userData);
   const [isPreview, setIsPreview] = useState(false);
+  const [initMessage, setInitMessage] = useState('');
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -64,6 +66,34 @@ const CVForm = ({ userData, setUserData }) => {
 
   const handleDownload = () => {
     generatePDF(formData);
+  };
+
+  const handleTestConnection = async () => {
+    setInitMessage('Testing database connection...');
+    try {
+      const result = await testDatabaseConnection();
+      if (result.success) {
+        setInitMessage('✅ Database connection successful!');
+      } else {
+        setInitMessage('❌ Connection failed: ' + result.error);
+      }
+    } catch (error) {
+      setInitMessage('❌ Connection error: ' + error.message);
+    }
+  };
+
+  const handleInitializeData = async () => {
+    setInitMessage('Initializing database...');
+    try {
+      const result = await initializeDataDirectly();
+      if (result.success) {
+        setInitMessage('✅ Database initialized successfully! Check your Supabase dashboard.');
+      } else {
+        setInitMessage('❌ Error: ' + result.error);
+      }
+    } catch (error) {
+      setInitMessage('❌ Error: ' + error.message);
+    }
   };
 
   if (isPreview) {
@@ -295,6 +325,34 @@ const CVForm = ({ userData, setUserData }) => {
           </div>
         </div>
       </form>
+
+      {/* Database Management Section */}
+      <div className="database-section">
+        <h3>Database Management</h3>
+        <div className="database-buttons">
+          <button className="btn btn-secondary" onClick={handleTestConnection} style={{backgroundColor: '#17a2b8', borderColor: '#17a2b8'}}>
+            <FaDatabase className="btn-icon" />
+            Test Connection
+          </button>
+          <button className="btn btn-secondary" onClick={handleInitializeData} style={{backgroundColor: '#28a745', borderColor: '#28a745'}}>
+            <FaDatabase className="btn-icon" />
+            Initialize Database
+          </button>
+        </div>
+        
+        {initMessage && (
+          <div style={{ 
+            marginTop: '20px', 
+            padding: '10px', 
+            backgroundColor: initMessage.includes('✅') ? '#d4edda' : '#f8d7da',
+            color: initMessage.includes('✅') ? '#155724' : '#721c24',
+            borderRadius: '5px',
+            textAlign: 'center'
+          }}>
+            {initMessage}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

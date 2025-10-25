@@ -1,13 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaDownload, FaEnvelope, FaDatabase } from 'react-icons/fa';
+import { FaDownload, FaEnvelope } from 'react-icons/fa';
 import { generatePDF } from '../utils/pdfGenerator';
-import { initializeDataDirectly, testDatabaseConnection } from '../utils/directDataInit';
 import './Home.css';
 
 const Home = ({ userData }) => {
   const navigate = useNavigate();
-  const [initMessage, setInitMessage] = useState('');
 
   const handleDownloadCV = () => {
     generatePDF(userData);
@@ -17,33 +15,6 @@ const Home = ({ userData }) => {
     navigate('/contact');
   };
 
-  const handleTestConnection = async () => {
-    setInitMessage('Testing database connection...');
-    try {
-      const result = await testDatabaseConnection();
-      if (result.success) {
-        setInitMessage('✅ Database connection successful!');
-      } else {
-        setInitMessage('❌ Connection failed: ' + result.error);
-      }
-    } catch (error) {
-      setInitMessage('❌ Connection error: ' + error.message);
-    }
-  };
-
-  const handleInitializeData = async () => {
-    setInitMessage('Initializing database...');
-    try {
-      const result = await initializeDataDirectly();
-      if (result.success) {
-        setInitMessage('✅ Database initialized successfully! Check your Supabase dashboard.');
-      } else {
-        setInitMessage('❌ Error: ' + result.error);
-      }
-    } catch (error) {
-      setInitMessage('❌ Error: ' + error.message);
-    }
-  };
 
   return (
     <div className="home">
@@ -162,28 +133,7 @@ const Home = ({ userData }) => {
             <FaEnvelope className="btn-icon" />
             Contact Me
           </button>
-          <button className="btn btn-secondary" onClick={handleTestConnection} style={{backgroundColor: '#17a2b8', borderColor: '#17a2b8'}}>
-            <FaDatabase className="btn-icon" />
-            Test Connection
-          </button>
-          <button className="btn btn-secondary" onClick={handleInitializeData} style={{backgroundColor: '#28a745', borderColor: '#28a745'}}>
-            <FaDatabase className="btn-icon" />
-            Initialize Database
-          </button>
         </div>
-        
-        {initMessage && (
-          <div style={{ 
-            marginTop: '20px', 
-            padding: '10px', 
-            backgroundColor: initMessage.includes('✅') ? '#d4edda' : '#f8d7da',
-            color: initMessage.includes('✅') ? '#155724' : '#721c24',
-            borderRadius: '5px',
-            textAlign: 'center'
-          }}>
-            {initMessage}
-          </div>
-        )}
       </div>
       
       <footer className="footer">
