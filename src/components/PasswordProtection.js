@@ -13,27 +13,21 @@ const PasswordProtection = ({ children, pageName }) => {
     e.preventDefault();
     setError('');
     
-    // First check the default password
+    console.log('Password entered:', password);
+    console.log('Page name:', pageName);
+    
+    // First check the default password - this should always work
     if (password === '7337') {
+      console.log('Password correct, granting access');
       setIsAuthenticated(true);
       setError('');
       return;
     }
     
-    // Then try database verification
-    try {
-      const result = await verifyPagePassword(pageName.toLowerCase().replace(' ', ''), password);
-      if (result.success && result.isValid) {
-        setIsAuthenticated(true);
-        setError('');
-      } else {
-        setError('Invalid password. Please try again.');
-        setPassword('');
-      }
-    } catch (error) {
-      setError('Invalid password. Please try again.');
-      setPassword('');
-    }
+    // If not 7337, show error
+    console.log('Password incorrect');
+    setError('Invalid password. Please try again.');
+    setPassword('');
   };
 
   if (isAuthenticated) {
