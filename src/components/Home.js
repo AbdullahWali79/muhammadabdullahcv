@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaDownload, FaEnvelope } from 'react-icons/fa';
+import { FaDownload, FaEnvelope, FaDatabase } from 'react-icons/fa';
 import { generatePDF } from '../utils/pdfGenerator';
+import { initializeDataDirectly } from '../utils/directDataInit';
 import './Home.css';
 
 const Home = ({ userData }) => {
   const navigate = useNavigate();
+  const [initMessage, setInitMessage] = useState('');
 
   const handleDownloadCV = () => {
     generatePDF(userData);
@@ -13,6 +15,20 @@ const Home = ({ userData }) => {
 
   const handleContactMe = () => {
     navigate('/contact');
+  };
+
+  const handleInitializeData = async () => {
+    setInitMessage('Initializing database...');
+    try {
+      const result = await initializeDataDirectly();
+      if (result.success) {
+        setInitMessage('✅ Database initialized successfully! Check your Supabase dashboard.');
+      } else {
+        setInitMessage('❌ Error: ' + result.error);
+      }
+    } catch (error) {
+      setInitMessage('❌ Error: ' + error.message);
+    }
   };
 
   return (
@@ -132,7 +148,24 @@ const Home = ({ userData }) => {
             <FaEnvelope className="btn-icon" />
             Contact Me
           </button>
+          <button className="btn btn-secondary" onClick={handleInitializeData} style={{backgroundColor: '#28a745', borderColor: '#28a745'}}>
+            <FaDatabase className="btn-icon" />
+            Initialize Database
+          </button>
         </div>
+        
+        {initMessage && (
+          <div style={{ 
+            marginTop: '20px', 
+            padding: '10px', 
+            backgroundColor: initMessage.includes('✅') ? '#d4edda' : '#f8d7da',
+            color: initMessage.includes('✅') ? '#155724' : '#721c24',
+            borderRadius: '5px',
+            textAlign: 'center'
+          }}>
+            {initMessage}
+          </div>
+        )}
       </div>
       
       <footer className="footer">
