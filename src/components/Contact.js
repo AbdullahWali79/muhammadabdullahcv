@@ -5,7 +5,6 @@ import './Contact.css';
 const Contact = ({ userData }) => {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     subject: '',
     message: ''
   });
@@ -22,7 +21,7 @@ const Contact = ({ userData }) => {
     e.preventDefault();
     
     // Create WhatsApp message
-    const whatsappMessage = `Hello! I'm ${formData.name} (${formData.email}).
+    const whatsappMessage = `Hello! I'm ${formData.name}.
 
 Subject: ${formData.subject}
 
@@ -41,7 +40,7 @@ Message: ${formData.message}`;
     window.open(whatsappUrl, '_blank');
     
     // Reset form
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    setFormData({ name: '', subject: '', message: '' });
   };
 
   const contactInfo = [
@@ -122,29 +121,16 @@ Message: ${formData.message}`;
           <div className="contact-form-section">
             <h2>Send a Message</h2>
             <form className="contact-form" onSubmit={handleSubmit}>
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="name">Full Name *</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="email">Email Address *</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
+              <div className="form-group">
+                <label htmlFor="name">Full Name *</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
               
               <div className="form-group">
