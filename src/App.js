@@ -18,6 +18,7 @@ import MakePortfolio from './components/MakePortfolio';
 import MakeNews from './components/MakeNews';
 import MakeContact from './components/MakeContact';
 import SecurityManager from './components/SecurityManager';
+import './components/Mobile.css';
 import PasswordProtection from './components/PasswordProtection';
 import './App.css';
 
