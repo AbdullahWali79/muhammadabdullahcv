@@ -1,9 +1,24 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaExternalLinkAlt, FaGithub } from 'react-icons/fa';
 import './Portfolio.css';
 
 const Portfolio = () => {
   const [activeFilter, setActiveFilter] = useState('All');
+  const navigate = useNavigate();
+
+  const handleViewLive = (projectId, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(`/portfolio/${projectId}`);
+  };
+
+  const handleViewCode = (githubUrl, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.open(githubUrl, '_blank');
+  };
+
   const projects = [
     {
       id: 1,
@@ -109,12 +124,20 @@ const Portfolio = () => {
                 />
                 <div className="portfolio-overlay">
                   <div className="portfolio-actions">
-                    <a href={project.liveUrl} className="action-btn" title="View Live">
+                    <button 
+                      className="action-btn" 
+                      title="View Live"
+                      onClick={(e) => handleViewLive(project.id, e)}
+                    >
                       <FaExternalLinkAlt />
-                    </a>
-                    <a href={project.githubUrl} className="action-btn" title="View Code">
+                    </button>
+                    <button 
+                      className="action-btn" 
+                      title="View Code"
+                      onClick={(e) => handleViewCode(project.githubUrl, e)}
+                    >
                       <FaGithub />
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>

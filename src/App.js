@@ -6,6 +6,7 @@ import Home from './components/Home';
 import About from './components/About';
 import Service from './components/Service';
 import Portfolio from './components/Portfolio';
+import PortfolioDetail from './components/PortfolioDetail';
 import News from './components/News';
 import NewsDetail from './components/NewsDetail';
 import Contact from './components/Contact';
@@ -79,6 +80,8 @@ function AppContent() {
         return 'service';
       case '/portfolio':
         return 'portfolio';
+      case '/portfolio/:id':
+        return 'portfolio';
       case '/news':
         return 'news';
       case '/news/:id':
@@ -120,6 +123,7 @@ function AppContent() {
           <Route path="/about" element={<About userData={userData} />} />
           <Route path="/service" element={<Service />} />
           <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="/portfolio/:id" element={<PortfolioDetail />} />
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/contact" element={<Contact userData={userData} />} />
