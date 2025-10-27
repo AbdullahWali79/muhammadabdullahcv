@@ -79,12 +79,17 @@
   position: relative;
   height: 250px;
   overflow: hidden;
+  background-color: #1A2B2E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .portfolio-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center top;
   transition: transform 0.3s ease;
 }
 
