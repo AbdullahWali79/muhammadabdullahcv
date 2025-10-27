@@ -1,8 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaCalendarAlt, FaUser, FaTag } from 'react-icons/fa';
 import './News.css';
 
 const News = () => {
+  const navigate = useNavigate();
+
+  const handleReadMore = (newsId) => {
+    navigate(`/news/${newsId}`);
+  };
+
   const newsItems = [
     {
       id: 1,
@@ -109,7 +116,12 @@ const News = () => {
                 <h2 className="news-title">{item.title}</h2>
                 <p className="news-excerpt">{item.excerpt}</p>
                 
-                <button className="read-more-btn">Read More</button>
+                <button 
+                  className="read-more-btn"
+                  onClick={() => handleReadMore(item.id)}
+                >
+                  Read More
+                </button>
               </div>
             </article>
           ))}

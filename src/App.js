@@ -7,6 +7,7 @@ import About from './components/About';
 import Service from './components/Service';
 import Portfolio from './components/Portfolio';
 import News from './components/News';
+import NewsDetail from './components/NewsDetail';
 import Contact from './components/Contact';
 import CVForm from './components/CVForm';
 import MakeHome from './components/MakeHome';
@@ -80,6 +81,8 @@ function AppContent() {
         return 'portfolio';
       case '/news':
         return 'news';
+      case '/news/:id':
+        return 'news';
       case '/contact':
         return 'contact';
       case '/makecv':
@@ -118,6 +121,7 @@ function AppContent() {
           <Route path="/service" element={<Service />} />
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/news" element={<News />} />
+          <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/contact" element={<Contact userData={userData} />} />
           <Route path="/makecv" element={
             <PasswordProtection pageName="CV Creation">
