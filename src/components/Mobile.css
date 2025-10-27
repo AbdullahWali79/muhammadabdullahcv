@@ -1,77 +1,96 @@
 /* Mobile-specific styles - separate from desktop CSS */
 
+/* Mobile App Layout Fixes */
+@media (max-width: 768px) {
+  .app {
+    flex-direction: column !important;
+  }
+  
+  .main-content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+  
+  .main-content.sidebar-collapsed {
+    margin-left: 0 !important;
+  }
+}
+
 /* Mobile Sidebar Fixes */
 @media (max-width: 768px) {
   .sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
-    padding: 10px 15px;
-    border-right: none;
-    border-bottom: 1px solid #2A3B3E;
-    background: linear-gradient(135deg, #1A2B2E, #2A3B3E);
-    overflow-x: hidden;
+    width: 100% !important;
+    height: auto !important;
+    position: relative !important;
+    padding: 8px 12px !important;
+    border-right: none !important;
+    border-bottom: 1px solid #2A3B3E !important;
+    background: linear-gradient(135deg, #1A2B2E, #2A3B3E) !important;
+    overflow-x: hidden !important;
+    display: block !important;
   }
   
   .sidebar-header {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: nowrap;
+    margin-bottom: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    flex-wrap: nowrap !important;
   }
   
   .profile-image {
-    width: 45px;
-    height: 45px;
-    margin: 0;
-    flex-shrink: 0;
+    width: 40px !important;
+    height: 40px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
   }
   
   .name {
-    font-size: 16px;
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 14px !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
   
   .title {
-    font-size: 11px;
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 10px !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
   
   .sidebar-nav {
-    flex-direction: row;
-    gap: 6px;
-    padding: 5px 0;
-    justify-content: space-between;
-    overflow-x: hidden;
-    width: 100%;
+    flex-direction: row !important;
+    gap: 4px !important;
+    padding: 3px 0 !important;
+    justify-content: space-between !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
+    display: flex !important;
   }
   
   .nav-item {
-    width: 45px;
-    height: 45px;
-    padding: 0;
-    font-size: 12px;
-    flex-shrink: 0;
-    border-radius: 50%;
-    justify-content: center;
-    display: flex;
-    align-items: center;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    font-size: 11px !important;
+    flex-shrink: 0 !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+    display: flex !important;
+    align-items: center !important;
   }
   
   .nav-label {
-    display: none;
+    display: none !important;
   }
   
   .nav-icon {
-    margin-right: 0;
-    font-size: 16px;
+    margin-right: 0 !important;
+    font-size: 14px !important;
   }
 }
 
@@ -112,159 +131,162 @@
 /* Mobile Home Page Fixes */
 @media (max-width: 768px) {
   .home {
-    padding: 8px;
-    min-height: 100vh;
-    overflow-x: hidden;
+    padding: 6px !important;
+    min-height: 100vh !important;
+    overflow-x: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
   
   .home-container {
-    max-width: 100%;
-    overflow-x: hidden;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
   }
   
   .hero-section {
-    margin-bottom: 25px;
-    text-align: center;
+    margin-bottom: 20px !important;
+    text-align: center !important;
   }
   
   .hello-badge {
-    font-size: 9px;
-    padding: 4px 8px;
-    margin-bottom: 10px;
-    align-self: center;
+    font-size: 8px !important;
+    padding: 3px 6px !important;
+    margin-bottom: 8px !important;
+    align-self: center !important;
   }
   
   .hero-content {
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    text-align: center;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 12px !important;
+    text-align: center !important;
   }
   
   .hero-image {
-    width: 140px;
-    height: 140px;
-    margin: 0 auto;
-    order: 1;
+    width: 120px !important;
+    height: 120px !important;
+    margin: 0 auto !important;
+    order: 1 !important;
   }
   
   .hero-text {
-    order: 2;
-    width: 100%;
-    max-width: 100%;
+    order: 2 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
   
   .hero-title {
-    font-size: 24px;
-    margin-bottom: 10px;
-    line-height: 1.2;
+    font-size: 20px !important;
+    margin-bottom: 8px !important;
+    line-height: 1.2 !important;
   }
   
   .hero-summary {
-    font-size: 13px;
-    line-height: 1.4;
-    max-width: 100%;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: initial;
-    word-wrap: break-word;
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: initial !important;
+    word-wrap: break-word !important;
   }
   
   .personal-info {
-    margin-bottom: 25px;
+    margin-bottom: 20px !important;
   }
   
   .info-tables-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-    margin: 0;
-    width: 100%;
-    overflow-x: hidden;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
   }
   
   .info-table {
-    font-size: 11px;
-    margin-bottom: 0;
-    border-radius: 8px;
-    overflow: hidden;
-    width: 100%;
-    background-color: #2A3B3E;
-    border: 1px solid #3A4B4E;
+    font-size: 10px !important;
+    margin-bottom: 0 !important;
+    border-radius: 6px !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    background-color: #2A3B3E !important;
+    border: 1px solid #3A4B4E !important;
   }
   
   .info-cell {
-    padding: 12px 15px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 12px;
-    min-height: 50px;
-    width: 100%;
-    box-sizing: border-box;
-    border-bottom: 1px solid #3A4B4E;
+    padding: 8px 10px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-height: 40px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    border-bottom: 1px solid #3A4B4E !important;
   }
   
   .info-cell:last-child {
-    border-bottom: none;
+    border-bottom: none !important;
   }
   
   .info-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-    flex-shrink: 0;
-    background-color: #00CED1;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 12px !important;
+    flex-shrink: 0 !important;
+    background-color: #00CED1 !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #ffffff !important;
   }
   
   .info-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: #B0B0B0;
-    min-width: 80px;
-    flex-shrink: 0;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    color: #B0B0B0 !important;
+    min-width: 70px !important;
+    flex-shrink: 0 !important;
   }
   
   .info-value {
-    font-size: 12px;
-    font-weight: 600;
-    color: #ffffff;
-    word-break: break-word;
-    overflow-wrap: break-word;
-    hyphens: auto;
-    flex: 1;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+    flex: 1 !important;
   }
   
   .action-buttons {
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 20px;
-    width: 100%;
+    flex-direction: column !important;
+    gap: 6px !important;
+    margin-bottom: 15px !important;
+    width: 100% !important;
   }
   
   .btn {
-    justify-content: center;
-    padding: 10px 16px;
-    font-size: 13px;
-    width: 100%;
-    max-width: 240px;
-    margin: 0 auto;
-    border-radius: 6px;
+    justify-content: center !important;
+    padding: 8px 14px !important;
+    font-size: 12px !important;
+    width: 100% !important;
+    max-width: 200px !important;
+    margin: 0 auto !important;
+    border-radius: 6px !important;
   }
   
   .footer {
-    text-align: center;
-    padding-top: 10px;
-    border-top: 1px solid #2A3B3E;
+    text-align: center !important;
+    padding-top: 8px !important;
+    border-top: 1px solid #2A3B3E !important;
   }
   
   .footer p {
-    font-size: 10px;
+    font-size: 9px !important;
   }
 }
 
