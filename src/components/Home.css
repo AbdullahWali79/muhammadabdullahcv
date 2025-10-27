@@ -115,13 +115,10 @@
   font-size: 18px;
   color: #B0B0B0;
   line-height: 1.6;
-  max-width: 600px;
   animation: slideInLeft 1s ease-out 0.3s both;
   word-spacing: 0.1em;
   hyphens: none;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 @media (max-width: 768px) {
