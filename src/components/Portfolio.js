@@ -19,6 +19,13 @@ const Portfolio = () => {
     window.open(githubUrl, '_blank');
   };
 
+  const handleStartProject = () => {
+    const phoneNumber = '+923046983794';
+    const message = 'Hi! I\'m interested in starting a project with you. Let\'s discuss the details.';
+    const whatsappUrl = `https://wa.me/${phoneNumber.replace('+', '')}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   const projects = [
     {
       id: 1,
@@ -160,7 +167,7 @@ const Portfolio = () => {
         <div className="portfolio-cta">
           <h2>Interested in my work?</h2>
           <p>Let's discuss your next project and bring your ideas to life.</p>
-          <button className="btn btn-primary">Start a Project</button>
+          <button className="btn btn-primary" onClick={handleStartProject}>Start a Project</button>
         </div>
       </div>
     </div>
