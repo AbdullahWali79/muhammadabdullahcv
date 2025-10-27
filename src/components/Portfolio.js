@@ -130,6 +130,7 @@ const Portfolio = () => {
                       onClick={(e) => handleViewLive(project.id, e)}
                     >
                       <FaExternalLinkAlt />
+                      <span>Live</span>
                     </button>
                     <button 
                       className="action-btn" 
@@ -137,6 +138,7 @@ const Portfolio = () => {
                       onClick={(e) => handleViewCode(project.githubUrl, e)}
                     >
                       <FaGithub />
+                      <span>Code</span>
                     </button>
                   </div>
                 </div>
