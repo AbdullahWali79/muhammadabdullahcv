@@ -144,12 +144,17 @@
   width: 100%;
   height: 500px;
   overflow: hidden;
+  background-color: #1A2B2E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .project-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center top;
 }
 
 .project-content {
