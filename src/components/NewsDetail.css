@@ -73,7 +73,7 @@
 }
 
 .article-excerpt {
-  font-size: 20px;
+  font-size: 18px;
   color: #B0B0B0;
   line-height: 1.6;
   margin: 0;
@@ -84,6 +84,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 30px;
+  margin-bottom: 30px;
   padding-bottom: 20px;
   border-bottom: 1px solid #3A4B4E;
 }
@@ -172,7 +173,7 @@
   }
   
   .article-excerpt {
-    font-size: 18px;
+    font-size: 16px;
   }
   
   .article-meta {
@@ -219,7 +220,7 @@
   }
   
   .article-excerpt {
-    font-size: 16px;
+    font-size: 14px;
   }
   
   .article-meta {
