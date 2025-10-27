@@ -33,7 +33,7 @@ const Home = ({ userData }) => {
             </div>
             <div className="hero-text">
               <h1 className="hero-title">{userData.firstName} {userData.lastName}</h1>
-              <p className="hero-summary">{userData.summary}</p>
+              <p className="hero-summary">{userData.summary?.replace(/ - /g, ' \u2013 ')}</p>
             </div>
           </div>
         </div>
