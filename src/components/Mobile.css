@@ -175,9 +175,9 @@
   }
   
   .info-tables-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
     margin: 0;
     width: 100%;
     overflow-x: hidden;
@@ -186,57 +186,58 @@
   .info-table {
     font-size: 11px;
     margin-bottom: 0;
-    border-radius: 6px;
+    border-radius: 8px;
     overflow: hidden;
     width: 100%;
-    display: flex;
-    flex-direction: column;
+    background-color: #2A3B3E;
+    border: 1px solid #3A4B4E;
   }
   
   .info-cell {
-    padding: 8px 10px;
+    padding: 12px 15px;
+    display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
-    min-height: 45px;
+    gap: 12px;
+    min-height: 50px;
     width: 100%;
     box-sizing: border-box;
-  }
-  
-  .info-cell:first-child {
-    flex-direction: row;
-    text-align: left;
-    gap: 8px;
-    background: #1A2B2E;
-    border-right: 1px solid #3A4B4E;
-    width: 100%;
-    min-width: auto;
+    border-bottom: 1px solid #3A4B4E;
   }
   
   .info-cell:last-child {
-    width: 100%;
-    padding-left: 10px;
+    border-bottom: none;
   }
   
   .info-icon {
-    width: 24px;
-    height: 24px;
-    font-size: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
     flex-shrink: 0;
+    background-color: #00CED1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
   }
   
   .info-label {
-    font-size: 10px;
-    font-weight: 500;
-    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 600;
+    color: #B0B0B0;
+    min-width: 80px;
+    flex-shrink: 0;
   }
   
   .info-value {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
+    color: #ffffff;
     word-break: break-word;
     overflow-wrap: break-word;
     hyphens: auto;
+    flex: 1;
   }
   
   .action-buttons {
@@ -302,7 +303,7 @@
   }
   
   .info-tables-container {
-    gap: 6px;
+    gap: 8px;
   }
   
   .info-table {
@@ -310,31 +311,24 @@
   }
   
   .info-cell {
-    padding: 6px 8px;
-    gap: 6px;
-    min-height: 40px;
-  }
-  
-  .info-cell:first-child {
-    gap: 6px;
-  }
-  
-  .info-cell:last-child {
-    padding-left: 8px;
+    padding: 10px 12px;
+    gap: 10px;
+    min-height: 45px;
   }
   
   .info-icon {
-    width: 20px;
-    height: 20px;
-    font-size: 10px;
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
   }
   
   .info-label {
-    font-size: 9px;
+    font-size: 10px;
+    min-width: 70px;
   }
   
   .info-value {
-    font-size: 10px;
+    font-size: 11px;
   }
   
   .action-buttons {
@@ -372,22 +366,24 @@
   }
   
   .info-cell {
-    padding: 5px 6px;
-    min-height: 35px;
+    padding: 8px 10px;
+    gap: 8px;
+    min-height: 40px;
   }
   
   .info-icon {
-    width: 18px;
-    height: 18px;
-    font-size: 9px;
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
   }
   
   .info-label {
-    font-size: 8px;
+    font-size: 9px;
+    min-width: 60px;
   }
   
   .info-value {
-    font-size: 9px;
+    font-size: 10px;
   }
   
   .btn {
