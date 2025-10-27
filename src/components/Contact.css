@@ -104,11 +104,21 @@
   color: #00CED1;
 }
 
-.social-links h3 {
+/* Social Media Links Section */
+.social-links-section {
+  background-color: #2A3B3E;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #3A4B4E;
+  margin-bottom: 30px;
+}
+
+.social-links-section h3 {
   font-size: 24px;
   color: #ffffff;
   margin-bottom: 20px;
   font-weight: 600;
+  text-align: center;
 }
 
 .social-grid {
@@ -118,16 +128,19 @@
 }
 
 .social-link {
-  display: block;
-  padding: 12px 20px;
-  background-color: #2A3B3E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 20px;
+  background-color: #1A2B2E;
   color: #B0B0B0;
   text-decoration: none;
   border-radius: 8px;
   border: 1px solid #3A4B4E;
-  text-align: center;
   font-weight: 500;
   transition: all 0.3s ease;
+  font-size: 14px;
 }
 
 .social-link:hover {
@@ -135,6 +148,18 @@
   color: #ffffff;
   border-color: #00CED1;
   transform: translateY(-2px);
+}
+
+.social-link i {
+  font-size: 18px;
+}
+
+/* Legacy styles for hidden section */
+.social-links h3 {
+  font-size: 24px;
+  color: #ffffff;
+  margin-bottom: 20px;
+  font-weight: 600;
 }
 
 .contact-form-section h2 {
