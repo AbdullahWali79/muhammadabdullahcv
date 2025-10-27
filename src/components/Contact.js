@@ -80,7 +80,8 @@ Message: ${formData.message}`;
         </div>
         
         <div className="contact-content">
-          <div className="contact-info">
+          {/* Contact Information section hidden as it's already displayed on home page */}
+          <div className="contact-info" style={{ display: 'none' }}>
             <h2>Contact Information</h2>
             <p>Feel free to reach out to me through any of the following channels:</p>
             
