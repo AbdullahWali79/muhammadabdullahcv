@@ -230,28 +230,28 @@
   
   .sidebar-nav {
     flex-direction: row;
-    overflow-x: auto;
     gap: 8px;
     padding: 5px 0;
-    -webkit-overflow-scrolling: touch;
+    justify-content: center;
   }
   
   .nav-item {
-    min-width: 100px;
-    padding: 8px 12px;
+    width: 50px;
+    height: 50px;
+    padding: 0;
     font-size: 13px;
     flex-shrink: 0;
-    border-radius: 20px;
+    border-radius: 50%;
+    justify-content: center;
   }
   
   .nav-label {
-    white-space: nowrap;
-    font-size: 12px;
+    display: none;
   }
   
   .nav-icon {
-    margin-right: 6px;
-    font-size: 14px;
+    margin-right: 0;
+    font-size: 18px;
   }
 }
 
@@ -279,18 +279,20 @@
   }
   
   .nav-item {
-    min-width: 90px;
-    padding: 6px 10px;
+    width: 45px;
+    height: 45px;
+    padding: 0;
     font-size: 12px;
+    justify-content: center;
   }
   
   .nav-label {
-    font-size: 11px;
+    display: none;
   }
   
   .nav-icon {
-    margin-right: 4px;
-    font-size: 12px;
+    margin-right: 0;
+    font-size: 16px;
   }
 }
 
