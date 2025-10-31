@@ -9,9 +9,9 @@ const MakeContact = () => {
     subtitle: 'Let\'s work together on your next project',
     description: 'Feel free to reach out to me for any project or collaboration. I\'m always interested in new opportunities.',
     contactInfo: {
-      email: 'contact@example.com',
-      phone: '+123 456 7890',
-      address: '123 Design St, Anytown, USA',
+      email: 'abdullahwale@gmail.com',
+      phone: '+923046983794',
+      address: 'Pakistan',
       website: 'www.example.com'
     },
     socialLinks: [

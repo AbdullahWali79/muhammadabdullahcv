@@ -7,11 +7,11 @@ import './MakeHome.css';
 const MakeHome = () => {
   const [homeData, setHomeData] = useState({
     title: 'Welcome to My Portfolio',
-    subtitle: 'Creative Designer & Developer',
-    description: 'I am a passionate and creative UI/UX Designer with a knack for building elegant and functional user experiences. I specialize in user-centered design and have a strong command of modern design tools.',
+    subtitle: 'AI Developer',
+    description: 'Consistency Makes a Man Perfect in Their Skill Set. - M. Abdullah',
     buttonText: 'Get Started',
     buttonLink: '#contact',
-    helloText: 'HELLO'
+    helloText: 'AsslamuAlikum'
   });
 
   const handleInputChange = (e) => {

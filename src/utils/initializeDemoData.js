@@ -118,9 +118,9 @@ const demoContact = {
   subtitle: 'Let\'s work together on your next project',
   description: 'I\'m always interested in new opportunities and exciting projects. Feel free to reach out!',
   contact_info: {
-    email: 'author.name@example.com',
-    phone: '+123 456 7890',
-    address: '123 Design St, Anytown, USA'
+    email: 'abdullahwale@gmail.com',
+    phone: '+923046983794',
+    address: 'Pakistan'
   },
   social_links: [
     { platform: 'LinkedIn', url: '#' },

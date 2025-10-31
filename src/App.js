@@ -26,17 +26,18 @@ import './App.css';
 function AppContent() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [userData, setUserData] = useState({
-    firstName: 'Author',
-    lastName: 'Name',
-    title: 'UI/UX Designer',
-    dateOfBirth: 'October 26, 1995',
-    nationality: 'CreativeLand',
-    phone: '+123 456 7890',
-    email: 'author.name@example.com',
-    address: '123 Design St, Anytown, USA',
-    languages: 'English, Designish',
+    firstName: 'Muhammad',
+    lastName: 'Abdullah',
+    title: 'AI Developer',
+    dateOfBirth: '25-12-1990',
+    nationality: 'Pakistan',
+    phone: '+923046983794',
+    email: 'abdullahwale@gmail.com',
+    address: 'Pakistan',
+    languages: 'English, Urdu, Punjabi',
     profileImage: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Professional.jpeg',
-    summary: 'I am a passionate and creative UI/UX Designer with a knack for building elegant and functional user experiences. I specialize in user-centered design and have a strong command of modern design tools.'
+    summary: 'Consistency Makes a Man Perfect in Their Skill Set. - M. Abdullah',
+    helloText: 'AsslamuAlikum'
   });
 
   // Load user data from database on component mount
@@ -48,17 +49,18 @@ function AppContent() {
           // Convert database format to component format
           const dbData = result.data;
           setUserData({
-            firstName: dbData.first_name || 'Author',
-            lastName: dbData.last_name || 'Name',
-            title: dbData.title || 'UI/UX Designer',
-            dateOfBirth: dbData.date_of_birth || 'October 26, 1995',
-            nationality: dbData.nationality || 'CreativeLand',
-            phone: dbData.phone || '+123 456 7890',
-            email: dbData.email || 'author.name@example.com',
-            address: dbData.address || '123 Design St, Anytown, USA',
-            languages: dbData.languages || 'English, Designish',
+            firstName: dbData.first_name || 'Muhammad',
+            lastName: dbData.last_name || 'Abdullah',
+            title: dbData.title || 'AI Developer',
+            dateOfBirth: dbData.date_of_birth || '25-12-1990',
+            nationality: dbData.nationality || 'Pakistan',
+            phone: dbData.phone || '+923046983794',
+            email: dbData.email || 'abdullahwale@gmail.com',
+            address: dbData.address || 'Pakistan',
+            languages: dbData.languages || 'English, Urdu, Punjabi',
             profileImage: dbData.profile_image || 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Professional.jpeg',
-            summary: dbData.summary || 'I am a passionate and creative UI/UX Designer with a knack for building elegant and functional user experiences. I specialize in user-centered design and have a strong command of modern design tools.'
+            summary: dbData.summary || 'Consistency Makes a Man Perfect in Their Skill Set. - M. Abdullah',
+            helloText: dbData.hello_text || 'AsslamuAlikum'
           });
         }
       } catch (error) {
