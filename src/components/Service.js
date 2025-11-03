@@ -117,7 +117,16 @@ const Service = () => {
         <div className="service-cta">
           <h2>Ready to work together?</h2>
           <p>Let's discuss your project and create something amazing together.</p>
-          <button className="btn btn-primary">Get In Touch</button>
+          <button 
+            className="btn btn-primary" 
+            onClick={() => {
+              const whatsappNumber = '923046983794';
+              const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+              window.open(whatsappUrl, '_blank');
+            }}
+          >
+            Get In Touch
+          </button>
         </div>
       </div>
     </div>

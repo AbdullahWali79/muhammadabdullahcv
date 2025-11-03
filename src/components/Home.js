@@ -12,7 +12,10 @@ const Home = ({ userData }) => {
   };
 
   const handleContactMe = () => {
-    navigate('/contact');
+    // Redirect to WhatsApp
+    const whatsappNumber = '923046983794';
+    const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+    window.open(whatsappUrl, '_blank');
   };
 
 

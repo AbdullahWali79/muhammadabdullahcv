@@ -100,8 +100,16 @@ const MakeService = () => {
     });
   };
 
-  const handleServiceChange = (id, field, value) => {
+  const handleServiceChange = (id, field, value, event) => {
+    // Save current scroll position and input element
     const scrollPosition = window.scrollY || window.pageYOffset;
+    const inputElement = event?.target;
+    let cursorPosition = null;
+    
+    if (inputElement && (inputElement.tagName === 'INPUT' || inputElement.tagName === 'TEXTAREA')) {
+      // Get cursor position - this is after the change since onChange fires after input
+      cursorPosition = inputElement.selectionStart || value.length;
+    }
     
     setServiceData(prev => ({
       ...prev,
@@ -110,8 +118,26 @@ const MakeService = () => {
       )
     }));
     
+    // Restore scroll position, focus, and cursor position
     requestAnimationFrame(() => {
-      window.scrollTo(0, scrollPosition);
+      // Restore scroll position
+      if (scrollPosition !== undefined) {
+        window.scrollTo(0, scrollPosition);
+      }
+      
+      // Restore focus and cursor position
+      if (inputElement) {
+        // Focus the input if it lost focus
+        if (document.activeElement !== inputElement) {
+          inputElement.focus();
+        }
+        // Restore cursor position - use the saved position or end of text
+        if (cursorPosition !== null && (inputElement.tagName === 'INPUT' || inputElement.tagName === 'TEXTAREA')) {
+          // Ensure cursor position doesn't exceed value length
+          const safeCursorPos = Math.min(cursorPosition, value.length);
+          inputElement.setSelectionRange(safeCursorPos, safeCursorPos);
+        }
+      }
     });
   };
 
@@ -225,7 +251,7 @@ const MakeService = () => {
                   <input
                     type="text"
                     value={service.title}
-                    onChange={(e) => handleServiceChange(service.id, 'title', e.target.value)}
+                    onChange={(e) => handleServiceChange(service.id, 'title', e.target.value, e)}
                     className="form-input"
                   />
                 </div>
@@ -234,7 +260,7 @@ const MakeService = () => {
                   <input
                     type="text"
                     value={service.icon}
-                    onChange={(e) => handleServiceChange(service.id, 'icon', e.target.value)}
+                    onChange={(e) => handleServiceChange(service.id, 'icon', e.target.value, e)}
                     className="form-input"
                     maxLength="2"
                   />
@@ -244,7 +270,7 @@ const MakeService = () => {
                   <input
                     type="text"
                     value={service.price}
-                    onChange={(e) => handleServiceChange(service.id, 'price', e.target.value)}
+                    onChange={(e) => handleServiceChange(service.id, 'price', e.target.value, e)}
                     className="form-input"
                   />
                 </div>
@@ -254,7 +280,7 @@ const MakeService = () => {
                 <label>Description</label>
                 <textarea
                   value={service.description}
-                  onChange={(e) => handleServiceChange(service.id, 'description', e.target.value)}
+                  onChange={(e) => handleServiceChange(service.id, 'description', e.target.value, e)}
                   rows="2"
                   className="form-textarea"
                 />
