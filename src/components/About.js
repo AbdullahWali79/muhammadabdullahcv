@@ -65,18 +65,16 @@ const About = ({ userData }) => {
             <h2>Hello, I'm {userData.firstName} {userData.lastName}</h2>
             <p className="about-summary">{userData.summary}</p>
             
-            {displayDescription ? (
-              <div className="detail-item">
-                <p>{displayDescription}</p>
-              </div>
-            ) : (
-              <div className="detail-item">
-                <p>With years of experience in the industry, I have developed a strong foundation in design principles and user experience. My journey has been marked by continuous learning and adaptation to new technologies and design trends.</p>
-              </div>
-            )}
-            
             <div className="about-details">
-              {(displayExperience || displayProjects) ? (
+              {/* Show description if available from database */}
+              {displayDescription && (
+                <div className="detail-item">
+                  <p>{displayDescription}</p>
+                </div>
+              )}
+              
+              {/* Show Statistics if experience or projects exist */}
+              {(displayExperience || displayProjects) && (
                 <div className="detail-item">
                   <h3>Statistics</h3>
                   <div className="stats-row">
@@ -94,7 +92,10 @@ const About = ({ userData }) => {
                     )}
                   </div>
                 </div>
-              ) : (
+              )}
+              
+              {/* Show Professional Experience only if no description and no stats */}
+              {!displayDescription && !displayExperience && !displayProjects && (
                 <div className="detail-item">
                   <h3>Professional Experience</h3>
                   <p>With years of experience in the industry, I have developed a strong foundation in design principles and user experience. My journey has been marked by continuous learning and adaptation to new technologies and design trends.</p>

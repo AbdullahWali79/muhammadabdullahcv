@@ -70,20 +70,46 @@ export const saveAboutData = async (aboutData) => {
     const dataToSave = { id: 1, ...aboutData };
     console.log('Data to save:', dataToSave);
     
+    // Validate Supabase client
+    if (!supabase) {
+      throw new Error('Supabase client is not initialized. Please check your configuration.');
+    }
+    
     const { data, error } = await supabase
       .from(TABLES.ABOUT_DATA)
       .upsert([dataToSave], { onConflict: 'id' })
     
     if (error) {
       console.error('Supabase error saving about data:', error);
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
       throw error;
     }
     
     console.log('About data saved successfully:', data);
     return { success: true, data }
   } catch (error) {
-    console.error('Error saving about data:', error)
-    return { success: false, error: error.message }
+    console.error('Error saving about data:', error);
+    
+    // Provide more helpful error messages
+    let errorMessage = error.message || 'Unknown error occurred';
+    
+    if (error.message?.includes('Failed to fetch') || 
+        error.message?.includes('NetworkError') ||
+        error.message?.includes('network') ||
+        error.name === 'TypeError') {
+      errorMessage = 'Network error: Please check your internet connection and Supabase configuration. Verify that:\n1. Your internet is working\n2. Supabase project is active\n3. API key is correct\n4. Table "about_data" exists in your database';
+    } else if (error.code === 'PGRST301' || error.message?.includes('permission')) {
+      errorMessage = 'Permission denied: Please check Row Level Security (RLS) policies in Supabase. Make sure INSERT and UPDATE policies are enabled for the about_data table.';
+    } else if (error.code === '42P01') {
+      errorMessage = 'Table not found: The "about_data" table does not exist. Please run the SQL schema to create the table.';
+    }
+    
+    return { success: false, error: errorMessage }
   }
 }
 

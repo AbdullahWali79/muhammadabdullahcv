@@ -112,7 +112,7 @@ const MakeAbout = () => {
         </div>
       </div>
       {message && (
-        <div className={`message ${message.includes('Error') ? 'error' : 'success'}`}>
+        <div className={`message ${message.includes('Error') || message.includes('error') ? 'error' : 'success'}`} style={{ whiteSpace: 'pre-line' }}>
           {message}
         </div>
       )}

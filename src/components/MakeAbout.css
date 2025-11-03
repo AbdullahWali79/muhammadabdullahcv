@@ -178,6 +178,36 @@
   transform: translateY(-1px);
 }
 
+.message {
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.message.success {
+  background-color: #2e7d32;
+  color: #ffffff;
+  border: 1px solid #4caf50;
+}
+
+.message.error {
+  background-color: #c62828;
+  color: #ffffff;
+  border: 1px solid #ef5350;
+}
+
+.loading {
+  padding: 15px 20px;
+  background-color: #2A3B3E;
+  color: #00CED1;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
 @media (max-width: 768px) {
   .editor-header {
     flex-direction: column;
