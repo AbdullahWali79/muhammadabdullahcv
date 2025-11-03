@@ -80,19 +80,34 @@ const MakePortfolio = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    const scrollPosition = window.scrollY || window.pageYOffset;
+    
     setPortfolioData(prev => ({
       ...prev,
       [name]: value
     }));
+    
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollPosition);
+      if (e.target && document.activeElement !== e.target) {
+        e.target.focus();
+      }
+    });
   };
 
   const handleProjectChange = (id, field, value) => {
+    const scrollPosition = window.scrollY || window.pageYOffset;
+    
     setPortfolioData(prev => ({
       ...prev,
       projects: prev.projects.map(project => 
         project.id === id ? { ...project, [field]: value } : project
       )
     }));
+    
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollPosition);
+    });
   };
 
   const handleImageSelect = (id, imageUrl) => {

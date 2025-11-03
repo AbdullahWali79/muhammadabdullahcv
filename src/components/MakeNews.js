@@ -32,19 +32,34 @@ const MakeNews = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    const scrollPosition = window.scrollY || window.pageYOffset;
+    
     setNewsData(prev => ({
       ...prev,
       [name]: value
     }));
+    
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollPosition);
+      if (e.target && document.activeElement !== e.target) {
+        e.target.focus();
+      }
+    });
   };
 
   const handleArticleChange = (id, field, value) => {
+    const scrollPosition = window.scrollY || window.pageYOffset;
+    
     setNewsData(prev => ({
       ...prev,
       articles: prev.articles.map(article => 
         article.id === id ? { ...article, [field]: value } : article
       )
     }));
+    
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollPosition);
+    });
   };
 
   const handleImageSelect = (id, imageUrl) => {

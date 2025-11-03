@@ -29,13 +29,24 @@ const MakeContact = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    const scrollPosition = window.scrollY || window.pageYOffset;
+    
     setContactData(prev => ({
       ...prev,
       [name]: value
     }));
+    
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollPosition);
+      if (e.target && document.activeElement !== e.target) {
+        e.target.focus();
+      }
+    });
   };
 
   const handleContactInfoChange = (field, value) => {
+    const scrollPosition = window.scrollY || window.pageYOffset;
+    
     setContactData(prev => ({
       ...prev,
       contactInfo: {
@@ -43,15 +54,25 @@ const MakeContact = () => {
         [field]: value
       }
     }));
+    
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollPosition);
+    });
   };
 
   const handleSocialLinkChange = (index, field, value) => {
+    const scrollPosition = window.scrollY || window.pageYOffset;
+    
     setContactData(prev => ({
       ...prev,
       socialLinks: prev.socialLinks.map((link, i) => 
         i === index ? { ...link, [field]: value } : link
       )
     }));
+    
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollPosition);
+    });
   };
 
   const addSocialLink = () => {

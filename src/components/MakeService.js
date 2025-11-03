@@ -85,19 +85,34 @@ const MakeService = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    const scrollPosition = window.scrollY || window.pageYOffset;
+    
     setServiceData(prev => ({
       ...prev,
       [name]: value
     }));
+    
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollPosition);
+      if (e.target && document.activeElement !== e.target) {
+        e.target.focus();
+      }
+    });
   };
 
   const handleServiceChange = (id, field, value) => {
+    const scrollPosition = window.scrollY || window.pageYOffset;
+    
     setServiceData(prev => ({
       ...prev,
       services: prev.services.map(service => 
         service.id === id ? { ...service, [field]: value } : service
       )
     }));
+    
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollPosition);
+    });
   };
 
   const addService = () => {

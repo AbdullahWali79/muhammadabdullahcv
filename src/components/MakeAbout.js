@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PasswordProtection from './PasswordProtection';
 import { FaSave, FaEye, FaEdit } from 'react-icons/fa';
 import { saveAboutData, getAboutData } from '../services/supabaseService';
@@ -16,6 +16,9 @@ const MakeAbout = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const messageTimeoutRef = useRef(null);
+  const activeInputRef = useRef(null);
+  const scrollPositionRef = useRef(0);
 
   // Load data from database on component mount
   useEffect(() => {
@@ -44,25 +47,74 @@ const MakeAbout = () => {
     loadData();
   }, []);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (messageTimeoutRef.current) {
+        clearTimeout(messageTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Save current focus and scroll position
+    activeInputRef.current = e.target;
+    scrollPositionRef.current = window.scrollY || window.pageYOffset;
+    
     setAboutData(prev => ({
       ...prev,
       [name]: value
     }));
-    // Clear any previous error messages when user starts typing
+    
+    // Clear error messages only if they exist, using timeout to prevent immediate re-render
     if (message && message.includes('Error')) {
-      setMessage('');
+      // Clear previous timeout if exists
+      if (messageTimeoutRef.current) {
+        clearTimeout(messageTimeoutRef.current);
+      }
+      // Set message to empty after a small delay to avoid layout shift during typing
+      messageTimeoutRef.current = setTimeout(() => {
+        setMessage('');
+        messageTimeoutRef.current = null;
+      }, 100);
     }
+    
+    // Restore scroll position after state update
+    requestAnimationFrame(() => {
+      if (scrollPositionRef.current !== undefined) {
+        window.scrollTo(0, scrollPositionRef.current);
+      }
+      // Restore focus if it was lost
+      if (activeInputRef.current && document.activeElement !== activeInputRef.current) {
+        activeInputRef.current.focus();
+        // For textarea, restore cursor position
+        if (activeInputRef.current.tagName === 'TEXTAREA' || activeInputRef.current.tagName === 'INPUT') {
+          const len = activeInputRef.current.value.length;
+          activeInputRef.current.setSelectionRange(len, len);
+        }
+      }
+    });
   };
 
   const handleSkillChange = (index, value) => {
+    // Save scroll position
+    scrollPositionRef.current = window.scrollY || window.pageYOffset;
+    
     const newSkills = [...aboutData.skills];
     newSkills[index] = value;
     setAboutData(prev => ({
       ...prev,
       skills: newSkills
     }));
+    
+    // Restore scroll position
+    requestAnimationFrame(() => {
+      if (scrollPositionRef.current !== undefined) {
+        window.scrollTo(0, scrollPositionRef.current);
+      }
+    });
   };
 
   const addSkill = () => {
@@ -123,11 +175,19 @@ const MakeAbout = () => {
           </button>
         </div>
       </div>
-      {message && (
-        <div className={`message ${message.includes('Error') || message.includes('error') ? 'error' : 'success'}`} style={{ whiteSpace: 'pre-line' }}>
-          {message}
-        </div>
-      )}
+      <div 
+        className={`message ${message.includes('Error') || message.includes('error') ? 'error' : 'success'}`} 
+        style={{ 
+          whiteSpace: 'pre-line',
+          minHeight: message ? 'auto' : '0px',
+          padding: message ? '15px 20px' : '0px',
+          marginBottom: message ? '20px' : '0px',
+          overflow: 'hidden',
+          transition: 'all 0.2s ease'
+        }}
+      >
+        {message}
+      </div>
       {loading && <div className="loading">Loading data...</div>}
 
       <div className="editor-content">
