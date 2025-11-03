@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PasswordProtection from './PasswordProtection';
 import GitHubImagePicker from './GitHubImagePicker';
 import { FaSave, FaEye, FaPlus, FaTrash } from 'react-icons/fa';
+import { savePortfolioData, getPortfolioData } from '../services/supabaseService';
 import './MakePortfolio.css';
 
 const MakePortfolio = () => {
@@ -29,6 +30,53 @@ const MakePortfolio = () => {
       }
     ]
   });
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState('');
+
+  // Load data from database on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const result = await getPortfolioData();
+        if (result.success && result.data) {
+          const defaultProjects = [
+            {
+              id: 1,
+              title: 'E-commerce Website',
+              description: 'A modern e-commerce platform with advanced features',
+              image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
+              category: 'Web Development',
+              link: '#',
+              technologies: ['React', 'Node.js', 'MongoDB']
+            },
+            {
+              id: 2,
+              title: 'Mobile App Design',
+              description: 'UI/UX design for a fitness tracking mobile app',
+              image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
+              category: 'UI/UX Design',
+              link: '#',
+              technologies: ['Figma', 'Adobe XD', 'Sketch']
+            }
+          ];
+          setPortfolioData({
+            title: result.data.title || 'My Portfolio',
+            subtitle: result.data.subtitle || 'Recent work and projects',
+            projects: result.data.projects || defaultProjects
+          });
+        }
+      } catch (error) {
+        console.error('Error loading portfolio data:', error);
+        setMessage('Error loading data. Using defaults.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -74,8 +122,23 @@ const MakePortfolio = () => {
     }));
   };
 
-  const handleSave = () => {
-    alert('Portfolio page data saved successfully!');
+  const handleSave = async () => {
+    setSaving(true);
+    setMessage('');
+    try {
+      const result = await savePortfolioData(portfolioData);
+      if (result.success) {
+        setMessage('Portfolio page data saved successfully!');
+      } else {
+        setMessage(`Error: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error saving portfolio data:', error);
+      setMessage(`Error saving data: ${error.message}`);
+    } finally {
+      setSaving(false);
+      setTimeout(() => setMessage(''), 3000);
+    }
   };
 
   const PortfolioEditor = () => (
@@ -83,14 +146,24 @@ const MakePortfolio = () => {
       <div className="editor-header">
         <h1>Edit Portfolio Page</h1>
         <div className="editor-actions">
-          <button className="btn btn-secondary" onClick={handleSave}>
-            <FaSave /> Save Changes
+          <button 
+            className="btn btn-secondary" 
+            onClick={handleSave}
+            disabled={saving || loading}
+          >
+            <FaSave /> {saving ? 'Saving...' : 'Save Changes'}
           </button>
           <button className="btn btn-primary">
             <FaEye /> Preview
           </button>
         </div>
       </div>
+      {message && (
+        <div className={`message ${message.includes('Error') ? 'error' : 'success'}`}>
+          {message}
+        </div>
+      )}
+      {loading && <div className="loading">Loading data...</div>}
 
       <div className="editor-content">
         <div className="form-section">

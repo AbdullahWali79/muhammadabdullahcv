@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PasswordProtection from './PasswordProtection';
 import { FaSave, FaEye, FaEdit } from 'react-icons/fa';
+import { saveAboutData, getAboutData } from '../services/supabaseService';
 import './MakeAbout.css';
 
 const MakeAbout = () => {
@@ -12,6 +13,36 @@ const MakeAbout = () => {
     experience: '5+ Years',
     projects: '50+ Completed'
   });
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState('');
+
+  // Load data from database on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const result = await getAboutData();
+        if (result.success && result.data) {
+          setAboutData({
+            title: result.data.title || 'About Me',
+            subtitle: result.data.subtitle || 'Get to know me better',
+            description: result.data.description || '',
+            skills: result.data.skills || ['UI/UX Design', 'Web Development', 'Mobile Design', 'Branding'],
+            experience: result.data.experience || '5+ Years',
+            projects: result.data.projects || '50+ Completed'
+          });
+        }
+      } catch (error) {
+        console.error('Error loading about data:', error);
+        setMessage('Error loading data. Using defaults.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -44,8 +75,23 @@ const MakeAbout = () => {
     }));
   };
 
-  const handleSave = () => {
-    alert('About page data saved successfully!');
+  const handleSave = async () => {
+    setSaving(true);
+    setMessage('');
+    try {
+      const result = await saveAboutData(aboutData);
+      if (result.success) {
+        setMessage('About page data saved successfully!');
+      } else {
+        setMessage(`Error: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error saving about data:', error);
+      setMessage(`Error saving data: ${error.message}`);
+    } finally {
+      setSaving(false);
+      setTimeout(() => setMessage(''), 3000);
+    }
   };
 
   const AboutEditor = () => (
@@ -53,14 +99,24 @@ const MakeAbout = () => {
       <div className="editor-header">
         <h1>Edit About Page</h1>
         <div className="editor-actions">
-          <button className="btn btn-secondary" onClick={handleSave}>
-            <FaSave /> Save Changes
+          <button 
+            className="btn btn-secondary" 
+            onClick={handleSave}
+            disabled={saving || loading}
+          >
+            <FaSave /> {saving ? 'Saving...' : 'Save Changes'}
           </button>
           <button className="btn btn-primary">
             <FaEye /> Preview
           </button>
         </div>
       </div>
+      {message && (
+        <div className={`message ${message.includes('Error') ? 'error' : 'success'}`}>
+          {message}
+        </div>
+      )}
+      {loading && <div className="loading">Loading data...</div>}
 
       <div className="editor-content">
         <div className="form-section">

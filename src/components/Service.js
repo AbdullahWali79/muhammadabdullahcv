@@ -1,9 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaPalette, FaCode, FaMobile, FaSearch, FaRocket, FaUsers } from 'react-icons/fa';
+import { getServiceData } from '../services/supabaseService';
 import './Service.css';
 
 const Service = () => {
-  const services = [
+  const [serviceData, setServiceData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadServiceData = async () => {
+      try {
+        const result = await getServiceData();
+        if (result.success && result.data) {
+          setServiceData(result.data);
+        }
+      } catch (error) {
+        console.error('Error loading service data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadServiceData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="service">
+        <div className="service-container">
+          <div className="loading">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  const displayTitle = serviceData?.title || 'My Services';
+  const displaySubtitle = serviceData?.subtitle || 'Comprehensive solutions for your digital needs';
+  const services = serviceData?.services || [];
+
+  // Default services if none found
+  const defaultServices = [
     {
       icon: FaPalette,
       title: 'UI/UX Design',
@@ -21,50 +57,58 @@ const Service = () => {
       title: 'Mobile App Design',
       description: 'Designing mobile applications that are both functional and visually appealing across all devices.',
       features: ['iOS Design', 'Android Design', 'Cross-platform', 'App Store Optimization']
-    },
-    {
-      icon: FaSearch,
-      title: 'User Research',
-      description: 'Conducting thorough research to understand user needs and improve product usability.',
-      features: ['User Interviews', 'Usability Testing', 'Analytics', 'Persona Development']
-    },
-    {
-      icon: FaRocket,
-      title: 'Product Strategy',
-      description: 'Developing comprehensive strategies to bring your product vision to life successfully.',
-      features: ['Product Planning', 'Roadmap Development', 'Feature Prioritization', 'Market Analysis']
-    },
-    {
-      icon: FaUsers,
-      title: 'Consulting',
-      description: 'Providing expert advice and guidance to help your business grow and succeed.',
-      features: ['Strategic Planning', 'Process Improvement', 'Team Training', 'Best Practices']
     }
   ];
+
+  const iconMap = {
+    '🎨': FaPalette,
+    '💻': FaCode,
+    '📱': FaMobile,
+    '🔍': FaSearch,
+    '🚀': FaRocket,
+    '👥': FaUsers,
+    '⭐': FaRocket,
+    '💡': FaCode
+  };
+
+  const displayServices = services.length > 0 
+    ? services.map(service => ({
+        ...service,
+        icon: typeof service.icon === 'string' 
+          ? (iconMap[service.icon] || FaCode)
+          : service.icon || FaCode,
+        features: service.features || []
+      }))
+    : defaultServices;
 
   return (
     <div className="service">
       <div className="service-container">
         <div className="service-header">
-          <h1>My Services</h1>
-          <p>Comprehensive solutions for your digital needs</p>
+          <h1>{displayTitle}</h1>
+          <p>{displaySubtitle}</p>
         </div>
         
         <div className="services-grid">
-          {services.map((service, index) => {
+          {displayServices.map((service, index) => {
             const IconComponent = service.icon;
             return (
-              <div key={index} className="service-card">
+              <div key={service.id || index} className="service-card">
                 <div className="service-icon">
                   <IconComponent />
                 </div>
                 <h3 className="service-title">{service.title}</h3>
                 <p className="service-description">{service.description}</p>
-                <ul className="service-features">
-                  {service.features.map((feature, featureIndex) => (
-                    <li key={featureIndex}>{feature}</li>
-                  ))}
-                </ul>
+                {service.price && (
+                  <div className="service-price">{service.price}</div>
+                )}
+                {service.features && service.features.length > 0 && (
+                  <ul className="service-features">
+                    {service.features.map((feature, featureIndex) => (
+                      <li key={featureIndex}>{feature}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
             );
           })}

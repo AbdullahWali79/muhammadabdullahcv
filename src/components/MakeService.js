@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PasswordProtection from './PasswordProtection';
 import { FaSave, FaEye, FaPlus, FaTrash } from 'react-icons/fa';
+import { saveServiceData, getServiceData } from '../services/supabaseService';
 import './MakeService.css';
 
 const MakeService = () => {
@@ -31,6 +32,56 @@ const MakeService = () => {
       }
     ]
   });
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState('');
+
+  // Load data from database on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const result = await getServiceData();
+        if (result.success && result.data) {
+          const defaultServices = [
+            {
+              id: 1,
+              title: 'UI/UX Design',
+              description: 'Creating beautiful and functional user interfaces',
+              icon: '🎨',
+              price: '$50/hour'
+            },
+            {
+              id: 2,
+              title: 'Web Development',
+              description: 'Building responsive and modern websites',
+              icon: '💻',
+              price: '$60/hour'
+            },
+            {
+              id: 3,
+              title: 'Mobile App Design',
+              description: 'Designing mobile applications for iOS and Android',
+              icon: '📱',
+              price: '$55/hour'
+            }
+          ];
+          setServiceData({
+            title: result.data.title || 'My Services',
+            subtitle: result.data.subtitle || 'What I can do for you',
+            services: result.data.services || defaultServices
+          });
+        }
+      } catch (error) {
+        console.error('Error loading service data:', error);
+        setMessage('Error loading data. Using defaults.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -70,8 +121,23 @@ const MakeService = () => {
     }));
   };
 
-  const handleSave = () => {
-    alert('Service page data saved successfully!');
+  const handleSave = async () => {
+    setSaving(true);
+    setMessage('');
+    try {
+      const result = await saveServiceData(serviceData);
+      if (result.success) {
+        setMessage('Service page data saved successfully!');
+      } else {
+        setMessage(`Error: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error saving service data:', error);
+      setMessage(`Error saving data: ${error.message}`);
+    } finally {
+      setSaving(false);
+      setTimeout(() => setMessage(''), 3000);
+    }
   };
 
   const ServiceEditor = () => (
@@ -79,14 +145,24 @@ const MakeService = () => {
       <div className="editor-header">
         <h1>Edit Service Page</h1>
         <div className="editor-actions">
-          <button className="btn btn-secondary" onClick={handleSave}>
-            <FaSave /> Save Changes
+          <button 
+            className="btn btn-secondary" 
+            onClick={handleSave}
+            disabled={saving || loading}
+          >
+            <FaSave /> {saving ? 'Saving...' : 'Save Changes'}
           </button>
           <button className="btn btn-primary">
             <FaEye /> Preview
           </button>
         </div>
       </div>
+      {message && (
+        <div className={`message ${message.includes('Error') ? 'error' : 'success'}`}>
+          {message}
+        </div>
+      )}
+      {loading && <div className="loading">Loading data...</div>}
 
       <div className="editor-content">
         <div className="form-section">

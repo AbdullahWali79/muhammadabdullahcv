@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaExternalLinkAlt, FaGithub } from 'react-icons/fa';
+import { getPortfolioData } from '../services/supabaseService';
 import './Portfolio.css';
 
 const Portfolio = () => {
   const [activeFilter, setActiveFilter] = useState('All');
+  const [portfolioData, setPortfolioData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const handleViewLive = (projectId, e) => {
@@ -19,6 +22,23 @@ const Portfolio = () => {
     window.open(githubUrl, '_blank');
   };
 
+  useEffect(() => {
+    const loadPortfolioData = async () => {
+      try {
+        const result = await getPortfolioData();
+        if (result.success && result.data) {
+          setPortfolioData(result.data);
+        }
+      } catch (error) {
+        console.error('Error loading portfolio data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPortfolioData();
+  }, []);
+
   const handleStartProject = () => {
     const phoneNumber = '+923046983794';
     const message = 'Hi! I\'m interested in starting a project with you. Let\'s discuss the details.';
@@ -26,7 +46,19 @@ const Portfolio = () => {
     window.open(whatsappUrl, '_blank');
   };
 
-  const projects = [
+  if (loading) {
+    return (
+      <div className="portfolio">
+        <div className="portfolio-container">
+          <div className="loading">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  const displayTitle = portfolioData?.title || 'My Portfolio';
+  const displaySubtitle = portfolioData?.subtitle || 'Showcasing my latest work and projects';
+  const projects = portfolioData?.projects || [
     {
       id: 1,
       title: 'E-Commerce Platform',
@@ -89,7 +121,9 @@ const Portfolio = () => {
     }
   ];
 
-  const categories = ['All', 'Web Design', 'Mobile Design', 'UI/UX'];
+  // Extract unique categories from projects
+  const allCategories = ['All', ...new Set(projects.map(p => p.category).filter(Boolean))];
+  const categories = allCategories.length > 1 ? allCategories : ['All', 'Web Design', 'Mobile Design', 'UI/UX'];
 
   // Filter projects based on active filter
   const filteredProjects = activeFilter === 'All' 
@@ -104,8 +138,8 @@ const Portfolio = () => {
     <div className="portfolio">
       <div className="portfolio-container">
         <div className="portfolio-header">
-          <h1>My Portfolio</h1>
-          <p>Showcasing my latest work and projects</p>
+          <h1>{displayTitle}</h1>
+          <p>{displaySubtitle}</p>
         </div>
         
         <div className="portfolio-filters">
@@ -125,7 +159,7 @@ const Portfolio = () => {
             <div key={project.id} className="portfolio-item">
               <div className="portfolio-image">
                 <img 
-                  src="https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg" 
+                  src={project.image || "https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg"} 
                   alt={project.title}
                   className="portfolio-img"
                 />
@@ -139,14 +173,16 @@ const Portfolio = () => {
                       <FaExternalLinkAlt />
                       <span>Live</span>
                     </button>
-                    <button 
-                      className="action-btn" 
-                      title="View Code"
-                      onClick={(e) => handleViewCode(project.githubUrl, e)}
-                    >
-                      <FaGithub />
-                      <span>Code</span>
-                    </button>
+                    {(project.githubUrl || project.link) && (
+                      <button 
+                        className="action-btn" 
+                        title="View Code"
+                        onClick={(e) => handleViewCode(project.githubUrl || project.link, e)}
+                      >
+                        <FaGithub />
+                        <span>Code</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
