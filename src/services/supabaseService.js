@@ -67,12 +67,48 @@ export const getHomeData = async () => {
 export const saveAboutData = async (aboutData) => {
   try {
     console.log('Saving about data:', aboutData);
-    const dataToSave = { id: 1, ...aboutData };
-    console.log('Data to save:', dataToSave);
     
     // Validate Supabase client
     if (!supabase) {
       throw new Error('Supabase client is not initialized. Please check your configuration.');
+    }
+    
+    // Sanitize and prepare data - ensure description is properly formatted
+    const dataToSave = { 
+      id: 1, 
+      ...aboutData,
+      // Ensure description is a string and trim excessive whitespace
+      description: typeof aboutData.description === 'string' 
+        ? aboutData.description.trim() 
+        : String(aboutData.description || '').trim()
+    };
+    
+    console.log('Data to save:', dataToSave);
+    
+    // Test connection first with a simple query
+    try {
+      const { error: testError } = await supabase
+        .from(TABLES.ABOUT_DATA)
+        .select('id')
+        .eq('id', 1)
+        .limit(1);
+      
+      if (testError && testError.code !== 'PGRST116') {
+        console.error('Connection test failed:', testError);
+        // If connection test fails, provide specific error
+        if (testError.code === '42P01') {
+          throw new Error('Table "about_data" does not exist. Please run the SQL schema in Supabase SQL Editor to create the table.');
+        }
+        if (testError.code === 'PGRST301') {
+          throw new Error('Permission denied: Please check Row Level Security (RLS) policies in Supabase. Make sure SELECT, INSERT and UPDATE policies are enabled for the about_data table.');
+        }
+      }
+    } catch (testErr) {
+      // If it's already a formatted error, re-throw it
+      if (testErr.message?.includes('does not exist') || testErr.message?.includes('Permission denied')) {
+        throw testErr;
+      }
+      // Otherwise continue with the save attempt
     }
     
     const { data, error } = await supabase
@@ -98,15 +134,22 @@ export const saveAboutData = async (aboutData) => {
     // Provide more helpful error messages
     let errorMessage = error.message || 'Unknown error occurred';
     
+    // Check for network/connection errors
     if (error.message?.includes('Failed to fetch') || 
         error.message?.includes('NetworkError') ||
         error.message?.includes('network') ||
-        error.name === 'TypeError') {
-      errorMessage = 'Network error: Please check your internet connection and Supabase configuration. Verify that:\n1. Your internet is working\n2. Supabase project is active\n3. API key is correct\n4. Table "about_data" exists in your database';
-    } else if (error.code === 'PGRST301' || error.message?.includes('permission')) {
+        error.message?.includes('fetch') ||
+        error.name === 'TypeError' ||
+        (error.name === 'TypeError' && error.message?.includes('fetch'))) {
+      errorMessage = 'Network error: Please check your internet connection and Supabase configuration. Verify that:\n1. Your internet is working\n2. Supabase project is active (not paused)\n3. API key is correct\n4. Table "about_data" exists in your database\n5. Check browser console for more details';
+    } else if (error.code === 'PGRST301' || error.message?.includes('permission') || error.message?.includes('Permission denied')) {
       errorMessage = 'Permission denied: Please check Row Level Security (RLS) policies in Supabase. Make sure INSERT and UPDATE policies are enabled for the about_data table.';
-    } else if (error.code === '42P01') {
-      errorMessage = 'Table not found: The "about_data" table does not exist. Please run the SQL schema to create the table.';
+    } else if (error.code === '42P01' || error.message?.includes('does not exist')) {
+      errorMessage = 'Table not found: The "about_data" table does not exist. Please run the SQL schema in Supabase SQL Editor to create the table.';
+    } else if (error.code === '23514' || error.message?.includes('violates check constraint')) {
+      errorMessage = 'Data validation error: The data you entered does not meet the database constraints. Please check your input.';
+    } else if (error.code === '22001' || error.message?.includes('value too long')) {
+      errorMessage = 'Data too long: The description is too long. Please shorten it or check database column size limits.';
     }
     
     return { success: false, error: errorMessage }

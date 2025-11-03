@@ -50,6 +50,10 @@ const MakeAbout = () => {
       ...prev,
       [name]: value
     }));
+    // Clear any previous error messages when user starts typing
+    if (message && message.includes('Error')) {
+      setMessage('');
+    }
   };
 
   const handleSkillChange = (index, value) => {
@@ -79,18 +83,26 @@ const MakeAbout = () => {
     setSaving(true);
     setMessage('');
     try {
+      // Validate description length (warn if very long but allow it)
+      if (aboutData.description && aboutData.description.length > 50000) {
+        setMessage('Warning: Description is very long. This may cause issues.');
+      }
+      
       const result = await saveAboutData(aboutData);
       if (result.success) {
         setMessage('About page data saved successfully!');
+        setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage(`Error: ${result.error}`);
+        // Keep error message longer so user can read it
+        setTimeout(() => setMessage(''), 8000);
       }
     } catch (error) {
       console.error('Error saving about data:', error);
       setMessage(`Error saving data: ${error.message}`);
+      setTimeout(() => setMessage(''), 8000);
     } finally {
       setSaving(false);
-      setTimeout(() => setMessage(''), 3000);
     }
   };
 

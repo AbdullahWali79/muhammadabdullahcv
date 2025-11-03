@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS user_data (
   first_name VARCHAR(100),
   last_name VARCHAR(100),
   title VARCHAR(200),
-  date_of_birth VARCHAR(50),
+  date_of_birth VARCHAR(50),                                                        
   nationality VARCHAR(100),
   phone VARCHAR(20),
   email VARCHAR(100),
