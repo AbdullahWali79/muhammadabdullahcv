@@ -66,11 +66,20 @@ export const getHomeData = async () => {
 // About Data
 export const saveAboutData = async (aboutData) => {
   try {
+    console.log('Saving about data:', aboutData);
+    const dataToSave = { id: 1, ...aboutData };
+    console.log('Data to save:', dataToSave);
+    
     const { data, error } = await supabase
       .from(TABLES.ABOUT_DATA)
-      .upsert([{ id: 1, ...aboutData }], { onConflict: 'id' })
+      .upsert([dataToSave], { onConflict: 'id' })
     
-    if (error) throw error
+    if (error) {
+      console.error('Supabase error saving about data:', error);
+      throw error;
+    }
+    
+    console.log('About data saved successfully:', data);
     return { success: true, data }
   } catch (error) {
     console.error('Error saving about data:', error)
@@ -80,13 +89,23 @@ export const saveAboutData = async (aboutData) => {
 
 export const getAboutData = async () => {
   try {
+    console.log('Fetching about data from table:', TABLES.ABOUT_DATA);
     const { data, error } = await supabase
       .from(TABLES.ABOUT_DATA)
       .select('*')
       .eq('id', 1)
       .single()
     
-    if (error && error.code !== 'PGRST116') throw error
+    if (error) {
+      // PGRST116 means no rows found, which is okay
+      if (error.code === 'PGRST116') {
+        console.log('No about data found in database (this is okay for first time)');
+        return { success: true, data: null }
+      }
+      throw error
+    }
+    
+    console.log('About data fetched successfully:', data);
     return { success: true, data: data || null }
   } catch (error) {
     console.error('Error fetching about data:', error)

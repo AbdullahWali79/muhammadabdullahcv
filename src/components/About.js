@@ -10,8 +10,12 @@ const About = ({ userData }) => {
     const loadAboutData = async () => {
       try {
         const result = await getAboutData();
+        console.log('About data fetch result:', result);
         if (result.success && result.data) {
+          console.log('Setting about data:', result.data);
           setAboutData(result.data);
+        } else {
+          console.log('No about data found in database, using defaults');
         }
       } catch (error) {
         console.error('Error loading about data:', error);
@@ -40,6 +44,14 @@ const About = ({ userData }) => {
   const displayExperience = aboutData?.experience || '';
   const displayProjects = aboutData?.projects || '';
 
+  // Default skills if none from database
+  const defaultSkills = displaySkills.length > 0 ? displaySkills : [
+    'UI/UX Design',
+    'Web Development',
+    'Mobile Design',
+    'User Research'
+  ];
+
   return (
     <div className="about">
       <div className="about-container">
@@ -53,14 +65,18 @@ const About = ({ userData }) => {
             <h2>Hello, I'm {userData.firstName} {userData.lastName}</h2>
             <p className="about-summary">{userData.summary}</p>
             
-            {displayDescription && (
+            {displayDescription ? (
               <div className="detail-item">
                 <p>{displayDescription}</p>
+              </div>
+            ) : (
+              <div className="detail-item">
+                <p>With years of experience in the industry, I have developed a strong foundation in design principles and user experience. My journey has been marked by continuous learning and adaptation to new technologies and design trends.</p>
               </div>
             )}
             
             <div className="about-details">
-              {(displayExperience || displayProjects) && (
+              {(displayExperience || displayProjects) ? (
                 <div className="detail-item">
                   <h3>Statistics</h3>
                   <div className="stats-row">
@@ -78,23 +94,31 @@ const About = ({ userData }) => {
                     )}
                   </div>
                 </div>
-              )}
-              
-              {displaySkills && displaySkills.length > 0 && (
+              ) : (
                 <div className="detail-item">
-                  <h3>Skills & Expertise</h3>
-                  <div className="skills-grid">
-                    {displaySkills.map((skill, index) => (
-                      <div key={index} className="skill-item">
-                        <span className="skill-name">{skill}</span>
-                        <div className="skill-bar">
-                          <div className="skill-progress" style={{width: `${Math.min(90, 70 + index * 5)}%`}}></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <h3>Professional Experience</h3>
+                  <p>With years of experience in the industry, I have developed a strong foundation in design principles and user experience. My journey has been marked by continuous learning and adaptation to new technologies and design trends.</p>
                 </div>
               )}
+              
+              <div className="detail-item">
+                <h3>Skills & Expertise</h3>
+                <div className="skills-grid">
+                  {defaultSkills.map((skill, index) => (
+                    <div key={index} className="skill-item">
+                      <span className="skill-name">{skill}</span>
+                      <div className="skill-bar">
+                        <div className="skill-progress" style={{width: `${Math.min(90, 70 + index * 5)}%`}}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="detail-item">
+                <h3>Personal Interests</h3>
+                <p>When I'm not designing, I enjoy exploring new technologies, reading about design trends, and spending time with my family. I believe in maintaining a healthy work-life balance and continuously improving my skills.</p>
+              </div>
             </div>
           </div>
           
