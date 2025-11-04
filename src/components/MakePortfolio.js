@@ -95,8 +95,14 @@ const MakePortfolio = () => {
     });
   };
 
-  const handleProjectChange = (id, field, value) => {
+  const handleProjectChange = (id, field, value, event) => {
     const scrollPosition = window.scrollY || window.pageYOffset;
+    const inputElement = event?.target;
+    let cursorPosition = null;
+    
+    if (inputElement && (inputElement.tagName === 'INPUT' || inputElement.tagName === 'TEXTAREA')) {
+      cursorPosition = inputElement.selectionStart || value.length;
+    }
     
     setPortfolioData(prev => ({
       ...prev,
@@ -107,6 +113,15 @@ const MakePortfolio = () => {
     
     requestAnimationFrame(() => {
       window.scrollTo(0, scrollPosition);
+      if (inputElement) {
+        if (document.activeElement !== inputElement) {
+          inputElement.focus();
+        }
+        if (cursorPosition !== null && (inputElement.tagName === 'INPUT' || inputElement.tagName === 'TEXTAREA')) {
+          const safeCursorPos = Math.min(cursorPosition, value.length);
+          inputElement.setSelectionRange(safeCursorPos, safeCursorPos);
+        }
+      }
     });
   };
 
@@ -119,6 +134,7 @@ const MakePortfolio = () => {
       id: Date.now(),
       title: 'New Project',
       description: 'Project description',
+      fullDescription: '', // Add fullDescription field
       image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
       category: 'Category',
       link: '#',
@@ -226,7 +242,7 @@ const MakePortfolio = () => {
                   <input
                     type="text"
                     value={project.title}
-                    onChange={(e) => handleProjectChange(project.id, 'title', e.target.value)}
+                    onChange={(e) => handleProjectChange(project.id, 'title', e.target.value, e)}
                     className="form-input"
                   />
                 </div>
@@ -235,7 +251,7 @@ const MakePortfolio = () => {
                   <input
                     type="text"
                     value={project.category}
-                    onChange={(e) => handleProjectChange(project.id, 'category', e.target.value)}
+                    onChange={(e) => handleProjectChange(project.id, 'category', e.target.value, e)}
                     className="form-input"
                   />
                 </div>
@@ -244,30 +260,44 @@ const MakePortfolio = () => {
                   <input
                     type="text"
                     value={project.link}
-                    onChange={(e) => handleProjectChange(project.id, 'link', e.target.value)}
+                    onChange={(e) => handleProjectChange(project.id, 'link', e.target.value, e)}
                     className="form-input"
                   />
                 </div>
               </div>
               
               <div className="form-group">
-                <label>Description</label>
+                <label>Short Description (for card view)</label>
                 <textarea
                   value={project.description}
-                  onChange={(e) => handleProjectChange(project.id, 'description', e.target.value)}
+                  onChange={(e) => handleProjectChange(project.id, 'description', e.target.value, e)}
                   rows="2"
                   className="form-textarea"
                 />
               </div>
               
               <div className="form-group">
-                <label>Technologies (comma separated)</label>
-                <input
-                  type="text"
-                  value={project.technologies.join(', ')}
-                  onChange={(e) => handleProjectChange(project.id, 'technologies', e.target.value.split(', '))}
-                  className="form-input"
+                <label>Full Description / Blog (for detail page)</label>
+                <textarea
+                  value={project.fullDescription || ''}
+                  onChange={(e) => handleProjectChange(project.id, 'fullDescription', e.target.value, e)}
+                  rows="8"
+                  className="form-textarea"
+                  placeholder="Enter complete project description, blog content, or detailed information that will display on the project detail page..."
                 />
+                <small style={{ color: '#B0B0B0', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                  This full description will be displayed on the project detail page when users click on a project.
+                </small>
+              </div>
+              
+              <div className="form-group">
+                <label>Technologies (comma separated)</label>
+                  <input
+                    type="text"
+                    value={project.technologies.join(', ')}
+                    onChange={(e) => handleProjectChange(project.id, 'technologies', e.target.value.split(', ').filter(t => t.trim()), e)}
+                    className="form-input"
+                  />
               </div>
               
               <div className="form-group">
