@@ -106,7 +106,6 @@ const PortfolioDetail = () => {
           <div className="project-header">
             <div className="project-category">{projectData.category}</div>
             <h1 className="project-title">{projectData.title}</h1>
-            <p className="project-description">{projectData.description}</p>
             
             {(projectData.startDate !== 'N/A' || projectData.role !== 'Developer' || projectData.status !== 'In Progress') && (
               <div className="project-meta">
