@@ -1,7 +1,35 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-export const generatePDF = (userData) => {
+// Helper function to get icon for skill
+const getSkillIcon = (skill) => {
+  const skillLower = skill.toLowerCase();
+  if (skillLower.includes('design') || skillLower.includes('ui') || skillLower.includes('ux')) {
+    return '🎨';
+  } else if (skillLower.includes('web') || skillLower.includes('frontend') || skillLower.includes('html') || skillLower.includes('css')) {
+    return '🌐';
+  } else if (skillLower.includes('mobile') || skillLower.includes('app')) {
+    return '📱';
+  } else if (skillLower.includes('react') || skillLower.includes('javascript') || skillLower.includes('js')) {
+    return '⚛️';
+  } else if (skillLower.includes('node') || skillLower.includes('backend') || skillLower.includes('api')) {
+    return '⚙️';
+  } else if (skillLower.includes('database') || skillLower.includes('sql') || skillLower.includes('mongodb')) {
+    return '💾';
+  } else if (skillLower.includes('python') || skillLower.includes('java') || skillLower.includes('c++')) {
+    return '💻';
+  } else if (skillLower.includes('git') || skillLower.includes('github')) {
+    return '🔧';
+  } else if (skillLower.includes('cloud') || skillLower.includes('aws') || skillLower.includes('azure')) {
+    return '☁️';
+  } else if (skillLower.includes('ai') || skillLower.includes('machine learning') || skillLower.includes('ml')) {
+    return '🤖';
+  } else {
+    return '⭐';
+  }
+};
+
+export const generatePDF = async (userData, portfolioData = null, aboutData = null) => {
   // Create a temporary div to hold the CV content
   const cvContent = document.createElement('div');
   cvContent.style.cssText = `
@@ -16,20 +44,74 @@ export const generatePDF = (userData) => {
     left: -9999px;
   `;
 
+  // Prepare portfolio HTML
+  const portfolioProjects = portfolioData?.projects || [];
+  const portfolioHTML = portfolioProjects.length > 0 ? `
+    <div style="margin-bottom: 30px; page-break-inside: avoid;">
+      <h2 style="font-size: 20px; color: #00CED1; margin-bottom: 15px; border-bottom: 2px solid #00CED1; padding-bottom: 5px;">Portfolio</h2>
+      ${portfolioProjects.map((project, index) => `
+        <div style="margin-bottom: 20px; page-break-inside: avoid; border: 1px solid #3A4B4E; border-radius: 8px; padding: 15px; background: #2A3B3E;">
+          ${project.image ? `
+            <div style="margin-bottom: 10px;">
+              <img src="${project.image}" alt="${project.title || 'Project'}" style="width: 100%; max-width: 400px; height: auto; border-radius: 6px; display: block; margin: 0 auto;" onerror="this.style.display='none'" />
+            </div>
+          ` : ''}
+          <h3 style="font-size: 16px; color: #00CED1; margin-bottom: 8px; font-weight: 600;">${project.title || 'Project ' + (index + 1)}</h3>
+          ${project.description ? `<p style="font-size: 13px; color: #B0B0B0; line-height: 1.5; margin-bottom: 8px;">${project.description}</p>` : ''}
+          ${project.category ? `<p style="font-size: 12px; color: #00CED1; margin-bottom: 5px;"><strong>Category:</strong> ${project.category}</p>` : ''}
+          ${project.technologies && project.technologies.length > 0 ? `
+            <div style="margin-top: 8px;">
+              <p style="font-size: 12px; color: #B0B0B0; margin-bottom: 5px;"><strong>Technologies:</strong></p>
+              <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                ${project.technologies.map(tech => `
+                  <span style="background: #3A4B4E; color: #00CED1; padding: 4px 8px; border-radius: 4px; font-size: 11px;">${tech}</span>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `).join('')}
+    </div>
+  ` : '';
+
+  // Prepare skills HTML with icons
+  const skills = aboutData?.skills || [];
+  const skillsHTML = skills.length > 0 ? `
+    <div style="margin-bottom: 30px; page-break-inside: avoid;">
+      <h2 style="font-size: 20px; color: #00CED1; margin-bottom: 15px; border-bottom: 2px solid #00CED1; padding-bottom: 5px;">Skills & Expertise</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+        ${skills.map((skill, index) => `
+          <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #2A3B3E; border-radius: 6px; border: 1px solid #3A4B4E;">
+            <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #00CED1, #00B8BA); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+              ${getSkillIcon(skill)}
+            </div>
+            <span style="font-size: 14px; color: #ffffff; font-weight: 500;">${skill}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
   cvContent.innerHTML = `
     <div style="display: flex; margin-bottom: 30px;">
       <div style="flex: 1;">
         <h1 style="font-size: 36px; font-weight: 700; color: #ffffff; margin-bottom: 10px;">
-          ${userData.firstName} ${userData.lastName}
+          ${userData.firstName || ''} ${userData.lastName || ''}
         </h1>
-        <p style="font-size: 18px; color: #00CED1; margin-bottom: 20px;">${userData.title}</p>
+        <p style="font-size: 18px; color: #00CED1; margin-bottom: 20px;">${userData.title || ''}</p>
         <p style="font-size: 14px; color: #B0B0B0; line-height: 1.6;">
-          ${userData.summary}
+          ${userData.summary || ''}
         </p>
       </div>
-      <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #00CED1, #008B8B); display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; color: white; margin-left: 20px;">
-        ${userData.firstName.charAt(0)}${userData.lastName.charAt(0)}
-      </div>
+      ${userData.profileImage ? `
+        <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; margin-left: 20px; border: 3px solid #00CED1;">
+          <img src="${userData.profileImage}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.innerHTML='${userData.firstName?.charAt(0) || ''}${userData.lastName?.charAt(0) || ''}'; this.parentElement.style.background='linear-gradient(135deg, #00CED1, #008B8B)'; this.parentElement.style.display='flex'; this.parentElement.style.alignItems='center'; this.parentElement.style.justifyContent='center'; this.parentElement.style.fontSize='36px'; this.parentElement.style.fontWeight='bold'; this.parentElement.style.color='white';" />
+        </div>
+      ` : `
+        <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #00CED1, #008B8B); display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; color: white; margin-left: 20px;">
+          ${userData.firstName?.charAt(0) || ''}${userData.lastName?.charAt(0) || ''}
+        </div>
+      `}
     </div>
 
     <div style="margin-bottom: 30px;">
@@ -73,23 +155,46 @@ export const generatePDF = (userData) => {
     <div style="margin-bottom: 30px;">
       <h2 style="font-size: 20px; color: #00CED1; margin-bottom: 15px; border-bottom: 2px solid #00CED1; padding-bottom: 5px;">Professional Summary</h2>
       <p style="font-size: 14px; color: #B0B0B0; line-height: 1.6;">
-        ${userData.summary}
+        ${userData.summary || ''}
       </p>
     </div>
 
+    ${skillsHTML}
+
+    ${portfolioHTML}
+
     <div style="margin-top: 40px; text-align: center; color: #B0B0B0; font-size: 12px;">
-      © 2024 ${userData.firstName} ${userData.lastName}. All Rights Reserved.
+      © 2024 ${userData.firstName || ''} ${userData.lastName || ''}. All Rights Reserved.
     </div>
   `;
 
   document.body.appendChild(cvContent);
+
+  // Wait for images to load
+  const images = cvContent.querySelectorAll('img');
+  const imagePromises = Array.from(images).map(img => {
+    return new Promise((resolve, reject) => {
+      if (img.complete) {
+        resolve();
+      } else {
+        img.onload = resolve;
+        img.onerror = resolve; // Continue even if image fails
+        setTimeout(resolve, 3000); // Timeout after 3 seconds
+      }
+    });
+  });
+
+  // Wait for all images to load or timeout
+  await Promise.all(imagePromises);
 
   // Generate PDF
   html2canvas(cvContent, {
     backgroundColor: '#1A2B2E',
     scale: 2,
     useCORS: true,
-    allowTaint: true
+    allowTaint: true,
+    logging: false,
+    imageTimeout: 5000
   }).then(canvas => {
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');

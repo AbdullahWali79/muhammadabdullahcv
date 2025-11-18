@@ -1,14 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaDownload, FaEnvelope } from 'react-icons/fa';
 import { generatePDF } from '../utils/pdfGenerator';
+import { getPortfolioData, getAboutData } from '../services/supabaseService';
 import './Home.css';
 
 const Home = ({ userData }) => {
   const navigate = useNavigate();
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleDownloadCV = () => {
-    generatePDF(userData);
+  const handleDownloadCV = async () => {
+    setIsGenerating(true);
+    try {
+      // Fetch portfolio and skills data
+      const [portfolioResult, aboutResult] = await Promise.all([
+        getPortfolioData(),
+        getAboutData()
+      ]);
+
+      const portfolioData = portfolioResult.success ? portfolioResult.data : null;
+      const aboutData = aboutResult.success ? aboutResult.data : null;
+
+      // Generate PDF with all data
+      await generatePDF(userData, portfolioData, aboutData);
+    } catch (error) {
+      console.error('Error fetching data for PDF:', error);
+      alert('Error loading data. Generating PDF with available information...');
+      await generatePDF(userData, null, null);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleContactMe = () => {
@@ -128,9 +149,9 @@ const Home = ({ userData }) => {
         </div>
 
         <div className="action-buttons">
-          <button className="btn btn-secondary" onClick={handleDownloadCV}>
+          <button className="btn btn-secondary" onClick={handleDownloadCV} disabled={isGenerating}>
             <FaDownload className="btn-icon" />
-            Download Resume
+            {isGenerating ? 'Generating PDF...' : 'Download Resume'}
           </button>
           <button className="btn btn-primary" onClick={handleContactMe}>
             <FaEnvelope className="btn-icon" />
