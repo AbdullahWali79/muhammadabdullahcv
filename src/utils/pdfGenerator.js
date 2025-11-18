@@ -44,35 +44,29 @@ export const generatePDF = async (userData, portfolioData = null, aboutData = nu
     left: -9999px;
   `;
 
-  // Prepare portfolio HTML
+  // Prepare portfolio HTML - Professional Summary ke jagah
   const portfolioProjects = portfolioData?.projects || [];
   const portfolioHTML = portfolioProjects.length > 0 ? `
-    <div style="margin-bottom: 30px; page-break-inside: avoid;">
-      <h2 style="font-size: 20px; color: #00CED1; margin-bottom: 15px; border-bottom: 2px solid #00CED1; padding-bottom: 5px;">Portfolio</h2>
+    <div style="margin-bottom: 30px;">
+      <h2 style="font-size: 20px; color: #00CED1; margin-bottom: 20px; border-bottom: 2px solid #00CED1; padding-bottom: 5px;">Portfolio</h2>
       ${portfolioProjects.map((project, index) => `
-        <div style="margin-bottom: 20px; page-break-inside: avoid; border: 1px solid #3A4B4E; border-radius: 8px; padding: 15px; background: #2A3B3E;">
+        <div style="margin-bottom: 25px; page-break-inside: avoid; border: 1px solid #3A4B4E; border-radius: 8px; padding: 15px; background: #2A3B3E;">
           ${project.image ? `
-            <div style="margin-bottom: 10px;">
-              <img src="${project.image}" alt="${project.title || 'Project'}" style="width: 100%; max-width: 400px; height: auto; border-radius: 6px; display: block; margin: 0 auto;" onerror="this.style.display='none'" />
+            <div style="margin-bottom: 12px;">
+              <img src="${project.image}" alt="${project.title || 'Project'}" style="width: 100%; max-width: 450px; height: auto; border-radius: 6px; display: block; margin: 0 auto; border: 1px solid #3A4B4E;" onerror="this.style.display='none'" />
             </div>
           ` : ''}
-          <h3 style="font-size: 16px; color: #00CED1; margin-bottom: 8px; font-weight: 600;">${project.title || 'Project ' + (index + 1)}</h3>
-          ${project.description ? `<p style="font-size: 13px; color: #B0B0B0; line-height: 1.5; margin-bottom: 8px;">${project.description}</p>` : ''}
-          ${project.category ? `<p style="font-size: 12px; color: #00CED1; margin-bottom: 5px;"><strong>Category:</strong> ${project.category}</p>` : ''}
-          ${project.technologies && project.technologies.length > 0 ? `
-            <div style="margin-top: 8px;">
-              <p style="font-size: 12px; color: #B0B0B0; margin-bottom: 5px;"><strong>Technologies:</strong></p>
-              <div style="display: flex; flex-wrap: wrap; gap: 5px;">
-                ${project.technologies.map(tech => `
-                  <span style="background: #3A4B4E; color: #00CED1; padding: 4px 8px; border-radius: 4px; font-size: 11px;">${tech}</span>
-                `).join('')}
-              </div>
-            </div>
-          ` : ''}
+          <h3 style="font-size: 18px; color: #00CED1; margin-bottom: 10px; font-weight: 600;">${project.title || 'Project ' + (index + 1)}</h3>
+          ${project.description ? `<p style="font-size: 14px; color: #B0B0B0; line-height: 1.6; margin-bottom: 0;">${project.description}</p>` : ''}
         </div>
       `).join('')}
     </div>
-  ` : '';
+  ` : `
+    <div style="margin-bottom: 30px;">
+      <h2 style="font-size: 20px; color: #00CED1; margin-bottom: 15px; border-bottom: 2px solid #00CED1; padding-bottom: 5px;">Portfolio</h2>
+      <p style="font-size: 14px; color: #B0B0B0; line-height: 1.6;">No portfolio projects available.</p>
+    </div>
+  `;
 
   // Prepare skills HTML with icons
   const skills = aboutData?.skills || [];
@@ -152,16 +146,9 @@ export const generatePDF = async (userData, portfolioData = null, aboutData = nu
       </div>
     </div>
 
-    <div style="margin-bottom: 30px;">
-      <h2 style="font-size: 20px; color: #00CED1; margin-bottom: 15px; border-bottom: 2px solid #00CED1; padding-bottom: 5px;">Professional Summary</h2>
-      <p style="font-size: 14px; color: #B0B0B0; line-height: 1.6;">
-        ${userData.summary || ''}
-      </p>
-    </div>
+    ${portfolioHTML}
 
     ${skillsHTML}
-
-    ${portfolioHTML}
 
     <div style="margin-top: 40px; text-align: center; color: #B0B0B0; font-size: 12px;">
       © 2024 ${userData.firstName || ''} ${userData.lastName || ''}. All Rights Reserved.
