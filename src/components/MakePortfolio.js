@@ -80,49 +80,20 @@ const MakePortfolio = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    const scrollPosition = window.scrollY || window.pageYOffset;
     
     setPortfolioData(prev => ({
       ...prev,
       [name]: value
     }));
-    
-    requestAnimationFrame(() => {
-      window.scrollTo(0, scrollPosition);
-      if (e.target && document.activeElement !== e.target) {
-        e.target.focus();
-      }
-    });
   };
 
   const handleProjectChange = (id, field, value, event) => {
-    const scrollPosition = window.scrollY || window.pageYOffset;
-    const inputElement = event?.target;
-    let cursorPosition = null;
-    
-    if (inputElement && (inputElement.tagName === 'INPUT' || inputElement.tagName === 'TEXTAREA')) {
-      cursorPosition = inputElement.selectionStart || value.length;
-    }
-    
     setPortfolioData(prev => ({
       ...prev,
       projects: prev.projects.map(project => 
         project.id === id ? { ...project, [field]: value } : project
       )
     }));
-    
-    requestAnimationFrame(() => {
-      window.scrollTo(0, scrollPosition);
-      if (inputElement) {
-        if (document.activeElement !== inputElement) {
-          inputElement.focus();
-        }
-        if (cursorPosition !== null && (inputElement.tagName === 'INPUT' || inputElement.tagName === 'TEXTAREA')) {
-          const safeCursorPos = Math.min(cursorPosition, value.length);
-          inputElement.setSelectionRange(safeCursorPos, safeCursorPos);
-        }
-      }
-    });
   };
 
   const handleImageSelect = (id, imageUrl) => {

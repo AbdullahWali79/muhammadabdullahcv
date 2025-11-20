@@ -17,8 +17,6 @@ const MakeAbout = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const messageTimeoutRef = useRef(null);
-  const activeInputRef = useRef(null);
-  const scrollPositionRef = useRef(0);
 
   // Load data from database on component mount
   useEffect(() => {
@@ -59,10 +57,6 @@ const MakeAbout = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
-    // Save current focus and scroll position
-    activeInputRef.current = e.target;
-    scrollPositionRef.current = window.scrollY || window.pageYOffset;
-    
     setAboutData(prev => ({
       ...prev,
       [name]: value
@@ -80,41 +74,15 @@ const MakeAbout = () => {
         messageTimeoutRef.current = null;
       }, 100);
     }
-    
-    // Restore scroll position after state update
-    requestAnimationFrame(() => {
-      if (scrollPositionRef.current !== undefined) {
-        window.scrollTo(0, scrollPositionRef.current);
-      }
-      // Restore focus if it was lost
-      if (activeInputRef.current && document.activeElement !== activeInputRef.current) {
-        activeInputRef.current.focus();
-        // For textarea, restore cursor position
-        if (activeInputRef.current.tagName === 'TEXTAREA' || activeInputRef.current.tagName === 'INPUT') {
-          const len = activeInputRef.current.value.length;
-          activeInputRef.current.setSelectionRange(len, len);
-        }
-      }
-    });
   };
 
   const handleSkillChange = (index, value) => {
-    // Save scroll position
-    scrollPositionRef.current = window.scrollY || window.pageYOffset;
-    
     const newSkills = [...aboutData.skills];
     newSkills[index] = value;
     setAboutData(prev => ({
       ...prev,
       skills: newSkills
     }));
-    
-    // Restore scroll position
-    requestAnimationFrame(() => {
-      if (scrollPositionRef.current !== undefined) {
-        window.scrollTo(0, scrollPositionRef.current);
-      }
-    });
   };
 
   const addSkill = () => {

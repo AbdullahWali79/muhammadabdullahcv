@@ -85,60 +85,20 @@ const MakeService = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    const scrollPosition = window.scrollY || window.pageYOffset;
     
     setServiceData(prev => ({
       ...prev,
       [name]: value
     }));
-    
-    requestAnimationFrame(() => {
-      window.scrollTo(0, scrollPosition);
-      if (e.target && document.activeElement !== e.target) {
-        e.target.focus();
-      }
-    });
   };
 
   const handleServiceChange = (id, field, value, event) => {
-    // Save current scroll position and input element
-    const scrollPosition = window.scrollY || window.pageYOffset;
-    const inputElement = event?.target;
-    let cursorPosition = null;
-    
-    if (inputElement && (inputElement.tagName === 'INPUT' || inputElement.tagName === 'TEXTAREA')) {
-      // Get cursor position - this is after the change since onChange fires after input
-      cursorPosition = inputElement.selectionStart || value.length;
-    }
-    
     setServiceData(prev => ({
       ...prev,
       services: prev.services.map(service => 
         service.id === id ? { ...service, [field]: value } : service
       )
     }));
-    
-    // Restore scroll position, focus, and cursor position
-    requestAnimationFrame(() => {
-      // Restore scroll position
-      if (scrollPosition !== undefined) {
-        window.scrollTo(0, scrollPosition);
-      }
-      
-      // Restore focus and cursor position
-      if (inputElement) {
-        // Focus the input if it lost focus
-        if (document.activeElement !== inputElement) {
-          inputElement.focus();
-        }
-        // Restore cursor position - use the saved position or end of text
-        if (cursorPosition !== null && (inputElement.tagName === 'INPUT' || inputElement.tagName === 'TEXTAREA')) {
-          // Ensure cursor position doesn't exceed value length
-          const safeCursorPos = Math.min(cursorPosition, value.length);
-          inputElement.setSelectionRange(safeCursorPos, safeCursorPos);
-        }
-      }
-    });
   };
 
   const addService = () => {

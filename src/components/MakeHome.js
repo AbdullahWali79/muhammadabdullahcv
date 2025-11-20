@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import PasswordProtection from './PasswordProtection';
 import { saveHomeData } from '../services/supabaseService';
 import { FaSave, FaEye, FaEdit } from 'react-icons/fa';
-import { preserveScrollAndFocus } from '../utils/scrollPreservation';
 import './MakeHome.css';
 
 const MakeHome = () => {
@@ -17,14 +16,11 @@ const MakeHome = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    const restoreScroll = preserveScrollAndFocus(e.target);
     
     setHomeData(prev => ({
       ...prev,
       [name]: value
     }));
-    
-    restoreScroll();
   };
 
   const handleSave = async () => {
