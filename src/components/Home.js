@@ -161,7 +161,7 @@ const Home = ({ userData }) => {
       </div>
       
       <footer className="footer">
-        <p>© 2024 {userData.firstName} {userData.lastName}. All Rights Reserved.</p>
+        <p>© 2026 {userData.firstName} {userData.lastName}. All Rights Reserved.</p>
       </footer>
     </div>
   );

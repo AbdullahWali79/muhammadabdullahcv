@@ -151,7 +151,7 @@ export const generatePDF = async (userData, portfolioData = null, aboutData = nu
     ${skillsHTML}
 
     <div style="margin-top: 40px; text-align: center; color: #B0B0B0; font-size: 12px;">
-      © 2024 ${userData.firstName || ''} ${userData.lastName || ''}. All Rights Reserved.
+      © 2026 ${userData.firstName || ''} ${userData.lastName || ''}. All Rights Reserved.
     </div>
   `;
 
