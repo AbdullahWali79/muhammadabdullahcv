@@ -124,12 +124,33 @@
   white-space: nowrap;
 }
 
+.typing-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: #00CED1;
+  font-weight: 300;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .hero-summary {
     white-space: normal;
     overflow: visible;
     text-overflow: initial;
     font-size: 16px;
+  }
+
+  .typing-cursor {
+    margin-left: 1px;
   }
 }
 

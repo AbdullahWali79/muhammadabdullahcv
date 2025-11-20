@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaDownload, FaEnvelope } from 'react-icons/fa';
 import { generatePDF } from '../utils/pdfGenerator';
@@ -8,6 +8,8 @@ import './Home.css';
 const Home = ({ userData }) => {
   const navigate = useNavigate();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [displayedText, setDisplayedText] = useState('');
+  const [isTyping, setIsTyping] = useState(true);
 
   const handleDownloadCV = async () => {
     setIsGenerating(true);
@@ -39,6 +41,28 @@ const Home = ({ userData }) => {
     window.open(whatsappUrl, '_blank');
   };
 
+  // Typing animation effect
+  useEffect(() => {
+    const fullText = userData.summary?.replace(/ - /g, ' \u2013 ') || '';
+    if (!fullText) return;
+
+    setDisplayedText('');
+    setIsTyping(true);
+    let currentIndex = 0;
+
+    const typingInterval = setInterval(() => {
+      if (currentIndex < fullText.length) {
+        setDisplayedText(fullText.substring(0, currentIndex + 1));
+        currentIndex++;
+      } else {
+        setIsTyping(false);
+        clearInterval(typingInterval);
+      }
+    }, 50); // Adjust speed here (lower = faster)
+
+    return () => clearInterval(typingInterval);
+  }, [userData.summary]);
+
 
   return (
     <div className="home">
@@ -57,7 +81,10 @@ const Home = ({ userData }) => {
             </div>
             <div className="hero-text">
               <h1 className="hero-title">{userData.firstName} {userData.lastName}</h1>
-              <p className="hero-summary">{userData.summary?.replace(/ - /g, ' \u2013 ')}</p>
+              <p className="hero-summary">
+                {displayedText}
+                {isTyping && <span className="typing-cursor">|</span>}
+              </p>
             </div>
           </div>
         </div>
