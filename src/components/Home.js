@@ -41,26 +41,42 @@ const Home = ({ userData }) => {
     window.open(whatsappUrl, '_blank');
   };
 
-  // Typing animation effect
+  // Typing animation effect with loop
   useEffect(() => {
     const fullText = userData.summary?.replace(/ - /g, ' \u2013 ') || '';
     if (!fullText) return;
 
-    setDisplayedText('');
-    setIsTyping(true);
     let currentIndex = 0;
+    let typingInterval = null;
+    let pauseTimeout = null;
 
-    const typingInterval = setInterval(() => {
-      if (currentIndex < fullText.length) {
-        setDisplayedText(fullText.substring(0, currentIndex + 1));
-        currentIndex++;
-      } else {
-        setIsTyping(false);
-        clearInterval(typingInterval);
-      }
-    }, 50); // Adjust speed here (lower = faster)
+    const startTyping = () => {
+      setDisplayedText('');
+      setIsTyping(true);
+      currentIndex = 0;
 
-    return () => clearInterval(typingInterval);
+      typingInterval = setInterval(() => {
+        if (currentIndex < fullText.length) {
+          setDisplayedText(fullText.substring(0, currentIndex + 1));
+          currentIndex++;
+        } else {
+          setIsTyping(false);
+          clearInterval(typingInterval);
+          
+          // Wait 2 seconds before restarting
+          pauseTimeout = setTimeout(() => {
+            startTyping();
+          }, 2000);
+        }
+      }, 50); // Adjust speed here (lower = faster)
+    };
+
+    startTyping();
+
+    return () => {
+      if (typingInterval) clearInterval(typingInterval);
+      if (pauseTimeout) clearTimeout(pauseTimeout);
+    };
   }, [userData.summary]);
 
 
