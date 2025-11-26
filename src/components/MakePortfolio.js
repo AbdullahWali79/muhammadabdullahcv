@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PasswordProtection from './PasswordProtection';
 import GitHubImagePicker from './GitHubImagePicker';
-import { FaSave, FaEye, FaPlus, FaTrash } from 'react-icons/fa';
+import { FaSave, FaEye, FaPlus, FaTrash, FaTimes } from 'react-icons/fa';
 import { savePortfolioData, getPortfolioData } from '../services/supabaseService';
 import './MakePortfolio.css';
 
@@ -33,6 +33,18 @@ const MakePortfolio = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [newProject, setNewProject] = useState({
+    title: '',
+    description: '',
+    fullDescription: '',
+    image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
+    category: '',
+    link: '#',
+    technologies: []
+  });
+  const [autoSaving, setAutoSaving] = useState(false);
+  const inputRefs = useRef({});
 
   // Load data from database on component mount
   useEffect(() => {
@@ -88,6 +100,11 @@ const MakePortfolio = () => {
   };
 
   const handleProjectChange = (id, field, value, event) => {
+    // Prevent default behavior that might cause scroll
+    if (event) {
+      event.preventDefault();
+    }
+    
     setPortfolioData(prev => ({
       ...prev,
       projects: prev.projects.map(project => 
@@ -100,25 +117,84 @@ const MakePortfolio = () => {
     handleProjectChange(id, 'image', imageUrl);
   };
 
-  const addProject = useCallback(() => {
-    const newProject = {
-      id: Date.now(),
-      title: 'New Project',
-      description: 'Project description',
-      fullDescription: '', // Add fullDescription field
+  const openModal = useCallback(() => {
+    setNewProject({
+      title: '',
+      description: '',
+      fullDescription: '',
       image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
-      category: 'Category',
+      category: '',
       link: '#',
-      technologies: ['Technology']
-    };
-    setPortfolioData(prev => ({
-      ...prev,
-      projects: [...prev.projects, newProject]
-    }));
-    // Show success message
-    setMessage('New project added successfully!');
-    setTimeout(() => setMessage(''), 2000);
+      technologies: []
+    });
+    setShowModal(true);
   }, []);
+
+  const closeModal = useCallback(() => {
+    setShowModal(false);
+    setNewProject({
+      title: '',
+      description: '',
+      fullDescription: '',
+      image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
+      category: '',
+      link: '#',
+      technologies: []
+    });
+  }, []);
+
+  const handleNewProjectChange = (field, value) => {
+    setNewProject(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSaveNewProject = async () => {
+    if (!newProject.title.trim()) {
+      setMessage('Please enter a project title');
+      setTimeout(() => setMessage(''), 2000);
+      return;
+    }
+
+    setAutoSaving(true);
+    setMessage('Saving to Supabase...');
+    try {
+      const projectToAdd = {
+        id: Date.now(),
+        ...newProject,
+        technologies: Array.isArray(newProject.technologies) 
+          ? newProject.technologies 
+          : (typeof newProject.technologies === 'string' && newProject.technologies.trim()
+              ? newProject.technologies.split(',').map(t => t.trim()).filter(t => t)
+              : [])
+      };
+
+      const updatedPortfolioData = {
+        ...portfolioData,
+        projects: [...portfolioData.projects, projectToAdd]
+      };
+
+      const result = await savePortfolioData(updatedPortfolioData);
+      if (result.success) {
+        setPortfolioData(updatedPortfolioData);
+        setMessage('Project saved successfully to Supabase!');
+        closeModal();
+        setTimeout(() => setMessage(''), 3000);
+      } else {
+        setMessage(`Error: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error saving project:', error);
+      setMessage(`Error saving: ${error.message}`);
+    } finally {
+      setAutoSaving(false);
+    }
+  };
+
+  const addProject = useCallback(() => {
+    openModal();
+  }, [openModal]);
 
   const removeProject = (id) => {
     setPortfolioData(prev => ({
@@ -223,7 +299,13 @@ const MakePortfolio = () => {
                   <input
                     type="text"
                     value={project.title}
-                    onChange={(e) => handleProjectChange(project.id, 'title', e.target.value, e)}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handleProjectChange(project.id, 'title', e.target.value, e);
+                    }}
+                    onFocus={(e) => {
+                      e.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }}
                     className="form-input"
                   />
                 </div>
@@ -296,6 +378,115 @@ const MakePortfolio = () => {
           </button>
         </div>
       </div>
+
+      {/* Modal for Adding New Project */}
+      {showModal && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Add New Project</h2>
+              <button className="modal-close-btn" onClick={closeModal}>
+                <FaTimes />
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Project Title *</label>
+                <input
+                  type="text"
+                  value={newProject.title}
+                  onChange={(e) => handleNewProjectChange('title', e.target.value)}
+                  className="form-input"
+                  placeholder="Enter project title"
+                  autoFocus
+                />
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Category</label>
+                  <input
+                    type="text"
+                    value={newProject.category}
+                    onChange={(e) => handleNewProjectChange('category', e.target.value)}
+                    className="form-input"
+                    placeholder="e.g., Web Development"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Project Link</label>
+                  <input
+                    type="text"
+                    value={newProject.link}
+                    onChange={(e) => handleNewProjectChange('link', e.target.value)}
+                    className="form-input"
+                    placeholder="https://..."
+                  />
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label>Short Description (for card view)</label>
+                <textarea
+                  value={newProject.description}
+                  onChange={(e) => handleNewProjectChange('description', e.target.value)}
+                  rows="3"
+                  className="form-textarea"
+                  placeholder="Brief description that appears on portfolio cards..."
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Full Description / Blog (for detail page)</label>
+                <textarea
+                  value={newProject.fullDescription}
+                  onChange={(e) => handleNewProjectChange('fullDescription', e.target.value)}
+                  rows="6"
+                  className="form-textarea"
+                  placeholder="Complete project description, blog content, or detailed information..."
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Technologies (comma separated)</label>
+                <input
+                  type="text"
+                  value={Array.isArray(newProject.technologies) ? newProject.technologies.join(', ') : newProject.technologies}
+                  onChange={(e) => handleNewProjectChange('technologies', e.target.value)}
+                  className="form-input"
+                  placeholder="React, Node.js, MongoDB"
+                />
+              </div>
+              
+              <div className="form-group">
+                <GitHubImagePicker
+                  label="Project Image"
+                  currentImage={newProject.image}
+                  onImageSelect={(imageUrl) => handleNewProjectChange('image', imageUrl)}
+                />
+              </div>
+              
+              {autoSaving && (
+                <div className="auto-save-indicator">
+                  <small>Saving to Supabase...</small>
+                </div>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={closeModal}>
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary" 
+                onClick={handleSaveNewProject}
+                disabled={autoSaving || !newProject.title.trim()}
+              >
+                {autoSaving ? 'Saving...' : 'Save Project'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 
