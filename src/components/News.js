@@ -1,16 +1,68 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCalendarAlt, FaUser, FaTag } from 'react-icons/fa';
+import { getNewsData } from '../services/supabaseService';
 import './News.css';
 
 const News = () => {
   const navigate = useNavigate();
+  const [newsData, setNewsData] = useState({
+    title: 'Latest News & Articles',
+    subtitle: 'Stay updated with the latest trends and insights in design and development',
+    articles: []
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadNewsData = async () => {
+      try {
+        const result = await getNewsData();
+        if (result.success && result.data) {
+          setNewsData({
+            title: result.data.title || 'Latest News & Articles',
+            subtitle: result.data.subtitle || 'Stay updated with the latest trends and insights in design and development',
+            articles: result.data.articles || []
+          });
+        }
+      } catch (error) {
+        console.error('Error loading news data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadNewsData();
+  }, []);
 
   const handleReadMore = (newsId) => {
     navigate(`/news/${newsId}`);
   };
 
-  const newsItems = [
+  // Format date for display
+  const formatDate = (dateString) => {
+    if (!dateString) return 'No date';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  // Calculate read time from content
+  const calculateReadTime = (content) => {
+    if (!content) return '2 min read';
+    const words = content.split(/\s+/).length;
+    const minutes = Math.ceil(words / 200);
+    return `${minutes} min read`;
+  };
+
+  // Default articles if no data loaded
+  const defaultNewsItems = [
     {
       id: 1,
       title: 'The Future of UI/UX Design in 2024',
@@ -79,19 +131,68 @@ const News = () => {
     }
   ];
 
+  // Use articles from Supabase, or fallback to default
+  const newsItems = newsData.articles.length > 0 
+    ? newsData.articles.map(article => ({
+        id: article.id,
+        title: article.title || 'Untitled Article',
+        excerpt: article.description || article.content || '',
+        content: article.fullDescription || article.content || article.description || '',
+        date: formatDate(article.date || article.pubDate),
+        author: article.source || 'News Team',
+        category: article.category || 'General',
+        readTime: calculateReadTime(article.content || article.description),
+        image: article.image || '/api/placeholder/400/250',
+        link: article.link || ''
+      }))
+    : defaultNewsItems;
+
+  if (loading) {
+    return (
+      <div className="news">
+        <div className="news-container">
+          <div className="loading" style={{ textAlign: 'center', padding: '40px', color: '#00CED1' }}>
+            Loading news...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="news">
       <div className="news-container">
         <div className="news-header">
-          <h1>Latest News & Articles</h1>
-          <p>Stay updated with the latest trends and insights in design and development</p>
+          <h1>{newsData.title}</h1>
+          <p>{newsData.subtitle}</p>
         </div>
         
-        <div className="news-grid">
-          {newsItems.map((item) => (
+        {newsItems.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#B0B0B0' }}>
+            <p>No articles available yet. Check back soon!</p>
+          </div>
+        ) : (
+          <div className="news-grid">
+            {newsItems.map((item) => (
             <article key={item.id} className="news-item">
               <div className="news-image">
-                <div className="placeholder-image">
+                {item.image && item.image !== '/api/placeholder/400/250' && !item.image.includes('placeholder') ? (
+                  <img 
+                    src={item.image} 
+                    alt={item.title} 
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'cover',
+                      borderRadius: '8px 8px 0 0'
+                    }} 
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextElementSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div className="placeholder-image" style={{ display: item.image && !item.image.includes('placeholder') ? 'none' : 'flex' }}>
                   <span>Article Image</span>
                 </div>
                 <div className="news-category">{item.category}</div>
@@ -124,8 +225,9 @@ const News = () => {
                 </button>
               </div>
             </article>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
         
         <div className="news-cta">
           <h2>Want to stay updated?</h2>
