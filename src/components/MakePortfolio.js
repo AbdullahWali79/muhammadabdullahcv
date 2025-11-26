@@ -101,7 +101,6 @@ const MakePortfolio = () => {
   };
 
   const addProject = useCallback(() => {
-    console.log('addProject function called');
     const newProject = {
       id: Date.now(),
       title: 'New Project',
@@ -112,24 +111,13 @@ const MakePortfolio = () => {
       link: '#',
       technologies: ['Technology']
     };
-    setPortfolioData(prev => {
-      const updated = {
-        ...prev,
-        projects: [...prev.projects, newProject]
-      };
-      console.log('Updated portfolio data:', updated);
-      return updated;
-    });
+    setPortfolioData(prev => ({
+      ...prev,
+      projects: [...prev.projects, newProject]
+    }));
     // Show success message
     setMessage('New project added successfully!');
     setTimeout(() => setMessage(''), 2000);
-    // Scroll to the new project after a short delay
-    setTimeout(() => {
-      const projectItems = document.querySelectorAll('.project-item');
-      if (projectItems.length > 0) {
-        projectItems[projectItems.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
   }, []);
 
   const removeProject = (id) => {
