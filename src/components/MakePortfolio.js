@@ -5,6 +5,31 @@ import { FaSave, FaEye, FaPlus, FaTrash, FaTimes } from 'react-icons/fa';
 import { savePortfolioData, getPortfolioData } from '../services/supabaseService';
 import './MakePortfolio.css';
 
+// Pre-defined categories for portfolio projects
+const PORTFOLIO_CATEGORIES = [
+  'Web Development',
+  'Mobile App Development',
+  'UI/UX Design',
+  'Full Stack Development',
+  'Frontend Development',
+  'Backend Development',
+  'React Development',
+  'Flutter Development',
+  'Node.js Development',
+  'Python Development',
+  'E-commerce Development',
+  'WordPress Development',
+  'API Development',
+  'Database Design',
+  'Cloud Solutions',
+  'DevOps',
+  'Machine Learning',
+  'Data Science',
+  'Game Development',
+  'Blockchain Development',
+  'Other'
+];
+
 const MakePortfolio = () => {
   const [portfolioData, setPortfolioData] = useState({
     title: 'My Portfolio',
@@ -43,6 +68,8 @@ const MakePortfolio = () => {
     link: '#',
     technologies: []
   });
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
+  const [customCategory, setCustomCategory] = useState('');
   const [autoSaving, setAutoSaving] = useState(false);
   const inputRefs = useRef({});
 
@@ -127,6 +154,8 @@ const MakePortfolio = () => {
       link: '#',
       technologies: []
     });
+    setShowCustomCategory(false);
+    setCustomCategory('');
     setShowModal(true);
   }, []);
 
@@ -141,6 +170,8 @@ const MakePortfolio = () => {
       link: '#',
       technologies: []
     });
+    setShowCustomCategory(false);
+    setCustomCategory('');
   }, []);
 
   const handleNewProjectChange = (field, value) => {
@@ -311,12 +342,42 @@ const MakePortfolio = () => {
                 </div>
                 <div className="form-group">
                   <label>Category</label>
-                  <input
-                    type="text"
-                    value={project.category}
-                    onChange={(e) => handleProjectChange(project.id, 'category', e.target.value, e)}
-                    className="form-input"
-                  />
+                  <select
+                    value={project.category || ''}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      const value = e.target.value;
+                      if (value === 'custom') {
+                        // Handle custom category
+                        handleProjectChange(project.id, 'category', '', e);
+                      } else {
+                        handleProjectChange(project.id, 'category', value, e);
+                      }
+                    }}
+                    onFocus={(e) => {
+                      e.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }}
+                    className="form-input form-select"
+                  >
+                    <option value="">Select Category</option>
+                    {PORTFOLIO_CATEGORIES.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                    <option value="custom">+ Add Custom Category</option>
+                  </select>
+                  {project.category && !PORTFOLIO_CATEGORIES.includes(project.category) && (
+                    <input
+                      type="text"
+                      value={project.category}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        handleProjectChange(project.id, 'category', e.target.value, e);
+                      }}
+                      className="form-input"
+                      style={{ marginTop: '8px' }}
+                      placeholder="Enter custom category"
+                    />
+                  )}
                 </div>
                 <div className="form-group">
                   <label>Project Link</label>
@@ -405,13 +466,42 @@ const MakePortfolio = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label>Category</label>
-                  <input
-                    type="text"
-                    value={newProject.category}
-                    onChange={(e) => handleNewProjectChange('category', e.target.value)}
-                    className="form-input"
-                    placeholder="e.g., Web Development"
-                  />
+                  <select
+                    value={newProject.category || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === 'custom') {
+                        setShowCustomCategory(true);
+                        setCustomCategory('');
+                        handleNewProjectChange('category', '');
+                      } else {
+                        setShowCustomCategory(false);
+                        handleNewProjectChange('category', value);
+                      }
+                    }}
+                    className="form-input form-select"
+                  >
+                    <option value="">Select Category</option>
+                    {PORTFOLIO_CATEGORIES.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                    <option value="custom">+ Add Custom Category</option>
+                  </select>
+                  {showCustomCategory && (
+                    <input
+                      type="text"
+                      value={customCategory}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setCustomCategory(value);
+                        handleNewProjectChange('category', value);
+                      }}
+                      className="form-input"
+                      style={{ marginTop: '8px' }}
+                      placeholder="Enter custom category"
+                      autoFocus
+                    />
+                  )}
                 </div>
                 <div className="form-group">
                   <label>Project Link</label>
