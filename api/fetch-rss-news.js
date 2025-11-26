@@ -177,28 +177,50 @@ module.exports = async (req, res) => {
 
   try {
     // Initialize Supabase
-    const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.REACT_APP_SUPABASE_URL;
-    const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.REACT_APP_SUPABASE_ANON_KEY;
+    // Try multiple environment variable names, with hardcoded fallback
+    const supabaseUrl = process.env.VITE_SUPABASE_URL 
+      || process.env.REACT_APP_SUPABASE_URL
+      || process.env.SUPABASE_URL
+      || 'https://qnwtztkfeejxfulvvyfi.supabase.co'; // Fallback to hardcoded value
+    
+    const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY 
+      || process.env.REACT_APP_SUPABASE_ANON_KEY
+      || process.env.SUPABASE_ANON_KEY
+      || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFud3R6dGtmZWVqeGZ1bHZ2eWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxODI1MzUsImV4cCI6MjA3Nzc1ODUzNX0.FjhiD2TK3M4ZfayGOa2tXDPIrUIQXyiMgutA0g512jI'; // Fallback to hardcoded value
 
-    if (!supabaseUrl || !supabaseKey) {
-      return res.status(500).json({
-        success: false,
-        error: 'Supabase credentials not configured'
-      });
-    }
-
+    // Always use the values (fallback ensures they're never empty)
+    console.log('Initializing Supabase client...', {
+      url: supabaseUrl ? 'Set' : 'Missing',
+      key: supabaseKey ? 'Set' : 'Missing',
+      usingFallback: !process.env.VITE_SUPABASE_URL && !process.env.REACT_APP_SUPABASE_URL
+    });
+    
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Fetch all RSS feeds
     console.log('Starting RSS feed fetch...');
     const allArticles = [];
     
-    for (const feed of RSS_FEEDS) {
-      const articles = await fetchRSSFeed(feed);
-      allArticles.push(...articles);
-      
-      // Small delay to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      for (const feed of RSS_FEEDS) {
+        try {
+          const articles = await fetchRSSFeed(feed);
+          allArticles.push(...articles);
+          console.log(`Fetched ${articles.length} articles from ${feed.name}`);
+          
+          // Small delay to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (feedError) {
+          console.error(`Error fetching feed ${feed.name}:`, feedError.message);
+          // Continue with other feeds even if one fails
+        }
+      }
+    } catch (fetchError) {
+      console.error('Error in RSS feed loop:', fetchError);
+      return res.status(500).json({
+        success: false,
+        error: `Error fetching RSS feeds: ${fetchError.message}`
+      });
     }
 
     console.log(`Total articles fetched: ${allArticles.length}`);
@@ -285,9 +307,11 @@ module.exports = async (req, res) => {
 
   } catch (error) {
     console.error('Error in fetch-rss-news:', error);
+    console.error('Error stack:', error.stack);
     return res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message || 'Unknown error occurred',
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 };

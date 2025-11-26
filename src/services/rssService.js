@@ -8,9 +8,8 @@
 export const fetchRSSNews = async () => {
   try {
     // Get the API URL (works for both development and production)
-    const apiUrl = process.env.NODE_ENV === 'production'
-      ? '/api/fetch-rss-news'
-      : 'http://localhost:3000/api/fetch-rss-news';
+    // For Vercel, use the current origin
+    const apiUrl = `${window.location.origin}/api/fetch-rss-news`;
 
     const response = await fetch(apiUrl, {
       method: 'GET',
