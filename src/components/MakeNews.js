@@ -1,34 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PasswordProtection from './PasswordProtection';
 import GitHubImagePicker from './GitHubImagePicker';
-import { FaSave, FaEye, FaPlus, FaTrash } from 'react-icons/fa';
+import { FaSave, FaEye, FaPlus, FaTrash, FaSync } from 'react-icons/fa';
+import { saveNewsData, getNewsData } from '../services/supabaseService';
+import { fetchRSSNews } from '../services/rssService';
 import './MakeNews.css';
 
 const MakeNews = () => {
   const [newsData, setNewsData] = useState({
     title: 'Latest News',
     subtitle: 'Stay updated with my latest work',
-    articles: [
-      {
-        id: 1,
-        title: 'New Project Launch',
-        content: 'I am excited to announce the launch of my latest project...',
-        date: '2024-01-15',
-        category: 'Project',
-        image: '',
-        featured: true
-      },
-      {
-        id: 2,
-        title: 'Design Tips Article',
-        content: 'Here are some useful design tips for beginners...',
-        date: '2024-01-10',
-        category: 'Article',
-        image: '',
-        featured: false
-      }
-    ]
+    articles: []
   });
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [fetchingRSS, setFetchingRSS] = useState(false);
+  const [message, setMessage] = useState('');
+
+  // Load data from database on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const result = await getNewsData();
+        if (result.success && result.data) {
+          setNewsData({
+            title: result.data.title || 'Latest News',
+            subtitle: result.data.subtitle || 'Stay updated with my latest work',
+            articles: result.data.articles || []
+          });
+        }
+      } catch (error) {
+        console.error('Error loading news data:', error);
+        setMessage('Error loading data. Using defaults.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -75,8 +86,51 @@ const MakeNews = () => {
     }));
   };
 
-  const handleSave = () => {
-    alert('News page data saved successfully!');
+  const handleSave = async () => {
+    setSaving(true);
+    setMessage('');
+    try {
+      const result = await saveNewsData(newsData);
+      if (result.success) {
+        setMessage('News page data saved successfully!');
+      } else {
+        setMessage(`Error: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error saving news data:', error);
+      setMessage(`Error saving data: ${error.message}`);
+    } finally {
+      setSaving(false);
+      setTimeout(() => setMessage(''), 3000);
+    }
+  };
+
+  const handleFetchRSS = async () => {
+    setFetchingRSS(true);
+    setMessage('Fetching latest news from RSS feeds...');
+    try {
+      const result = await fetchRSSNews();
+      if (result.success) {
+        setMessage(`Successfully fetched ${result.articlesCount || 0} new articles!`);
+        // Reload data from database
+        const dataResult = await getNewsData();
+        if (dataResult.success && dataResult.data) {
+          setNewsData({
+            title: dataResult.data.title || newsData.title,
+            subtitle: dataResult.data.subtitle || newsData.subtitle,
+            articles: dataResult.data.articles || []
+          });
+        }
+      } else {
+        setMessage(`Error: ${result.error || 'Failed to fetch RSS news'}`);
+      }
+    } catch (error) {
+      console.error('Error fetching RSS news:', error);
+      setMessage(`Error: ${error.message}`);
+    } finally {
+      setFetchingRSS(false);
+      setTimeout(() => setMessage(''), 5000);
+    }
   };
 
   const NewsEditor = () => (
@@ -84,14 +138,32 @@ const MakeNews = () => {
       <div className="editor-header">
         <h1>Edit News Page</h1>
         <div className="editor-actions">
-          <button className="btn btn-secondary" onClick={handleSave}>
-            <FaSave /> Save Changes
+          <button 
+            className="btn btn-primary" 
+            onClick={handleFetchRSS}
+            disabled={fetchingRSS || loading}
+          >
+            <FaSync className={fetchingRSS ? 'spinning' : ''} /> 
+            {fetchingRSS ? 'Fetching...' : 'Fetch RSS News'}
+          </button>
+          <button 
+            className="btn btn-secondary" 
+            onClick={handleSave}
+            disabled={saving || loading}
+          >
+            <FaSave /> {saving ? 'Saving...' : 'Save Changes'}
           </button>
           <button className="btn btn-primary">
             <FaEye /> Preview
           </button>
         </div>
       </div>
+      {message && (
+        <div className={`message ${message.includes('Error') ? 'error' : 'success'}`}>
+          {message}
+        </div>
+      )}
+      {loading && <div className="loading">Loading data...</div>}
 
       <div className="editor-content">
         <div className="form-section">
@@ -181,6 +253,13 @@ const MakeNews = () => {
                   rows="4"
                   className="form-textarea"
                 />
+                {article.link && (
+                  <small style={{ color: '#00CED1', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                    Source: <a href={article.link} target="_blank" rel="noopener noreferrer" style={{ color: '#00CED1' }}>
+                      {article.link}
+                    </a>
+                  </small>
+                )}
               </div>
               
               <div className="form-group">
