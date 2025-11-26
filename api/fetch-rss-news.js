@@ -116,7 +116,8 @@ function cleanText(text) {
 // Preserve HTML content (for full descriptions)
 function preserveHTML(text) {
   if (!text) return '';
-  // Decode HTML entities but keep HTML structure
+  // Keep HTML structure intact, only decode entities
+  // Don't remove HTML tags - preserve them for rendering
   return text
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
@@ -124,7 +125,12 @@ function preserveHTML(text) {
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
-    .replace(/&apos;/g, "'");
+    .replace(/&apos;/g, "'")
+    .replace(/&#8217;/g, "'")
+    .replace(/&#8220;/g, '"')
+    .replace(/&#8221;/g, '"')
+    .replace(/&#8211;/g, '–')
+    .replace(/&#8212;/g, '—');
 }
 
 // Check if article is technology-related
@@ -156,10 +162,18 @@ async function fetchRSSFeed(feedConfig) {
       .map(item => {
         const pubDate = item.pubDate ? new Date(item.pubDate) : new Date();
         
-        // Get content - preserve HTML for full description, clean for short description
+        // Get content - prioritize contentEncoded (full HTML) for fullDescription
         const rawContent = item.content || item.contentSnippet || item.description || '';
-        const shortDescription = cleanText(rawContent); // Clean HTML for card view
-        const fullDescription = preserveHTML(rawContent); // Preserve HTML for detail page
+        const htmlContent = item.contentEncoded || item.content || item.contentSnippet || item.description || '';
+        
+        // Short description (clean text for card view)
+        const shortDescription = cleanText(rawContent);
+        
+        // Full description (preserve HTML for detail page)
+        // Use contentEncoded if available (full HTML), otherwise preserve HTML from content
+        const fullDescription = item.contentEncoded 
+          ? preserveHTML(item.contentEncoded) 
+          : preserveHTML(htmlContent);
         
         return {
           id: `rss_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,

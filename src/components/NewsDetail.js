@@ -318,17 +318,35 @@ Remember, a design system is a tool to help your team work better together, not 
 
           <div className="article-content">
             {(() => {
-              const content = displayItem.fullDescription || displayItem.content || displayItem.description || '';
+              // Prioritize fullDescription, then content, then description
+              let content = displayItem.fullDescription || displayItem.content || displayItem.description || '';
               
-              // Check if content contains HTML tags
-              const hasHTML = /<[a-z][\s\S]*>/i.test(content);
+              if (!content || content.trim() === '') {
+                return <p className="article-paragraph">No content available.</p>;
+              }
+              
+              // Check if content contains HTML tags (comprehensive check)
+              const hasHTML = /<[a-z][\s\S]*>/i.test(content) || 
+                             content.includes('<p>') ||
+                             content.includes('<div>') ||
+                             content.includes('<br') ||
+                             content.includes('<h1>') ||
+                             content.includes('<h2>') ||
+                             content.includes('<ul>') ||
+                             content.includes('<ol>') ||
+                             content.includes('<li>') ||
+                             content.includes('<strong>') ||
+                             content.includes('<em>') ||
+                             content.includes('<a href');
               
               if (hasHTML) {
-                // Parse and render HTML content
+                // Use dangerouslySetInnerHTML for better HTML rendering
+                // This will render HTML exactly as it appears in the source
                 return (
-                  <div className="article-html-content">
-                    {parse(content)}
-                  </div>
+                  <div 
+                    className="article-html-content"
+                    dangerouslySetInnerHTML={{ __html: content }}
+                  />
                 );
               } else {
                 // Plain text - split into paragraphs
