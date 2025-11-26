@@ -165,6 +165,7 @@ async function fetchRSSFeed(feedConfig) {
 }
 
 // Main handler function
+// Version: 2.0 - Fixed Supabase credentials with fallback
 module.exports = async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -175,26 +176,30 @@ module.exports = async (req, res) => {
     return res.status(200).end();
   }
 
+  console.log('RSS Fetch API called - Version 2.0');
+
   try {
-    // Initialize Supabase
-    // Try multiple environment variable names, with hardcoded fallback
+    // Initialize Supabase with hardcoded credentials (fallback always available)
     const supabaseUrl = process.env.VITE_SUPABASE_URL 
       || process.env.REACT_APP_SUPABASE_URL
       || process.env.SUPABASE_URL
-      || 'https://qnwtztkfeejxfulvvyfi.supabase.co'; // Fallback to hardcoded value
+      || 'https://qnwtztkfeejxfulvvyfi.supabase.co';
     
     const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY 
       || process.env.REACT_APP_SUPABASE_ANON_KEY
       || process.env.SUPABASE_ANON_KEY
-      || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFud3R6dGtmZWVqeGZ1bHZ2eWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxODI1MzUsImV4cCI6MjA3Nzc1ODUzNX0.FjhiD2TK3M4ZfayGOa2tXDPIrUIQXyiMgutA0g512jI'; // Fallback to hardcoded value
+      || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFud3R6dGtmZWVqeGZ1bHZ2eWZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxODI1MzUsImV4cCI6MjA3Nzc1ODUzNX0.FjhiD2TK3M4ZfayGOa2tXDPIrUIQXyiMgutA0g512jI';
 
-    // Always use the values (fallback ensures they're never empty)
-    console.log('Initializing Supabase client...', {
-      url: supabaseUrl ? 'Set' : 'Missing',
-      key: supabaseKey ? 'Set' : 'Missing',
-      usingFallback: !process.env.VITE_SUPABASE_URL && !process.env.REACT_APP_SUPABASE_URL
-    });
-    
+    // Verify credentials are set (should always be true due to fallback)
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('CRITICAL: Supabase credentials are missing even with fallback!');
+      return res.status(500).json({
+        success: false,
+        error: 'Configuration error: Supabase credentials missing'
+      });
+    }
+
+    console.log('Initializing Supabase client with URL:', supabaseUrl.substring(0, 30) + '...');
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Fetch all RSS feeds
