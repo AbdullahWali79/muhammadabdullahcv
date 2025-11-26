@@ -215,7 +215,11 @@ const News = () => {
                 </div>
                 
                 <h2 className="news-title">{item.title}</h2>
-                <p className="news-excerpt">{item.excerpt}</p>
+                <p className="news-excerpt">
+                  {item.excerpt && item.excerpt.length > 0 
+                    ? (item.excerpt.length > 120 ? item.excerpt.substring(0, 120) + '...' : item.excerpt)
+                    : 'No description available'}
+                </p>
                 
                 <button 
                   className="read-more-btn"

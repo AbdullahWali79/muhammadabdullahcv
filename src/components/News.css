@@ -112,10 +112,16 @@
 }
 
 .news-excerpt {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 14px;
   color: #B0B0B0;
   line-height: 1.6;
   margin-bottom: 20px;
+  max-height: 1.6em;
 }
 
 .read-more-btn {

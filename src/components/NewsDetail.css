@@ -122,18 +122,50 @@
 
 .article-content {
   padding: 40px;
+  max-width: 100%;
 }
 
 .article-paragraph {
   font-size: 18px;
   color: #E0E0E0;
-  line-height: 1.8;
-  margin-bottom: 24px;
-  text-align: justify;
+  line-height: 1.9;
+  margin-bottom: 28px;
+  text-align: left;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+
+.article-paragraph:first-child {
+  font-size: 20px;
+  color: #F0F0F0;
+  font-weight: 500;
+  margin-bottom: 32px;
 }
 
 .article-paragraph:last-child {
   margin-bottom: 0;
+}
+
+.article-footer {
+  padding: 30px 40px;
+  border-top: 1px solid #3A4B4E;
+  margin-top: 20px;
+}
+
+.article-source-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #00CED1;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.article-source-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
 }
 
 .error-message {

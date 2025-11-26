@@ -1,14 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaCalendarAlt, FaUser, FaTag, FaArrowLeft } from 'react-icons/fa';
+import { FaCalendarAlt, FaUser, FaTag, FaArrowLeft, FaExternalLinkAlt } from 'react-icons/fa';
+import { getNewsData } from '../services/supabaseService';
 import './NewsDetail.css';
 
 const NewsDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [newsItem, setNewsItem] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Sample news data - in a real app, this would come from an API
-  const newsItems = [
+  useEffect(() => {
+    const loadNewsData = async () => {
+      try {
+        const result = await getNewsData();
+        if (result.success && result.data && result.data.articles) {
+          // Find article by ID (handle both numeric and string IDs)
+          const article = result.data.articles.find(item => 
+            item.id === parseInt(id) || 
+            item.id === id || 
+            String(item.id) === String(id)
+          );
+          setNewsItem(article);
+        }
+      } catch (error) {
+        console.error('Error loading news data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadNewsData();
+  }, [id]);
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    if (!dateString) return 'No date';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  // Calculate read time from content
+  const calculateReadTime = (content) => {
+    if (!content) return '2 min read';
+    const words = content.split(/\s+/).length;
+    const minutes = Math.ceil(words / 200);
+    return `${minutes} min read`;
+  };
+
+  // Sample news data - fallback if no data from Supabase
+  const defaultNewsItems = [
     {
       id: 1,
       title: 'The Future of UI/UX Design in 2024',
@@ -177,10 +226,22 @@ Remember, a design system is a tool to help your team work better together, not 
     }
   ];
 
-  // Find the news item by ID
-  const newsItem = newsItems.find(item => item.id === parseInt(id));
+  // Use article from Supabase or fallback to default
+  const displayItem = newsItem || defaultNewsItems.find(item => item.id === parseInt(id));
 
-  if (!newsItem) {
+  if (loading) {
+    return (
+      <div className="news-detail">
+        <div className="news-detail-container">
+          <div className="loading" style={{ textAlign: 'center', padding: '40px', color: '#00CED1' }}>
+            Loading article...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!displayItem) {
     return (
       <div className="news-detail">
         <div className="news-detail-container">
@@ -211,39 +272,77 @@ Remember, a design system is a tool to help your team work better together, not 
 
         <article className="news-article">
           <div className="article-header">
-            <div className="article-category">{newsItem.category}</div>
-            <h1 className="article-title">{newsItem.title}</h1>
-            <p className="article-excerpt">{newsItem.excerpt}</p>
+            <div className="article-category">{displayItem.category || 'General'}</div>
+            <h1 className="article-title">{displayItem.title || 'Untitled Article'}</h1>
+            {(displayItem.excerpt || displayItem.description) && (
+              <p className="article-excerpt">
+                {displayItem.excerpt || displayItem.description}
+              </p>
+            )}
             
             <div className="article-meta">
               <div className="meta-item">
                 <FaCalendarAlt className="meta-icon" />
-                <span>{newsItem.date}</span>
+                <span>{formatDate(displayItem.date || displayItem.pubDate)}</span>
               </div>
               <div className="meta-item">
                 <FaUser className="meta-icon" />
-                <span>{newsItem.author}</span>
+                <span>{displayItem.author || displayItem.source || 'News Team'}</span>
               </div>
               <div className="meta-item">
                 <FaTag className="meta-icon" />
-                <span>{newsItem.readTime}</span>
+                <span>{calculateReadTime(displayItem.content || displayItem.fullDescription || displayItem.description)}</span>
               </div>
             </div>
           </div>
 
-          <div className="article-image">
-            <div className="placeholder-image">
-              <span>Article Image</span>
+          {displayItem.image && displayItem.image !== '/api/placeholder/800/400' && !displayItem.image.includes('placeholder') && (
+            <div className="article-image">
+              <img 
+                src={displayItem.image} 
+                alt={displayItem.title} 
+                style={{ 
+                  width: '100%', 
+                  height: 'auto',
+                  borderRadius: '8px',
+                  maxHeight: '500px',
+                  objectFit: 'cover'
+                }}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
             </div>
-          </div>
+          )}
 
           <div className="article-content">
-            {newsItem.content.split('\n\n').map((paragraph, index) => (
-              <p key={index} className="article-paragraph">
-                {paragraph}
-              </p>
-            ))}
+            {(() => {
+              const content = displayItem.fullDescription || displayItem.content || displayItem.description || '';
+              // Split by double newlines for paragraphs, or single newlines if no double newlines
+              const paragraphs = content.includes('\n\n') 
+                ? content.split('\n\n').filter(p => p.trim())
+                : content.split('\n').filter(p => p.trim());
+              
+              return paragraphs.map((paragraph, index) => (
+                <p key={index} className="article-paragraph">
+                  {paragraph.trim()}
+                </p>
+              ));
+            })()}
           </div>
+
+          {displayItem.link && (
+            <div className="article-footer">
+              <a 
+                href={displayItem.link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="article-source-link"
+              >
+                <FaExternalLinkAlt /> Read Original Article
+              </a>
+            </div>
+          )}
         </article>
       </div>
     </div>
