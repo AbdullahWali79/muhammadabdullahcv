@@ -125,6 +125,139 @@
   max-width: 100%;
 }
 
+.article-html-content {
+  font-size: 18px;
+  color: #E0E0E0;
+  line-height: 1.9;
+  letter-spacing: 0.3px;
+}
+
+.article-html-content p {
+  margin-bottom: 28px;
+  text-align: left;
+  font-weight: 400;
+}
+
+.article-html-content p:first-child {
+  font-size: 20px;
+  color: #F0F0F0;
+  font-weight: 500;
+  margin-bottom: 32px;
+}
+
+.article-html-content p:last-child {
+  margin-bottom: 0;
+}
+
+.article-html-content h1,
+.article-html-content h2,
+.article-html-content h3,
+.article-html-content h4,
+.article-html-content h5,
+.article-html-content h6 {
+  color: #ffffff;
+  margin-top: 32px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.article-html-content h1 { font-size: 32px; }
+.article-html-content h2 { font-size: 28px; }
+.article-html-content h3 { font-size: 24px; }
+.article-html-content h4 { font-size: 20px; }
+
+.article-html-content ul,
+.article-html-content ol {
+  margin: 20px 0;
+  padding-left: 30px;
+  color: #E0E0E0;
+}
+
+.article-html-content li {
+  margin-bottom: 12px;
+  line-height: 1.8;
+}
+
+.article-html-content a {
+  color: #00CED1;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.article-html-content a:hover {
+  color: #ffffff;
+}
+
+.article-html-content strong,
+.article-html-content b {
+  color: #F0F0F0;
+  font-weight: 600;
+}
+
+.article-html-content em,
+.article-html-content i {
+  font-style: italic;
+}
+
+.article-html-content code {
+  background-color: #1A2B2E;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  color: #00CED1;
+}
+
+.article-html-content pre {
+  background-color: #1A2B2E;
+  padding: 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 24px 0;
+  border: 1px solid #3A4B4E;
+}
+
+.article-html-content pre code {
+  background: none;
+  padding: 0;
+  color: #E0E0E0;
+}
+
+.article-html-content blockquote {
+  border-left: 4px solid #00CED1;
+  padding-left: 20px;
+  margin: 24px 0;
+  color: #B0B0B0;
+  font-style: italic;
+}
+
+.article-html-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 24px 0;
+}
+
+.article-html-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+}
+
+.article-html-content table th,
+.article-html-content table td {
+  padding: 12px;
+  border: 1px solid #3A4B4E;
+  text-align: left;
+}
+
+.article-html-content table th {
+  background-color: #2A3B3E;
+  color: #ffffff;
+  font-weight: 600;
+}
+
 .article-paragraph {
   font-size: 18px;
   color: #E0E0E0;

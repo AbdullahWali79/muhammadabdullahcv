@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCalendarAlt, FaUser, FaTag } from 'react-icons/fa';
 import { getNewsData } from '../services/supabaseService';
+import parse from 'html-react-parser';
 import './News.css';
 
 const News = () => {
@@ -215,11 +216,26 @@ const News = () => {
                 </div>
                 
                 <h2 className="news-title">{item.title}</h2>
-                <p className="news-excerpt">
-                  {item.excerpt && item.excerpt.length > 0 
-                    ? (item.excerpt.length > 120 ? item.excerpt.substring(0, 120) + '...' : item.excerpt)
-                    : 'No description available'}
-                </p>
+                <div className="news-excerpt">
+                  {(() => {
+                    const excerpt = item.excerpt && item.excerpt.length > 0 
+                      ? item.excerpt 
+                      : 'No description available';
+                    
+                    // Check if HTML content
+                    const hasHTML = /<[a-z][\s\S]*>/i.test(excerpt);
+                    
+                    if (hasHTML) {
+                      // Strip HTML tags for excerpt and limit to 120 chars
+                      const textOnly = excerpt.replace(/<[^>]*>/g, '');
+                      const truncated = textOnly.length > 120 ? textOnly.substring(0, 120) + '...' : textOnly;
+                      return truncated;
+                    } else {
+                      // Plain text - truncate to 120 chars
+                      return excerpt.length > 120 ? excerpt.substring(0, 120) + '...' : excerpt;
+                    }
+                  })()}
+                </div>
                 
                 <button 
                   className="read-more-btn"

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaCalendarAlt, FaUser, FaTag, FaArrowLeft, FaExternalLinkAlt } from 'react-icons/fa';
 import { getNewsData } from '../services/supabaseService';
+import parse from 'html-react-parser';
 import './NewsDetail.css';
 
 const NewsDetail = () => {
@@ -318,16 +319,29 @@ Remember, a design system is a tool to help your team work better together, not 
           <div className="article-content">
             {(() => {
               const content = displayItem.fullDescription || displayItem.content || displayItem.description || '';
-              // Split by double newlines for paragraphs, or single newlines if no double newlines
-              const paragraphs = content.includes('\n\n') 
-                ? content.split('\n\n').filter(p => p.trim())
-                : content.split('\n').filter(p => p.trim());
               
-              return paragraphs.map((paragraph, index) => (
-                <p key={index} className="article-paragraph">
-                  {paragraph.trim()}
-                </p>
-              ));
+              // Check if content contains HTML tags
+              const hasHTML = /<[a-z][\s\S]*>/i.test(content);
+              
+              if (hasHTML) {
+                // Parse and render HTML content
+                return (
+                  <div className="article-html-content">
+                    {parse(content)}
+                  </div>
+                );
+              } else {
+                // Plain text - split into paragraphs
+                const paragraphs = content.includes('\n\n') 
+                  ? content.split('\n\n').filter(p => p.trim())
+                  : content.split('\n').filter(p => p.trim());
+                
+                return paragraphs.map((paragraph, index) => (
+                  <p key={index} className="article-paragraph">
+                    {paragraph.trim()}
+                  </p>
+                ));
+              }
             })()}
           </div>
 

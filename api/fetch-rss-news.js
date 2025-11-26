@@ -100,7 +100,7 @@ function extractImage(item) {
   return '';
 }
 
-// Clean HTML from text
+// Clean HTML from text (for short descriptions only)
 function cleanText(text) {
   if (!text) return '';
   return text
@@ -111,6 +111,20 @@ function cleanText(text) {
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .trim();
+}
+
+// Preserve HTML content (for full descriptions)
+function preserveHTML(text) {
+  if (!text) return '';
+  // Decode HTML entities but keep HTML structure
+  return text
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'");
 }
 
 // Check if article is technology-related
@@ -142,10 +156,17 @@ async function fetchRSSFeed(feedConfig) {
       .map(item => {
         const pubDate = item.pubDate ? new Date(item.pubDate) : new Date();
         
+        // Get content - preserve HTML for full description, clean for short description
+        const rawContent = item.content || item.contentSnippet || item.description || '';
+        const shortDescription = cleanText(rawContent); // Clean HTML for card view
+        const fullDescription = preserveHTML(rawContent); // Preserve HTML for detail page
+        
         return {
           id: `rss_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           title: item.title || 'Untitled Article',
-          content: cleanText(item.contentSnippet || item.content || item.description || ''),
+          description: shortDescription, // Clean text for card view
+          fullDescription: fullDescription, // HTML preserved for detail page
+          content: shortDescription, // Fallback
           date: pubDate.toISOString().split('T')[0],
           category: feedConfig.category,
           image: extractImage(item) || '',
