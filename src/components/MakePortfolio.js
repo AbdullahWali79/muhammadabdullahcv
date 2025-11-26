@@ -155,6 +155,12 @@ const MakePortfolio = () => {
           >
             <FaSave /> {saving ? 'Saving...' : 'Save Changes'}
           </button>
+          <button 
+            className="btn btn-primary" 
+            onClick={addProject}
+          >
+            <FaPlus /> Add New Portfolio
+          </button>
           <button className="btn btn-primary">
             <FaEye /> Preview
           </button>
