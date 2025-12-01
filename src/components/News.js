@@ -135,18 +135,30 @@ const News = () => {
 
   // Use articles from Supabase, or fallback to default
   const allNewsItems = newsData.articles.length > 0 
-    ? newsData.articles.map(article => ({
-        id: article.id,
-        title: article.title || 'Untitled Article',
-        excerpt: article.description || article.content || '',
-        content: article.fullDescription || article.content || article.description || '',
-        date: formatDate(article.date || article.pubDate),
-        author: article.source || 'News Team',
-        category: article.category || 'General',
-        readTime: calculateReadTime(article.content || article.description),
-        image: article.image || '/api/placeholder/400/250',
-        link: article.link || ''
-      }))
+    ? newsData.articles.map(article => {
+        // Check if article is a YouTube video
+        const isYouTube = article.id?.includes('youtube') || 
+                         article.link?.includes('youtube.com') || 
+                         article.link?.includes('youtu.be') ||
+                         article.source?.toLowerCase().includes('youtube');
+        
+        // Set category for YouTube videos
+        const category = isYouTube ? 'YouTube Videos' : (article.category || 'General');
+        
+        return {
+          id: article.id,
+          title: article.title || 'Untitled Article',
+          excerpt: article.description || article.content || '',
+          content: article.fullDescription || article.content || article.description || '',
+          date: formatDate(article.date || article.pubDate),
+          author: article.source || 'News Team',
+          category: category,
+          readTime: calculateReadTime(article.content || article.description),
+          image: article.image || '/api/placeholder/400/250',
+          link: article.link || '',
+          isYouTube: isYouTube
+        };
+      })
     : defaultNewsItems;
 
   // Filter articles by selected category
@@ -167,6 +179,9 @@ const News = () => {
         if (selectedCategory === 'AI' && category === 'AI') {
           return true;
         }
+        if (selectedCategory === 'YouTube Videos' && category === 'YouTube Videos') {
+          return true;
+        }
         return category === selectedCategory;
       });
 
@@ -175,7 +190,14 @@ const News = () => {
     const cat = item.category || 'General';
     if (['Technology', 'General'].includes(cat)) return 'Technology';
     return cat;
-  }).filter(Boolean))];
+  }).filter(Boolean))].sort((a, b) => {
+    // Sort categories: All first, then alphabetically, YouTube Videos at end
+    if (a === 'All') return -1;
+    if (b === 'All') return 1;
+    if (a === 'YouTube Videos') return 1;
+    if (b === 'YouTube Videos') return -1;
+    return a.localeCompare(b);
+  });
 
   if (loading) {
     return (

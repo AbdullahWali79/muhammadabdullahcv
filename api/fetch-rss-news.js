@@ -429,6 +429,141 @@ async function fetchNewsAPI(category = 'technology') {
   }
 }
 
+// Fetch YouTube videos (Free tier - 10,000 units/day, search costs 100 units)
+async function fetchYouTubeVideos() {
+  try {
+    const apiKey = process.env.YOUTUBE_API_KEY || '';
+    if (!apiKey) {
+      console.log('YouTube API key not found, skipping...');
+      return [];
+    }
+    
+    console.log('Fetching YouTube tech videos from last week...');
+    
+    // Calculate last week's date
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    const publishedAfter = oneWeekAgo.toISOString();
+    
+    // Tech-related search queries
+    const searchQueries = [
+      'technology',
+      'programming',
+      'web development',
+      'artificial intelligence',
+      'machine learning',
+      'software development'
+    ];
+    
+    const allVideos = [];
+    
+    // Fetch videos for each query (limit to 2-3 queries to stay within quota)
+    for (const query of searchQueries.slice(0, 3)) {
+      try {
+        const searchUrl = `https://www.googleapis.com/youtube/v3/search?` +
+          `part=snippet&` +
+          `q=${encodeURIComponent(query)}&` +
+          `type=video&` +
+          `publishedAfter=${publishedAfter}&` +
+          `maxResults=10&` +
+          `order=date&` +
+          `key=${apiKey}`;
+        
+        const response = await fetch(searchUrl);
+        const data = await response.json();
+        
+        if (data.items && data.items.length > 0) {
+          // Get video details for better description
+          const videoIds = data.items.map(item => item.id.videoId).join(',');
+          
+          let videoDetails = {};
+          try {
+            const detailsUrl = `https://www.googleapis.com/youtube/v3/videos?` +
+              `part=snippet,contentDetails&` +
+              `id=${videoIds}&` +
+              `key=${apiKey}`;
+            
+            const detailsResponse = await fetch(detailsUrl);
+            const detailsData = await detailsResponse.json();
+            
+            if (detailsData.items) {
+              detailsData.items.forEach(video => {
+                videoDetails[video.id] = video.snippet;
+              });
+            }
+          } catch (detailsError) {
+            console.error('Error fetching video details:', detailsError.message);
+          }
+          
+          const videos = data.items
+            .filter(item => {
+              // Filter only videos from last week
+              const pubDate = item.snippet.publishedAt ? new Date(item.snippet.publishedAt) : new Date();
+              const daysAgo = (Date.now() - pubDate.getTime()) / (1000 * 60 * 60 * 24);
+              return daysAgo <= 7;
+            })
+            .map(item => {
+              const videoId = item.id.videoId;
+              const snippet = item.snippet;
+              const details = videoDetails[videoId] || snippet;
+              
+              // Get best quality thumbnail
+              const thumbnail = details.thumbnails?.high?.url || 
+                               details.thumbnails?.medium?.url || 
+                               details.thumbnails?.default?.url || 
+                               '';
+              
+              const pubDate = new Date(snippet.publishedAt);
+              
+              return {
+                id: `youtube_${videoId}_${Date.now()}`,
+                title: snippet.title || 'Untitled Video',
+                description: cleanText(details.description || snippet.description || snippet.title || ''),
+                fullDescription: cleanText(details.description || snippet.description || snippet.title || ''),
+                content: cleanText(details.description || snippet.description || snippet.title || '').substring(0, 300),
+                date: pubDate.toISOString().split('T')[0],
+                category: 'Technology',
+                image: validateImageUrl(thumbnail),
+                featured: false,
+                source: snippet.channelTitle || 'YouTube',
+                link: `https://www.youtube.com/watch?v=${videoId}`,
+                pubDate: pubDate.toISOString(),
+                videoId: videoId,
+                channelTitle: snippet.channelTitle || ''
+              };
+            });
+          
+          allVideos.push(...videos);
+          
+          // Small delay to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      } catch (queryError) {
+        console.error(`Error fetching YouTube videos for query "${query}":`, queryError.message);
+        // Continue with other queries
+      }
+    }
+    
+    // Remove duplicates based on videoId
+    const uniqueVideos = [];
+    const seenVideoIds = new Set();
+    
+    allVideos.forEach(video => {
+      if (video.videoId && !seenVideoIds.has(video.videoId)) {
+        seenVideoIds.add(video.videoId);
+        uniqueVideos.push(video);
+      }
+    });
+    
+    console.log(`Found ${uniqueVideos.length} unique YouTube videos from last week`);
+    return uniqueVideos.slice(0, 20); // Limit to 20 videos
+    
+  } catch (error) {
+    console.error('Error fetching YouTube videos:', error.message);
+    return [];
+  }
+}
+
 // Fetch Reddit posts (Free - 60 requests/minute)
 async function fetchRedditNews(subreddit, category) {
   try {
@@ -683,6 +818,15 @@ module.exports = async (req, res) => {
         await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (error) {
         console.error('Error fetching Reddit ML:', error.message);
+      }
+
+      // Fetch from YouTube (Free tier - requires API key)
+      try {
+        const youtubeVideos = await fetchYouTubeVideos();
+        allArticles.push(...youtubeVideos);
+        console.log(`Fetched ${youtubeVideos.length} YouTube videos`);
+      } catch (error) {
+        console.error('Error fetching YouTube videos:', error.message);
       }
 
     } catch (fetchError) {
