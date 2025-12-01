@@ -13,6 +13,7 @@ const News = () => {
     articles: []
   });
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   useEffect(() => {
     const loadNewsData = async () => {
@@ -133,7 +134,7 @@ const News = () => {
   ];
 
   // Use articles from Supabase, or fallback to default
-  const newsItems = newsData.articles.length > 0 
+  const allNewsItems = newsData.articles.length > 0 
     ? newsData.articles.map(article => ({
         id: article.id,
         title: article.title || 'Untitled Article',
@@ -147,6 +148,34 @@ const News = () => {
         link: article.link || ''
       }))
     : defaultNewsItems;
+
+  // Filter articles by selected category
+  const newsItems = selectedCategory === 'All' 
+    ? allNewsItems 
+    : allNewsItems.filter(item => {
+        const category = item.category || 'General';
+        // Map categories for filtering
+        if (selectedCategory === 'Technology' && ['Technology', 'General'].includes(category)) {
+          return true;
+        }
+        if (selectedCategory === 'Development' && category === 'Development') {
+          return true;
+        }
+        if (selectedCategory === 'Crypto' && category === 'Crypto') {
+          return true;
+        }
+        if (selectedCategory === 'AI' && category === 'AI') {
+          return true;
+        }
+        return category === selectedCategory;
+      });
+
+  // Get unique categories from articles
+  const categories = ['All', ...new Set(allNewsItems.map(item => {
+    const cat = item.category || 'General';
+    if (['Technology', 'General'].includes(cat)) return 'Technology';
+    return cat;
+  }).filter(Boolean))];
 
   if (loading) {
     return (
@@ -166,6 +195,19 @@ const News = () => {
         <div className="news-header">
           <h1>{newsData.title}</h1>
           <p>{newsData.subtitle}</p>
+        </div>
+
+        {/* Filter Section */}
+        <div className="news-filters">
+          {categories.map(category => (
+            <button
+              key={category}
+              className={`filter-btn ${selectedCategory === category ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(category)}
+            >
+              {category}
+            </button>
+          ))}
         </div>
         
         {newsItems.length === 0 ? (

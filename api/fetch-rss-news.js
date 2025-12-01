@@ -14,6 +14,7 @@ const parser = new Parser({
 
 // RSS Feed Sources
 const RSS_FEEDS = [
+  // Technology Feeds
   {
     name: 'TechCrunch',
     url: 'https://techcrunch.com/feed/',
@@ -53,17 +54,89 @@ const RSS_FEEDS = [
     name: 'Smashing Magazine',
     url: 'https://www.smashingmagazine.com/feed/',
     category: 'Development'
+  },
+  // Crypto News Feeds
+  {
+    name: 'CoinDesk',
+    url: 'https://www.coindesk.com/arc/outboundfeeds/rss/',
+    category: 'Crypto'
+  },
+  {
+    name: 'CoinTelegraph',
+    url: 'https://cointelegraph.com/rss',
+    category: 'Crypto'
+  },
+  {
+    name: 'CryptoSlate',
+    url: 'https://cryptoslate.com/feed/',
+    category: 'Crypto'
+  },
+  {
+    name: 'Decrypt',
+    url: 'https://decrypt.co/feed',
+    category: 'Crypto'
+  },
+  {
+    name: 'Bitcoin Magazine',
+    url: 'https://bitcoinmagazine.com/.rss/full/',
+    category: 'Crypto'
+  },
+  {
+    name: 'The Block',
+    url: 'https://www.theblock.co/rss.xml',
+    category: 'Crypto'
+  },
+  // AI News & Tools Feeds
+  {
+    name: 'The Verge AI',
+    url: 'https://www.theverge.com/ai-artificial-intelligence/rss/index.xml',
+    category: 'AI'
+  },
+  {
+    name: 'TechCrunch AI',
+    url: 'https://techcrunch.com/tag/artificial-intelligence/feed/',
+    category: 'AI'
+  },
+  {
+    name: 'VentureBeat AI',
+    url: 'https://venturebeat.com/ai/feed/',
+    category: 'AI'
+  },
+  {
+    name: 'AI News',
+    url: 'https://www.artificialintelligence-news.com/feed/',
+    category: 'AI'
+  },
+  {
+    name: 'Towards Data Science',
+    url: 'https://towardsdatascience.com/feed',
+    category: 'AI'
+  },
+  {
+    name: 'There\'s An AI For That',
+    url: 'https://theresanaiforthat.com/feed/',
+    category: 'AI'
   }
 ];
 
 // Technology keywords to filter articles
 const TECH_KEYWORDS = [
+  // General Tech
   'javascript', 'react', 'node', 'python', 'java', 'web development',
   'programming', 'coding', 'software', 'app development', 'mobile app',
   'flutter', 'react native', 'vue', 'angular', 'typescript', 'html', 'css',
   'api', 'database', 'cloud', 'aws', 'azure', 'docker', 'kubernetes',
+  'cybersecurity', 'devops', 'git', 'github',
+  // AI & Machine Learning
   'machine learning', 'ai', 'artificial intelligence', 'data science',
-  'blockchain', 'crypto', 'cybersecurity', 'devops', 'git', 'github'
+  'deep learning', 'neural network', 'chatgpt', 'openai', 'gpt', 'llm',
+  'large language model', 'generative ai', 'ml', 'nlp', 'computer vision',
+  'ai tool', 'ai tools', 'automation', 'robotics', 'ai model',
+  // Crypto & Blockchain
+  'blockchain', 'crypto', 'cryptocurrency', 'bitcoin', 'btc', 'ethereum',
+  'eth', 'defi', 'nft', 'web3', 'altcoin', 'trading', 'wallet', 'mining',
+  'smart contract', 'dapp', 'dao', 'token', 'coin', 'exchange', 'binance',
+  'crypto market', 'digital currency', 'stablecoin', 'metaverse'
 ];
 
 // Extract image from article content
@@ -133,10 +206,162 @@ function preserveHTML(text) {
     .replace(/&#8212;/g, '—');
 }
 
-// Check if article is technology-related
+// Check if article is technology-related (includes crypto and AI)
 function isTechRelated(title, content) {
   const text = (title + ' ' + content).toLowerCase();
+  // For crypto and AI feeds, accept all articles since they're already filtered by source
+  // For other feeds, filter by keywords
   return TECH_KEYWORDS.some(keyword => text.includes(keyword));
+}
+
+// Check if feed should skip keyword filtering (crypto and AI feeds are already curated)
+function shouldSkipFiltering(category) {
+  return category === 'Crypto' || category === 'AI';
+}
+
+// Fetch news from CryptoCompare API (Free - 100K calls/month)
+async function fetchCryptoCompareNews() {
+  try {
+    console.log('Fetching CryptoCompare news...');
+    const response = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
+    const data = await response.json();
+    
+    if (data.Response === 'Success' && data.Data) {
+      const articles = data.Data
+        .filter(item => {
+          // Filter only recent articles (last 24 hours)
+          const pubDate = item.published_on ? new Date(item.published_on * 1000) : new Date();
+          const hoursAgo = (Date.now() - pubDate.getTime()) / (1000 * 60 * 60);
+          return hoursAgo <= 24;
+        })
+        .slice(0, 10) // Limit to 10 articles
+        .map(item => {
+          const pubDate = item.published_on ? new Date(item.published_on * 1000) : new Date();
+          return {
+            id: `crypto_${item.id}_${Date.now()}`,
+            title: item.title || 'Untitled Article',
+            description: cleanText(item.body || item.title || ''),
+            fullDescription: cleanText(item.body || item.title || ''),
+            content: cleanText(item.body || item.title || ''),
+            date: pubDate.toISOString().split('T')[0],
+            category: 'Crypto',
+            image: item.imageurl || item.source_info?.img || '',
+            featured: false,
+            source: item.source_info?.name || 'CryptoCompare',
+            link: item.url || item.guid || '',
+            pubDate: pubDate.toISOString()
+          };
+        });
+      
+      console.log(`Found ${articles.length} articles from CryptoCompare`);
+      return articles;
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching CryptoCompare news:', error.message);
+    return [];
+  }
+}
+
+// Fetch news from NewsAPI (Free tier - requires API key, but we'll try without first)
+async function fetchNewsAPI(category = 'technology') {
+  try {
+    const apiKey = process.env.NEWS_API_KEY || '';
+    if (!apiKey) {
+      console.log('NewsAPI key not found, skipping...');
+      return [];
+    }
+    
+    console.log(`Fetching NewsAPI for ${category}...`);
+    const query = category === 'crypto' ? 'cryptocurrency' : 
+                  category === 'ai' ? 'artificial intelligence' : 
+                  'technology';
+    
+    const response = await fetch(
+      `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&pageSize=10&apiKey=${apiKey}`
+    );
+    const data = await response.json();
+    
+    if (data.status === 'ok' && data.articles) {
+      const articles = data.articles
+        .filter(item => {
+          // Filter only recent articles (last 24 hours)
+          const pubDate = item.publishedAt ? new Date(item.publishedAt) : new Date();
+          const hoursAgo = (Date.now() - pubDate.getTime()) / (1000 * 60 * 60);
+          return hoursAgo <= 24;
+        })
+        .map(item => {
+          const pubDate = item.publishedAt ? new Date(item.publishedAt) : new Date();
+          return {
+            id: `newsapi_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            title: item.title || 'Untitled Article',
+            description: cleanText(item.description || item.title || ''),
+            fullDescription: cleanText(item.content || item.description || item.title || ''),
+            content: cleanText(item.description || item.title || ''),
+            date: pubDate.toISOString().split('T')[0],
+            category: category === 'crypto' ? 'Crypto' : category === 'ai' ? 'AI' : 'Technology',
+            image: item.urlToImage || '',
+            featured: false,
+            source: item.source?.name || 'NewsAPI',
+            link: item.url || '',
+            pubDate: pubDate.toISOString()
+          };
+        });
+      
+      console.log(`Found ${articles.length} articles from NewsAPI (${category})`);
+      return articles;
+    }
+    return [];
+  } catch (error) {
+    console.error(`Error fetching NewsAPI (${category}):`, error.message);
+    return [];
+  }
+}
+
+// Fetch Reddit posts (Free - 60 requests/minute)
+async function fetchRedditNews(subreddit, category) {
+  try {
+    console.log(`Fetching Reddit r/${subreddit}...`);
+    const response = await fetch(`https://www.reddit.com/r/${subreddit}/hot.json?limit=10`);
+    const data = await response.json();
+    
+    if (data.data && data.data.children) {
+      const articles = data.data.children
+        .filter(item => {
+          const post = item.data;
+          // Filter only recent posts (last 24 hours)
+          const pubDate = post.created_utc ? new Date(post.created_utc * 1000) : new Date();
+          const hoursAgo = (Date.now() - pubDate.getTime()) / (1000 * 60 * 60);
+          return hoursAgo <= 24 && !post.stickied;
+        })
+        .slice(0, 5)
+        .map(item => {
+          const post = item.data;
+          const pubDate = post.created_utc ? new Date(post.created_utc * 1000) : new Date();
+          return {
+            id: `reddit_${post.id}_${Date.now()}`,
+            title: post.title || 'Untitled Post',
+            description: cleanText(post.selftext || post.title || '').substring(0, 200),
+            fullDescription: cleanText(post.selftext || post.title || ''),
+            content: cleanText(post.selftext || post.title || '').substring(0, 200),
+            date: pubDate.toISOString().split('T')[0],
+            category: category,
+            image: post.thumbnail && post.thumbnail.startsWith('http') ? post.thumbnail : '',
+            featured: false,
+            source: `Reddit r/${subreddit}`,
+            link: `https://www.reddit.com${post.permalink}`,
+            pubDate: pubDate.toISOString()
+          };
+        });
+      
+      console.log(`Found ${articles.length} articles from Reddit r/${subreddit}`);
+      return articles;
+    }
+    return [];
+  } catch (error) {
+    console.error(`Error fetching Reddit r/${subreddit}:`, error.message);
+    return [];
+  }
 }
 
 // Fetch and parse RSS feed
@@ -153,7 +378,11 @@ async function fetchRSSFeed(feedConfig) {
         return hoursAgo <= 24;
       })
       .filter(item => {
-        // Filter technology-related articles
+        // For crypto and AI feeds, skip keyword filtering (they're already curated)
+        // For other feeds, filter technology-related articles
+        if (shouldSkipFiltering(feedConfig.category)) {
+          return true; // Accept all articles from crypto/AI feeds
+        }
         const title = item.title || '';
         const content = item.contentSnippet || item.content || '';
         return isTechRelated(title, content);
@@ -237,11 +466,12 @@ module.exports = async (req, res) => {
     console.log('Initializing Supabase client with URL:', supabaseUrl.substring(0, 30) + '...');
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Fetch all RSS feeds
-    console.log('Starting RSS feed fetch...');
+    // Fetch all RSS feeds and REST APIs
+    console.log('Starting news fetch from all sources...');
     const allArticles = [];
     
     try {
+      // Fetch RSS feeds
       for (const feed of RSS_FEEDS) {
         try {
           const articles = await fetchRSSFeed(feed);
@@ -255,11 +485,71 @@ module.exports = async (req, res) => {
           // Continue with other feeds even if one fails
         }
       }
+
+      // Fetch from CryptoCompare API (Free - no API key needed)
+      try {
+        const cryptoArticles = await fetchCryptoCompareNews();
+        allArticles.push(...cryptoArticles);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error('Error fetching CryptoCompare:', error.message);
+      }
+
+      // Fetch from NewsAPI (if API key is available)
+      try {
+        const techArticles = await fetchNewsAPI('technology');
+        allArticles.push(...techArticles);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error('Error fetching NewsAPI technology:', error.message);
+      }
+
+      try {
+        const cryptoNewsAPI = await fetchNewsAPI('crypto');
+        allArticles.push(...cryptoNewsAPI);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error('Error fetching NewsAPI crypto:', error.message);
+      }
+
+      try {
+        const aiNewsAPI = await fetchNewsAPI('ai');
+        allArticles.push(...aiNewsAPI);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error('Error fetching NewsAPI AI:', error.message);
+      }
+
+      // Fetch from Reddit (Free - no API key needed)
+      try {
+        const redditCrypto = await fetchRedditNews('cryptocurrency', 'Crypto');
+        allArticles.push(...redditCrypto);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error('Error fetching Reddit crypto:', error.message);
+      }
+
+      try {
+        const redditAI = await fetchRedditNews('artificial', 'AI');
+        allArticles.push(...redditAI);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error('Error fetching Reddit AI:', error.message);
+      }
+
+      try {
+        const redditML = await fetchRedditNews('MachineLearning', 'AI');
+        allArticles.push(...redditML);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error('Error fetching Reddit ML:', error.message);
+      }
+
     } catch (fetchError) {
-      console.error('Error in RSS feed loop:', fetchError);
+      console.error('Error in news fetch loop:', fetchError);
       return res.status(500).json({
         success: false,
-        error: `Error fetching RSS feeds: ${fetchError.message}`
+        error: `Error fetching news: ${fetchError.message}`
       });
     }
 
@@ -308,14 +598,25 @@ module.exports = async (req, res) => {
     }
 
     // Merge new articles with existing ones (new articles first)
-    const updatedArticles = [...newArticles, ...existingArticles]
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    
+    // Filter out articles older than 1 month
+    const recentExistingArticles = existingArticles.filter(article => {
+      const articleDate = new Date(article.pubDate || article.date || 0);
+      return articleDate >= oneMonthAgo;
+    });
+    
+    console.log(`Removed ${existingArticles.length - recentExistingArticles.length} old articles (older than 1 month)`);
+    
+    const updatedArticles = [...newArticles, ...recentExistingArticles]
       .sort((a, b) => {
         // Sort by date, newest first
         const dateA = new Date(a.pubDate || a.date || 0);
         const dateB = new Date(b.pubDate || b.date || 0);
         return dateB - dateA;
       })
-      .slice(0, 50); // Keep only latest 50 articles
+      .slice(0, 100); // Keep only latest 100 articles (increased from 50)
 
     // Update news data
     const newsData = {
