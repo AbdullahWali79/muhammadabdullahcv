@@ -14,6 +14,9 @@ const News = () => {
   });
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  
+  // Default image URL (GitHub raw URL)
+  const DEFAULT_IMAGE_URL = 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Muhammad%20Abdullah%20Ai-%20Developer.png';
 
   useEffect(() => {
     const loadNewsData = async () => {
@@ -162,7 +165,7 @@ const News = () => {
           author: article.source || 'News Team',
           category: category,
           readTime: calculateReadTime(article.content || article.description),
-          image: article.image || '/api/placeholder/400/250',
+          image: article.image || '',
           link: article.link || '',
           isYouTube: isYouTube
         };
@@ -262,23 +265,27 @@ const News = () => {
             {newsItems.map((item) => (
             <article key={item.id} className="news-item">
               <div className="news-image">
-                {item.image && item.image !== '/api/placeholder/400/250' && !item.image.includes('placeholder') ? (
-                  <img 
-                    src={item.image} 
-                    alt={item.title} 
-                    style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      objectFit: 'cover',
-                      borderRadius: '8px 8px 0 0'
-                    }} 
-                    onError={(e) => {
+                <img 
+                  src={item.image || DEFAULT_IMAGE_URL} 
+                  alt={item.title} 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover',
+                    borderRadius: '8px 8px 0 0'
+                  }} 
+                  onError={(e) => {
+                    // If image fails to load, use default image
+                    if (e.target.src !== DEFAULT_IMAGE_URL) {
+                      e.target.src = DEFAULT_IMAGE_URL;
+                    } else {
+                      // If default image also fails, show placeholder
                       e.target.style.display = 'none';
                       e.target.nextElementSibling.style.display = 'flex';
-                    }}
-                  />
-                ) : null}
-                <div className="placeholder-image" style={{ display: item.image && !item.image.includes('placeholder') ? 'none' : 'flex' }}>
+                    }
+                  }}
+                />
+                <div className="placeholder-image" style={{ display: 'none' }}>
                   <span>Article Image</span>
                 </div>
                 <div className="news-category">{item.category}</div>
