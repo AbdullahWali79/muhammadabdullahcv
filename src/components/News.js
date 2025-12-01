@@ -136,11 +136,19 @@ const News = () => {
   // Use articles from Supabase, or fallback to default
   const allNewsItems = newsData.articles.length > 0 
     ? newsData.articles.map(article => {
-        // Check if article is a YouTube video
-        const isYouTube = article.id?.includes('youtube') || 
-                         article.link?.includes('youtube.com') || 
-                         article.link?.includes('youtu.be') ||
-                         article.source?.toLowerCase().includes('youtube');
+        // Check if article is a YouTube video (multiple checks)
+        const link = article.link || '';
+        const id = article.id || '';
+        const source = (article.source || '').toLowerCase();
+        
+        const isYouTube = id.includes('youtube') || 
+                         id.includes('youtube_') ||
+                         link.includes('youtube.com/watch') ||
+                         link.includes('youtube.com/embed') ||
+                         link.includes('youtu.be/') ||
+                         link.includes('youtube.com/v/') ||
+                         source.includes('youtube') ||
+                         source === 'youtube';
         
         // Keep original category for videos (Technology or AI)
         const category = article.category || 'General';
@@ -195,16 +203,11 @@ const News = () => {
     return cat;
   }).filter(Boolean));
   
-  // Check if there are any videos (Technology or AI)
-  const hasVideos = allNewsItems.some(item => 
-    item.isYouTube && (item.category === 'Technology' || item.category === 'AI')
-  );
-  
   // Build categories array
   const categories = ['All', ...Array.from(articleCategories)];
   
-  // Add Videos filter if videos exist
-  if (hasVideos) {
+  // Always add Videos filter button (will show empty if no videos)
+  if (!categories.includes('Videos')) {
     categories.push('Videos');
   }
   
