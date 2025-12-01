@@ -142,8 +142,8 @@ const News = () => {
                          article.link?.includes('youtu.be') ||
                          article.source?.toLowerCase().includes('youtube');
         
-        // Set category for YouTube videos
-        const category = isYouTube ? 'YouTube Videos' : (article.category || 'General');
+        // Keep original category for videos (Technology or AI)
+        const category = article.category || 'General';
         
         return {
           id: article.id,
@@ -166,6 +166,8 @@ const News = () => {
     ? allNewsItems 
     : allNewsItems.filter(item => {
         const category = item.category || 'General';
+        const isVideo = item.isYouTube || false;
+        
         // Map categories for filtering
         if (selectedCategory === 'Technology' && ['Technology', 'General'].includes(category)) {
           return true;
@@ -179,23 +181,39 @@ const News = () => {
         if (selectedCategory === 'AI' && category === 'AI') {
           return true;
         }
-        if (selectedCategory === 'YouTube Videos' && category === 'YouTube Videos') {
-          return true;
+        // Videos filter - show only videos from Technology and AI categories
+        if (selectedCategory === 'Videos') {
+          return isVideo && (category === 'Technology' || category === 'AI');
         }
         return category === selectedCategory;
       });
 
   // Get unique categories from articles
-  const categories = ['All', ...new Set(allNewsItems.map(item => {
+  const articleCategories = new Set(allNewsItems.map(item => {
     const cat = item.category || 'General';
     if (['Technology', 'General'].includes(cat)) return 'Technology';
     return cat;
-  }).filter(Boolean))].sort((a, b) => {
-    // Sort categories: All first, then alphabetically, YouTube Videos at end
+  }).filter(Boolean));
+  
+  // Check if there are any videos (Technology or AI)
+  const hasVideos = allNewsItems.some(item => 
+    item.isYouTube && (item.category === 'Technology' || item.category === 'AI')
+  );
+  
+  // Build categories array
+  const categories = ['All', ...Array.from(articleCategories)];
+  
+  // Add Videos filter if videos exist
+  if (hasVideos) {
+    categories.push('Videos');
+  }
+  
+  // Sort categories: All first, then alphabetically, Videos at end
+  categories.sort((a, b) => {
     if (a === 'All') return -1;
     if (b === 'All') return 1;
-    if (a === 'YouTube Videos') return 1;
-    if (b === 'YouTube Videos') return -1;
+    if (a === 'Videos') return 1;
+    if (b === 'Videos') return -1;
     return a.localeCompare(b);
   });
 
