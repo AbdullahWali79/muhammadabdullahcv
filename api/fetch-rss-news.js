@@ -139,35 +139,128 @@ const TECH_KEYWORDS = [
   'crypto market', 'digital currency', 'stablecoin', 'metaverse'
 ];
 
-// Extract image from article content
+// Validate and clean image URL
+function validateImageUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  
+  // Remove whitespace
+  url = url.trim();
+  
+  // Check if it's a valid HTTP/HTTPS URL
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return '';
+  }
+  
+  // Remove common invalid URLs
+  const invalidPatterns = [
+    'placeholder',
+    'default',
+    'none',
+    'null',
+    'undefined',
+    'data:image',
+    'about:blank'
+  ];
+  
+  const urlLower = url.toLowerCase();
+  if (invalidPatterns.some(pattern => urlLower.includes(pattern))) {
+    return '';
+  }
+  
+  // Check for valid image extensions
+  const validExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+  const hasExtension = validExtensions.some(ext => urlLower.includes(ext));
+  
+  // If no extension, still allow if it looks like an image URL (has /image/ or similar)
+  if (!hasExtension && !urlLower.includes('/image') && !urlLower.includes('/img') && !urlLower.includes('/photo')) {
+    // Still allow it, might be a CDN URL without extension
+  }
+  
+  return url;
+}
+
+// Extract image from article content (RSS feeds)
 function extractImage(item) {
+  let imageUrl = '';
+  
   // Try media:content first
   if (item.mediaContent && item.mediaContent.length > 0) {
-    const media = item.mediaContent.find(m => m.$.url);
-    if (media) return media.$.url;
+    const media = item.mediaContent.find(m => m.$ && m.$.url);
+    if (media && media.$.url) {
+      imageUrl = validateImageUrl(media.$.url);
+      if (imageUrl) return imageUrl;
+    }
   }
   
   // Try media:thumbnail
   if (item.mediaThumbnail && item.mediaThumbnail.length > 0) {
-    const thumb = item.mediaThumbnail.find(t => t.$.url);
-    if (thumb) return thumb.$.url;
+    const thumb = item.mediaThumbnail.find(t => t.$ && t.$.url);
+    if (thumb && thumb.$.url) {
+      imageUrl = validateImageUrl(thumb.$.url);
+      if (imageUrl) return imageUrl;
+    }
   }
   
-  // Try content:encoded for img tags
+  // Try content:encoded for img tags (multiple patterns)
   if (item.contentEncoded) {
-    const imgMatch = item.contentEncoded.match(/<img[^>]+src="([^"]+)"/i);
-    if (imgMatch) return imgMatch[1];
+    // Try src="..." pattern
+    let imgMatch = item.contentEncoded.match(/<img[^>]+src=["']([^"']+)["']/i);
+    if (!imgMatch) {
+      // Try src=... pattern (without quotes)
+      imgMatch = item.contentEncoded.match(/<img[^>]+src=([^\s>]+)/i);
+    }
+    if (imgMatch && imgMatch[1]) {
+      imageUrl = validateImageUrl(imgMatch[1]);
+      if (imageUrl) return imageUrl;
+    }
+  }
+  
+  // Try content for img tags
+  if (item.content) {
+    let imgMatch = item.content.match(/<img[^>]+src=["']([^"']+)["']/i);
+    if (!imgMatch) {
+      imgMatch = item.content.match(/<img[^>]+src=([^\s>]+)/i);
+    }
+    if (imgMatch && imgMatch[1]) {
+      imageUrl = validateImageUrl(imgMatch[1]);
+      if (imageUrl) return imageUrl;
+    }
   }
   
   // Try contentSnippet for img tags
   if (item.contentSnippet) {
-    const imgMatch = item.contentSnippet.match(/<img[^>]+src="([^"]+)"/i);
-    if (imgMatch) return imgMatch[1];
+    let imgMatch = item.contentSnippet.match(/<img[^>]+src=["']([^"']+)["']/i);
+    if (!imgMatch) {
+      imgMatch = item.contentSnippet.match(/<img[^>]+src=([^\s>]+)/i);
+    }
+    if (imgMatch && imgMatch[1]) {
+      imageUrl = validateImageUrl(imgMatch[1]);
+      if (imageUrl) return imageUrl;
+    }
   }
   
-  // Try enclosure
+  // Try description for img tags
+  if (item.description) {
+    let imgMatch = item.description.match(/<img[^>]+src=["']([^"']+)["']/i);
+    if (!imgMatch) {
+      imgMatch = item.description.match(/<img[^>]+src=([^\s>]+)/i);
+    }
+    if (imgMatch && imgMatch[1]) {
+      imageUrl = validateImageUrl(imgMatch[1]);
+      if (imageUrl) return imageUrl;
+    }
+  }
+  
+  // Try enclosure (usually for podcasts, but sometimes images)
   if (item.enclosure && item.enclosure.url) {
-    return item.enclosure.url;
+    imageUrl = validateImageUrl(item.enclosure.url);
+    if (imageUrl) return imageUrl;
+  }
+  
+  // Try itunes:image
+  if (item.itunes && item.itunes.image) {
+    imageUrl = validateImageUrl(item.itunes.image);
+    if (imageUrl) return imageUrl;
   }
   
   return '';
@@ -237,6 +330,20 @@ async function fetchCryptoCompareNews() {
         .slice(0, 10) // Limit to 10 articles
         .map(item => {
           const pubDate = item.published_on ? new Date(item.published_on * 1000) : new Date();
+          
+          // Extract and validate image URL from CryptoCompare
+          let imageUrl = '';
+          if (item.imageurl) {
+            imageUrl = validateImageUrl(item.imageurl);
+          }
+          if (!imageUrl && item.source_info && item.source_info.img) {
+            imageUrl = validateImageUrl(item.source_info.img);
+          }
+          if (!imageUrl && item.imageurl) {
+            // Try direct URL even if validation fails (might be valid)
+            imageUrl = item.imageurl.startsWith('http') ? item.imageurl : '';
+          }
+          
           return {
             id: `crypto_${item.id}_${Date.now()}`,
             title: item.title || 'Untitled Article',
@@ -245,7 +352,7 @@ async function fetchCryptoCompareNews() {
             content: cleanText(item.body || item.title || ''),
             date: pubDate.toISOString().split('T')[0],
             category: 'Crypto',
-            image: item.imageurl || item.source_info?.img || '',
+            image: imageUrl,
             featured: false,
             source: item.source_info?.name || 'CryptoCompare',
             link: item.url || item.guid || '',
@@ -292,6 +399,10 @@ async function fetchNewsAPI(category = 'technology') {
         })
         .map(item => {
           const pubDate = item.publishedAt ? new Date(item.publishedAt) : new Date();
+          
+          // Extract and validate image URL from NewsAPI
+          const imageUrl = validateImageUrl(item.urlToImage || '');
+          
           return {
             id: `newsapi_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             title: item.title || 'Untitled Article',
@@ -300,7 +411,7 @@ async function fetchNewsAPI(category = 'technology') {
             content: cleanText(item.description || item.title || ''),
             date: pubDate.toISOString().split('T')[0],
             category: category === 'crypto' ? 'Crypto' : category === 'ai' ? 'AI' : 'Technology',
-            image: item.urlToImage || '',
+            image: imageUrl,
             featured: false,
             source: item.source?.name || 'NewsAPI',
             link: item.url || '',
@@ -338,6 +449,35 @@ async function fetchRedditNews(subreddit, category) {
         .map(item => {
           const post = item.data;
           const pubDate = post.created_utc ? new Date(post.created_utc * 1000) : new Date();
+          
+          // Extract and validate image URL from Reddit
+          let imageUrl = '';
+          
+          // Try preview images first (best quality)
+          if (post.preview && post.preview.images && post.preview.images.length > 0) {
+            const previewImg = post.preview.images[0];
+            if (previewImg.source && previewImg.source.url) {
+              // Reddit preview URLs are encoded, decode them
+              imageUrl = previewImg.source.url.replace(/&amp;/g, '&');
+              imageUrl = validateImageUrl(imageUrl);
+            }
+          }
+          
+          // Try thumbnail_hint (medium quality)
+          if (!imageUrl && post.thumbnail_hint) {
+            imageUrl = validateImageUrl(post.thumbnail_hint);
+          }
+          
+          // Try thumbnail (low quality, but better than nothing)
+          if (!imageUrl && post.thumbnail && post.thumbnail.startsWith('http')) {
+            imageUrl = validateImageUrl(post.thumbnail);
+          }
+          
+          // Try url if it's an image post
+          if (!imageUrl && post.url && (post.url.includes('.jpg') || post.url.includes('.png') || post.url.includes('.gif') || post.url.includes('.webp'))) {
+            imageUrl = validateImageUrl(post.url);
+          }
+          
           return {
             id: `reddit_${post.id}_${Date.now()}`,
             title: post.title || 'Untitled Post',
@@ -346,7 +486,7 @@ async function fetchRedditNews(subreddit, category) {
             content: cleanText(post.selftext || post.title || '').substring(0, 200),
             date: pubDate.toISOString().split('T')[0],
             category: category,
-            image: post.thumbnail && post.thumbnail.startsWith('http') ? post.thumbnail : '',
+            image: imageUrl,
             featured: false,
             source: `Reddit r/${subreddit}`,
             link: `https://www.reddit.com${post.permalink}`,
