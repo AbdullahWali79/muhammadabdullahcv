@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PasswordProtection from './PasswordProtection';
-import { saveHomeData } from '../services/supabaseService';
+import { saveHomeData, getHomeData } from '../services/supabaseService';
 import { FaSave, FaEye, FaEdit } from 'react-icons/fa';
 import './MakeHome.css';
 
@@ -19,6 +19,39 @@ const MakeHome = () => {
       dribbble: 'https://dribbble.com/muhammadabdullah'
     }
   });
+  const [loading, setLoading] = useState(false);
+
+  // Load data from database on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const result = await getHomeData();
+        if (result.success && result.data) {
+          setHomeData({
+            title: result.data.title || 'Welcome to My Portfolio',
+            subtitle: result.data.subtitle || 'AI Developer',
+            description: result.data.description || 'Consistency Makes a Man Perfect in Their Skill Set. - M. Abdullah',
+            buttonText: result.data.buttonText || 'Get Started',
+            buttonLink: result.data.buttonLink || '#contact',
+            helloText: result.data.helloText || 'AsslamuAlikum',
+            socialLinks: result.data.socialLinks || {
+              linkedin: 'https://linkedin.com/in/muhammadabdullah',
+              twitter: 'https://twitter.com/muhammadabdullah',
+              github: 'https://github.com/AbdullahWali79',
+              dribbble: 'https://dribbble.com/muhammadabdullah'
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Error loading home data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

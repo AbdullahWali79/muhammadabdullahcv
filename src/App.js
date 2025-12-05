@@ -37,7 +37,13 @@ function AppContent() {
     languages: 'English, Urdu, Punjabi',
     profileImage: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Professional.jpeg',
     summary: 'Consistency Makes a Man Perfect in Their Skill Set. - M. Abdullah',
-    helloText: 'AsslamuAlikum'
+    helloText: 'AsslamuAlikum',
+    socialLinks: {
+      linkedin: 'https://linkedin.com/in/muhammadabdullah',
+      twitter: 'https://twitter.com/muhammadabdullah',
+      github: 'https://github.com/AbdullahWali79',
+      dribbble: 'https://dribbble.com/muhammadabdullah'
+    }
   });
 
   // Load user data from database on component mount
@@ -60,7 +66,13 @@ function AppContent() {
             languages: dbData.languages || 'English, Urdu, Punjabi',
             profileImage: dbData.profile_image || 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Professional.jpeg',
             summary: dbData.summary || 'Consistency Makes a Man Perfect in Their Skill Set. - M. Abdullah',
-            helloText: dbData.hello_text || 'AsslamuAlikum'
+            helloText: dbData.hello_text || 'AsslamuAlikum',
+            socialLinks: dbData.social_links || {
+              linkedin: 'https://linkedin.com/in/muhammadabdullah',
+              twitter: 'https://twitter.com/muhammadabdullah',
+              github: 'https://github.com/AbdullahWali79',
+              dribbble: 'https://dribbble.com/muhammadabdullah'
+            }
           });
         }
       } catch (error) {
