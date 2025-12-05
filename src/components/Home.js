@@ -10,6 +10,7 @@ const Home = ({ userData }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
+  const [localUserData, setLocalUserData] = useState(userData);
 
   const handleDownloadCV = async () => {
     setIsGenerating(true);
@@ -41,9 +42,40 @@ const Home = ({ userData }) => {
     window.open(whatsappUrl, '_blank');
   };
 
+  // Load social links from localStorage on mount and when storage changes
+  useEffect(() => {
+    const loadLocalData = () => {
+      const savedSocialLinks = localStorage.getItem('socialLinks');
+      const savedHelloText = localStorage.getItem('helloText');
+      
+      if (savedSocialLinks || savedHelloText) {
+        setLocalUserData(prev => ({
+          ...prev,
+          socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : prev.socialLinks,
+          helloText: savedHelloText || prev.helloText
+        }));
+      }
+    };
+
+    // Load on mount
+    loadLocalData();
+
+    // Listen for storage changes
+    window.addEventListener('storage', loadLocalData);
+    
+    return () => {
+      window.removeEventListener('storage', loadLocalData);
+    };
+  }, []);
+
+  // Update localUserData when userData prop changes
+  useEffect(() => {
+    setLocalUserData(userData);
+  }, [userData]);
+
   // Typing animation effect with loop
   useEffect(() => {
-    const fullText = userData.summary?.replace(/ - /g, ' \u2013 ') || '';
+    const fullText = localUserData.summary?.replace(/ - /g, ' \u2013 ') || '';
     if (!fullText) return;
 
     let currentIndex = 0;
@@ -77,26 +109,26 @@ const Home = ({ userData }) => {
       if (typingInterval) clearInterval(typingInterval);
       if (pauseTimeout) clearTimeout(pauseTimeout);
     };
-  }, [userData.summary]);
+  }, [localUserData.summary]);
 
 
   return (
     <div className="home">
       <div className="home-container">
         <div className="hero-section">
-          <div className="hello-badge">{userData.helloText || 'AsslamuAlikum'}</div>
+          <div className="hello-badge">{localUserData.helloText || 'AsslamuAlikum'}</div>
           <div className="hero-content">
             <div className="hero-image">
-              {userData.profileImage ? (
-                <img src={userData.profileImage} alt="Profile" />
+              {localUserData.profileImage ? (
+                <img src={localUserData.profileImage} alt="Profile" />
               ) : (
                 <div className="default-hero-avatar">
-                  {userData.firstName.charAt(0)}{userData.lastName.charAt(0)}
+                  {localUserData.firstName.charAt(0)}{localUserData.lastName.charAt(0)}
                 </div>
               )}
             </div>
             <div className="hero-text">
-              <h1 className="hero-title">{userData.firstName} {userData.lastName}</h1>
+              <h1 className="hero-title">{localUserData.firstName} {localUserData.lastName}</h1>
               <p className="hero-summary">
                 {displayedText}
                 {isTyping && <span className="typing-cursor">|</span>}
@@ -115,7 +147,7 @@ const Home = ({ userData }) => {
                     <span className="info-label">Full Name:</span>
                   </td>
                   <td className="info-cell">
-                    <span className="info-value">{userData.firstName} {userData.lastName}</span>
+                    <span className="info-value">{localUserData.firstName} {localUserData.lastName}</span>
                   </td>
                 </tr>
                 <tr className="info-row">
@@ -124,7 +156,7 @@ const Home = ({ userData }) => {
                     <span className="info-label">Date of Birth:</span>
                   </td>
                   <td className="info-cell">
-                    <span className="info-value">{userData.dateOfBirth}</span>
+                    <span className="info-value">{localUserData.dateOfBirth}</span>
                   </td>
                 </tr>
                 <tr className="info-row">
@@ -133,7 +165,7 @@ const Home = ({ userData }) => {
                     <span className="info-label">Phone:</span>
                   </td>
                   <td className="info-cell">
-                    <span className="info-value">{userData.phone}</span>
+                    <span className="info-value">{localUserData.phone}</span>
                   </td>
                 </tr>
                 <tr className="info-row">
@@ -142,7 +174,7 @@ const Home = ({ userData }) => {
                     <span className="info-label">Address:</span>
                   </td>
                   <td className="info-cell">
-                    <span className="info-value">{userData.address}</span>
+                    <span className="info-value">{localUserData.address}</span>
                   </td>
                 </tr>
               </tbody>
@@ -156,7 +188,7 @@ const Home = ({ userData }) => {
                     <span className="info-label">Email Address:</span>
                   </td>
                   <td className="info-cell">
-                    <span className="info-value">{userData.email}</span>
+                    <span className="info-value">{localUserData.email}</span>
                   </td>
                 </tr>
                 <tr className="info-row">
@@ -165,7 +197,7 @@ const Home = ({ userData }) => {
                     <span className="info-label">Professional Title:</span>
                   </td>
                   <td className="info-cell">
-                    <span className="info-value">{userData.title}</span>
+                    <span className="info-value">{localUserData.title}</span>
                   </td>
                 </tr>
                 <tr className="info-row">
@@ -174,7 +206,7 @@ const Home = ({ userData }) => {
                     <span className="info-label">Languages:</span>
                   </td>
                   <td className="info-cell">
-                    <span className="info-value">{userData.languages}</span>
+                    <span className="info-value">{localUserData.languages}</span>
                   </td>
                 </tr>
                 <tr className="info-row">
@@ -183,7 +215,7 @@ const Home = ({ userData }) => {
                     <span className="info-label">Nationality:</span>
                   </td>
                   <td className="info-cell">
-                    <span className="info-value">{userData.nationality}</span>
+                    <span className="info-value">{localUserData.nationality}</span>
                   </td>
                 </tr>
               </tbody>
@@ -203,11 +235,11 @@ const Home = ({ userData }) => {
         </div>
 
         {/* Social Media Links Section */}
-        {userData.socialLinks && userData.socialLinks.length > 0 && (
+        {localUserData.socialLinks && localUserData.socialLinks.length > 0 && (
           <div className="social-links-section">
             <h3>Follow Me</h3>
             <div className="social-grid">
-              {userData.socialLinks.map((link) => (
+              {localUserData.socialLinks.map((link) => (
                 link.url && (
                   <a 
                     key={link.id} 
@@ -227,7 +259,7 @@ const Home = ({ userData }) => {
       </div>
       
       <footer className="footer">
-        <p>© 2026 {userData.firstName} {userData.lastName}. All Rights Reserved.</p>
+        <p>© 2026 {localUserData.firstName} {localUserData.lastName}. All Rights Reserved.</p>
       </footer>
     </div>
   );

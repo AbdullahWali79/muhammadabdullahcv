@@ -161,10 +161,14 @@ const MakeHome = () => {
       const result = await saveHomeData(dataToSave);
       
       if (result.success) {
-        setMessage('Home page data saved successfully! (Note: Social links and hello text are stored locally)');
-        // Store social links and helloText in localStorage for now
+        // Store social links and helloText in localStorage
         localStorage.setItem('socialLinks', JSON.stringify(homeData.socialLinks));
         localStorage.setItem('helloText', homeData.helloText);
+        
+        // Trigger a storage event to notify other components
+        window.dispatchEvent(new Event('storage'));
+        
+        setMessage('Home page data saved successfully! Please refresh the home page to see changes.');
       } else {
         setMessage(`Error: ${result.error}`);
       }
