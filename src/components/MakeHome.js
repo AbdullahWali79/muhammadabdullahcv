@@ -25,6 +25,7 @@ const MakeHome = () => {
 
   // Available social media platforms with icons
   const availablePlatforms = [
+    { name: 'Website', icon: 'fas fa-globe', color: '#00CED1' },
     { name: 'LinkedIn', icon: 'fab fa-linkedin', color: '#0077B5' },
     { name: 'Twitter', icon: 'fab fa-twitter', color: '#1DA1F2' },
     { name: 'Facebook', icon: 'fab fa-facebook', color: '#1877F2' },
