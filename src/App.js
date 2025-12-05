@@ -51,6 +51,18 @@ function AppContent() {
     const loadUserData = async () => {
       try {
         const result = await getUserData();
+        
+        // Load social links and helloText from localStorage
+        const savedSocialLinks = localStorage.getItem('socialLinks');
+        const savedHelloText = localStorage.getItem('helloText');
+        
+        const defaultSocialLinks = [
+          { id: 1, platform: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/muhammadabdullah', color: '#0077B5' },
+          { id: 2, platform: 'Twitter', icon: 'fab fa-twitter', url: 'https://twitter.com/muhammadabdullah', color: '#1DA1F2' },
+          { id: 3, platform: 'GitHub', icon: 'fab fa-github', url: 'https://github.com/AbdullahWali79', color: '#ffffff' },
+          { id: 4, platform: 'YouTube', icon: 'fab fa-youtube', url: 'https://youtube.com/@muhammadabdullah', color: '#FF0000' }
+        ];
+        
         if (result.success && result.data) {
           // Convert database format to component format
           const dbData = result.data;
@@ -66,14 +78,16 @@ function AppContent() {
             languages: dbData.languages || 'English, Urdu, Punjabi',
             profileImage: dbData.profile_image || 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Professional.jpeg',
             summary: dbData.summary || 'Consistency Makes a Man Perfect in Their Skill Set. - M. Abdullah',
-            helloText: dbData.hello_text || 'AsslamuAlikum',
-            socialLinks: dbData.social_links || [
-              { id: 1, platform: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/muhammadabdullah', color: '#0077B5' },
-              { id: 2, platform: 'Twitter', icon: 'fab fa-twitter', url: 'https://twitter.com/muhammadabdullah', color: '#1DA1F2' },
-              { id: 3, platform: 'GitHub', icon: 'fab fa-github', url: 'https://github.com/AbdullahWali79', color: '#ffffff' },
-              { id: 4, platform: 'YouTube', icon: 'fab fa-youtube', url: 'https://youtube.com/@muhammadabdullah', color: '#FF0000' }
-            ]
+            helloText: savedHelloText || 'AsslamuAlikum',
+            socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : defaultSocialLinks
           });
+        } else {
+          // Use localStorage data if available
+          setUserData(prev => ({
+            ...prev,
+            helloText: savedHelloText || prev.helloText,
+            socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : prev.socialLinks
+          }));
         }
       } catch (error) {
         console.error('Error loading user data:', error);

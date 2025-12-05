@@ -53,21 +53,35 @@ const MakeHome = () => {
       setLoading(true);
       try {
         const result = await getHomeData();
+        
+        // Load social links and helloText from localStorage
+        const savedSocialLinks = localStorage.getItem('socialLinks');
+        const savedHelloText = localStorage.getItem('helloText');
+        
+        const defaultSocialLinks = [
+          { id: 1, platform: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/muhammadabdullah', color: '#0077B5' },
+          { id: 2, platform: 'Twitter', icon: 'fab fa-twitter', url: 'https://twitter.com/muhammadabdullah', color: '#1DA1F2' },
+          { id: 3, platform: 'GitHub', icon: 'fab fa-github', url: 'https://github.com/AbdullahWali79', color: '#ffffff' },
+          { id: 4, platform: 'YouTube', icon: 'fab fa-youtube', url: 'https://youtube.com/@muhammadabdullah', color: '#FF0000' }
+        ];
+        
         if (result.success && result.data) {
           setHomeData({
             title: result.data.title || 'Welcome to My Portfolio',
             subtitle: result.data.subtitle || 'AI Developer',
             description: result.data.description || 'Consistency Makes a Man Perfect in Their Skill Set. - M. Abdullah',
-            buttonText: result.data.buttonText || 'Get Started',
-            buttonLink: result.data.buttonLink || '#contact',
-            helloText: result.data.helloText || 'AsslamuAlikum',
-            socialLinks: result.data.socialLinks || [
-              { id: 1, platform: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/muhammadabdullah', color: '#0077B5' },
-              { id: 2, platform: 'Twitter', icon: 'fab fa-twitter', url: 'https://twitter.com/muhammadabdullah', color: '#1DA1F2' },
-              { id: 3, platform: 'GitHub', icon: 'fab fa-github', url: 'https://github.com/AbdullahWali79', color: '#ffffff' },
-              { id: 4, platform: 'YouTube', icon: 'fab fa-youtube', url: 'https://youtube.com/@muhammadabdullah', color: '#FF0000' }
-            ]
+            buttonText: result.data.button_text || 'Get Started',
+            buttonLink: result.data.button_link || '#contact',
+            helloText: savedHelloText || 'AsslamuAlikum',
+            socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : defaultSocialLinks
           });
+        } else {
+          // Use defaults if no data in database
+          setHomeData(prev => ({
+            ...prev,
+            helloText: savedHelloText || prev.helloText,
+            socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : prev.socialLinks
+          }));
         }
       } catch (error) {
         console.error('Error loading home data:', error);
@@ -135,19 +149,22 @@ const MakeHome = () => {
     setSaving(true);
     setMessage('');
     try {
-      // Only save fields that exist in database
+      // Only save fields that exist in database (home_data table)
       const dataToSave = {
         title: homeData.title,
         subtitle: homeData.subtitle,
         description: homeData.description,
-        helloText: homeData.helloText,
-        socialLinks: homeData.socialLinks
+        button_text: homeData.buttonText,
+        button_link: homeData.buttonLink
       };
       
       const result = await saveHomeData(dataToSave);
       
       if (result.success) {
-        setMessage('Home page data saved successfully!');
+        setMessage('Home page data saved successfully! (Note: Social links and hello text are stored locally)');
+        // Store social links and helloText in localStorage for now
+        localStorage.setItem('socialLinks', JSON.stringify(homeData.socialLinks));
+        localStorage.setItem('helloText', homeData.helloText);
       } else {
         setMessage(`Error: ${result.error}`);
       }
