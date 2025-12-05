@@ -11,7 +11,13 @@ const MakeHome = () => {
     description: 'Consistency Makes a Man Perfect in Their Skill Set. - M. Abdullah',
     buttonText: 'Get Started',
     buttonLink: '#contact',
-    helloText: 'AsslamuAlikum'
+    helloText: 'AsslamuAlikum',
+    socialLinks: {
+      linkedin: 'https://linkedin.com/in/muhammadabdullah',
+      twitter: 'https://twitter.com/muhammadabdullah',
+      github: 'https://github.com/AbdullahWali79',
+      dribbble: 'https://dribbble.com/muhammadabdullah'
+    }
   });
 
   const handleInputChange = (e) => {
@@ -20,6 +26,16 @@ const MakeHome = () => {
     setHomeData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  const handleSocialLinkChange = (platform, value) => {
+    setHomeData(prev => ({
+      ...prev,
+      socialLinks: {
+        ...prev.socialLinks,
+        [platform]: value
+      }
     }));
   };
 
@@ -122,6 +138,67 @@ const MakeHome = () => {
                 className="form-input"
               />
             </div>
+          </div>
+        </div>
+
+        <div className="form-section">
+          <h2>Social Media Links</h2>
+          <p className="section-description">Add your social media profile links that will appear on the home page</p>
+          
+          <div className="form-group">
+            <label>
+              <i className="fab fa-linkedin" style={{ color: '#0077B5', marginRight: '8px' }}></i>
+              LinkedIn Profile URL
+            </label>
+            <input
+              type="url"
+              value={homeData.socialLinks.linkedin}
+              onChange={(e) => handleSocialLinkChange('linkedin', e.target.value)}
+              className="form-input"
+              placeholder="https://linkedin.com/in/your-profile"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>
+              <i className="fab fa-twitter" style={{ color: '#1DA1F2', marginRight: '8px' }}></i>
+              Twitter Profile URL
+            </label>
+            <input
+              type="url"
+              value={homeData.socialLinks.twitter}
+              onChange={(e) => handleSocialLinkChange('twitter', e.target.value)}
+              className="form-input"
+              placeholder="https://twitter.com/your-username"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>
+              <i className="fab fa-github" style={{ color: '#ffffff', marginRight: '8px' }}></i>
+              GitHub Profile URL
+            </label>
+            <input
+              type="url"
+              value={homeData.socialLinks.github}
+              onChange={(e) => handleSocialLinkChange('github', e.target.value)}
+              className="form-input"
+              placeholder="https://github.com/your-username"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>
+              <i className="fab fa-dribbble" style={{ color: '#EA4C89', marginRight: '8px' }}></i>
+              Dribbble Profile URL
+            </label>
+            <input
+              type="url"
+              value={homeData.socialLinks.dribbble}
+              onChange={(e) => handleSocialLinkChange('dribbble', e.target.value)}
+              className="form-input"
+              placeholder="https://dribbble.com/your-username"
+            />
           </div>
         </div>
       </div>
