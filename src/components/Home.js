@@ -201,6 +201,29 @@ const Home = ({ userData }) => {
             Contact Me
           </button>
         </div>
+
+        {/* Social Media Links Section */}
+        <div className="social-links-section">
+          <h3>Follow Me</h3>
+          <div className="social-grid">
+            <a href="https://linkedin.com/in/muhammadabdullah" target="_blank" rel="noopener noreferrer" className="social-link">
+              <i className="fab fa-linkedin"></i>
+              LinkedIn
+            </a>
+            <a href="https://twitter.com/muhammadabdullah" target="_blank" rel="noopener noreferrer" className="social-link">
+              <i className="fab fa-twitter"></i>
+              Twitter
+            </a>
+            <a href="https://github.com/AbdullahWali79" target="_blank" rel="noopener noreferrer" className="social-link">
+              <i className="fab fa-github"></i>
+              GitHub
+            </a>
+            <a href="https://dribbble.com/muhammadabdullah" target="_blank" rel="noopener noreferrer" className="social-link">
+              <i className="fab fa-dribbble"></i>
+              Dribbble
+            </a>
+          </div>
+        </div>
       </div>
       
       <footer className="footer">
