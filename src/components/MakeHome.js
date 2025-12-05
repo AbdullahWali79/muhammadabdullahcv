@@ -135,7 +135,16 @@ const MakeHome = () => {
     setSaving(true);
     setMessage('');
     try {
-      const result = await saveHomeData(homeData);
+      // Only save fields that exist in database
+      const dataToSave = {
+        title: homeData.title,
+        subtitle: homeData.subtitle,
+        description: homeData.description,
+        helloText: homeData.helloText,
+        socialLinks: homeData.socialLinks
+      };
+      
+      const result = await saveHomeData(dataToSave);
       
       if (result.success) {
         setMessage('Home page data saved successfully!');
