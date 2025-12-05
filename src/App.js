@@ -38,12 +38,12 @@ function AppContent() {
     profileImage: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Professional.jpeg',
     summary: 'Consistency Makes a Man Perfect in Their Skill Set. - M. Abdullah',
     helloText: 'AsslamuAlikum',
-    socialLinks: {
-      linkedin: 'https://linkedin.com/in/muhammadabdullah',
-      twitter: 'https://twitter.com/muhammadabdullah',
-      github: 'https://github.com/AbdullahWali79',
-      dribbble: 'https://dribbble.com/muhammadabdullah'
-    }
+    socialLinks: [
+      { id: 1, platform: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/muhammadabdullah', color: '#0077B5' },
+      { id: 2, platform: 'Twitter', icon: 'fab fa-twitter', url: 'https://twitter.com/muhammadabdullah', color: '#1DA1F2' },
+      { id: 3, platform: 'GitHub', icon: 'fab fa-github', url: 'https://github.com/AbdullahWali79', color: '#ffffff' },
+      { id: 4, platform: 'YouTube', icon: 'fab fa-youtube', url: 'https://youtube.com/@muhammadabdullah', color: '#FF0000' }
+    ]
   });
 
   // Load user data from database on component mount
@@ -67,12 +67,12 @@ function AppContent() {
             profileImage: dbData.profile_image || 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Professional.jpeg',
             summary: dbData.summary || 'Consistency Makes a Man Perfect in Their Skill Set. - M. Abdullah',
             helloText: dbData.hello_text || 'AsslamuAlikum',
-            socialLinks: dbData.social_links || {
-              linkedin: 'https://linkedin.com/in/muhammadabdullah',
-              twitter: 'https://twitter.com/muhammadabdullah',
-              github: 'https://github.com/AbdullahWali79',
-              dribbble: 'https://dribbble.com/muhammadabdullah'
-            }
+            socialLinks: dbData.social_links || [
+              { id: 1, platform: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/muhammadabdullah', color: '#0077B5' },
+              { id: 2, platform: 'Twitter', icon: 'fab fa-twitter', url: 'https://twitter.com/muhammadabdullah', color: '#1DA1F2' },
+              { id: 3, platform: 'GitHub', icon: 'fab fa-github', url: 'https://github.com/AbdullahWali79', color: '#ffffff' },
+              { id: 4, platform: 'YouTube', icon: 'fab fa-youtube', url: 'https://youtube.com/@muhammadabdullah', color: '#FF0000' }
+            ]
           });
         }
       } catch (error) {

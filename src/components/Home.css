@@ -293,6 +293,11 @@
 
 .social-link i {
   font-size: 20px;
+  transition: color 0.3s ease;
+}
+
+.social-link:hover i {
+  color: inherit !important;
 }
 
 .btn {
