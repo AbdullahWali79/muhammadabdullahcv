@@ -43,7 +43,7 @@ const MakeNews = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     setNewsData(prev => ({
       ...prev,
       [name]: value
@@ -53,7 +53,7 @@ const MakeNews = () => {
   const handleArticleChange = (id, field, value) => {
     setNewsData(prev => ({
       ...prev,
-      articles: prev.articles.map(article => 
+      articles: prev.articles.map(article =>
         article.id === id ? { ...article, [field]: value } : article
       )
     }));
@@ -133,156 +133,152 @@ const MakeNews = () => {
     }
   };
 
-  const NewsEditor = () => (
-    <div className="make-news">
-      <div className="editor-header">
-        <h1>Edit News Page</h1>
-        <div className="editor-actions">
-          <button 
-            className="btn btn-primary" 
-            onClick={handleFetchRSS}
-            disabled={fetchingRSS || loading}
-          >
-            <FaSync className={fetchingRSS ? 'spinning' : ''} /> 
-            {fetchingRSS ? 'Fetching...' : 'Fetch RSS News'}
-          </button>
-          <button 
-            className="btn btn-secondary" 
-            onClick={handleSave}
-            disabled={saving || loading}
-          >
-            <FaSave /> {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-          <button className="btn btn-primary">
-            <FaEye /> Preview
-          </button>
-        </div>
-      </div>
-      {message && (
-        <div className={`message ${message.includes('Error') ? 'error' : 'success'}`}>
-          {message}
-        </div>
-      )}
-      {loading && <div className="loading">Loading data...</div>}
-
-      <div className="editor-content">
-        <div className="form-section">
-          <h2>Page Information</h2>
-          <div className="form-group">
-            <label>Page Title</label>
-            <input
-              type="text"
-              name="title"
-              value={newsData.title}
-              onChange={handleInputChange}
-              className="form-input"
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Subtitle</label>
-            <input
-              type="text"
-              name="subtitle"
-              value={newsData.subtitle}
-              onChange={handleInputChange}
-              className="form-input"
-            />
-          </div>
-        </div>
-
-        <div className="form-section">
-          <h2>Articles</h2>
-          {newsData.articles.map((article) => (
-            <div key={article.id} className="article-item">
-              <div className="article-header">
-                <h3>Article #{article.id}</h3>
-                <div className="article-controls">
-                  <label className="featured-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={article.featured}
-                      onChange={(e) => handleArticleChange(article.id, 'featured', e.target.checked)}
-                    />
-                    Featured
-                  </label>
-                  <button 
-                    onClick={() => removeArticle(article.id)}
-                    className="remove-btn"
-                  >
-                    <FaTrash />
-                  </button>
-                </div>
-              </div>
-              
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Article Title</label>
-                  <input
-                    type="text"
-                    value={article.title}
-                    onChange={(e) => handleArticleChange(article.id, 'title', e.target.value)}
-                    className="form-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Category</label>
-                  <input
-                    type="text"
-                    value={article.category}
-                    onChange={(e) => handleArticleChange(article.id, 'category', e.target.value)}
-                    className="form-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Date</label>
-                  <input
-                    type="date"
-                    value={article.date}
-                    onChange={(e) => handleArticleChange(article.id, 'date', e.target.value)}
-                    className="form-input"
-                  />
-                </div>
-              </div>
-              
-              <div className="form-group">
-                <label>Content</label>
-                <textarea
-                  value={article.content}
-                  onChange={(e) => handleArticleChange(article.id, 'content', e.target.value)}
-                  rows="4"
-                  className="form-textarea"
-                />
-                {article.link && (
-                  <small style={{ color: '#00CED1', fontSize: '12px', marginTop: '5px', display: 'block' }}>
-                    Source: <a href={article.link} target="_blank" rel="noopener noreferrer" style={{ color: '#00CED1' }}>
-                      {article.link}
-                    </a>
-                  </small>
-                )}
-              </div>
-              
-              <div className="form-group">
-                <GitHubImagePicker
-                  label={`Article Image - ${article.title}`}
-                  currentImage={article.image}
-                  onImageSelect={(imageUrl) => handleImageSelect(article.id, imageUrl)}
-                />
-              </div>
-            </div>
-          ))}
-          
-          <button onClick={addArticle} className="add-article-btn">
-            <FaPlus /> Add New Article
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <PasswordProtection pageName="News">
-      <NewsEditor />
+      <div className="make-news">
+        <div className="editor-header">
+          <h1>Edit News Page</h1>
+          <div className="editor-actions">
+            <button
+              className="btn btn-primary"
+              onClick={handleFetchRSS}
+              disabled={fetchingRSS || loading}
+            >
+              <FaSync className={fetchingRSS ? 'spinning' : ''} />
+              {fetchingRSS ? 'Fetching...' : 'Fetch RSS News'}
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={handleSave}
+              disabled={saving || loading}
+            >
+              <FaSave /> {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+            <button className="btn btn-primary">
+              <FaEye /> Preview
+            </button>
+          </div>
+        </div>
+        {message && (
+          <div className={`message ${message.includes('Error') ? 'error' : 'success'}`}>
+            {message}
+          </div>
+        )}
+        {loading && <div className="loading">Loading data...</div>}
+
+        <div className="editor-content">
+          <div className="form-section">
+            <h2>Page Information</h2>
+            <div className="form-group">
+              <label>Page Title</label>
+              <input
+                type="text"
+                name="title"
+                value={newsData.title}
+                onChange={handleInputChange}
+                className="form-input"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Subtitle</label>
+              <input
+                type="text"
+                name="subtitle"
+                value={newsData.subtitle}
+                onChange={handleInputChange}
+                className="form-input"
+              />
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h2>Articles</h2>
+            {newsData.articles.map((article) => (
+              <div key={article.id} className="article-item">
+                <div className="article-header">
+                  <h3>Article #{article.id}</h3>
+                  <div className="article-controls">
+                    <label className="featured-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={article.featured}
+                        onChange={(e) => handleArticleChange(article.id, 'featured', e.target.checked)}
+                      />
+                      Featured
+                    </label>
+                    <button
+                      onClick={() => removeArticle(article.id)}
+                      className="remove-btn"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Article Title</label>
+                    <input
+                      type="text"
+                      value={article.title}
+                      onChange={(e) => handleArticleChange(article.id, 'title', e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Category</label>
+                    <input
+                      type="text"
+                      value={article.category}
+                      onChange={(e) => handleArticleChange(article.id, 'category', e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Date</label>
+                    <input
+                      type="date"
+                      value={article.date}
+                      onChange={(e) => handleArticleChange(article.id, 'date', e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Content</label>
+                  <textarea
+                    value={article.content}
+                    onChange={(e) => handleArticleChange(article.id, 'content', e.target.value)}
+                    rows="4"
+                    className="form-textarea"
+                  />
+                  {article.link && (
+                    <small style={{ color: '#00CED1', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                      Source: <a href={article.link} target="_blank" rel="noopener noreferrer" style={{ color: '#00CED1' }}>
+                        {article.link}
+                      </a>
+                    </small>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <GitHubImagePicker
+                    label={`Article Image - ${article.title}`}
+                    currentImage={article.image}
+                    onImageSelect={(imageUrl) => handleImageSelect(article.id, imageUrl)}
+                  />
+                </div>
+              </div>
+            ))}
+
+            <button onClick={addArticle} className="add-article-btn">
+              <FaPlus /> Add New Article
+            </button>
+          </div>
+        </div>
+      </div>
     </PasswordProtection>
   );
 };

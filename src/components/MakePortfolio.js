@@ -119,7 +119,7 @@ const MakePortfolio = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     setPortfolioData(prev => ({
       ...prev,
       [name]: value
@@ -131,10 +131,10 @@ const MakePortfolio = () => {
     if (event) {
       event.preventDefault();
     }
-    
+
     setPortfolioData(prev => ({
       ...prev,
-      projects: prev.projects.map(project => 
+      projects: prev.projects.map(project =>
         project.id === id ? { ...project, [field]: value } : project
       )
     }));
@@ -194,11 +194,11 @@ const MakePortfolio = () => {
       const projectToAdd = {
         id: Date.now(),
         ...newProject,
-        technologies: Array.isArray(newProject.technologies) 
-          ? newProject.technologies 
+        technologies: Array.isArray(newProject.technologies)
+          ? newProject.technologies
           : (typeof newProject.technologies === 'string' && newProject.technologies.trim()
-              ? newProject.technologies.split(',').map(t => t.trim()).filter(t => t)
-              : [])
+            ? newProject.technologies.split(',').map(t => t.trim()).filter(t => t)
+            : [])
       };
 
       const updatedPortfolioData = {
@@ -253,336 +253,332 @@ const MakePortfolio = () => {
     }
   };
 
-  const PortfolioEditor = () => (
-    <div className="make-portfolio">
-      <div className="editor-header">
-        <h1>Edit Portfolio Page</h1>
-        <div className="editor-actions">
-          <button 
-            className="btn btn-secondary" 
-            onClick={handleSave}
-            disabled={saving || loading}
-          >
-            <FaSave /> {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-          <button 
-            type="button"
-            className="btn btn-primary" 
-            onClick={addProject}
-          >
-            <FaPlus /> Add New Portfolio
-          </button>
-          <button className="btn btn-primary">
-            <FaEye /> Preview
-          </button>
-        </div>
-      </div>
-      {message && (
-        <div className={`message ${message.includes('Error') ? 'error' : 'success'}`}>
-          {message}
-        </div>
-      )}
-      {loading && <div className="loading">Loading data...</div>}
-
-      <div className="editor-content">
-        <div className="form-section">
-          <h2>Page Information</h2>
-          <div className="form-group">
-            <label>Page Title</label>
-            <input
-              type="text"
-              name="title"
-              value={portfolioData.title}
-              onChange={handleInputChange}
-              className="form-input"
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Subtitle</label>
-            <input
-              type="text"
-              name="subtitle"
-              value={portfolioData.subtitle}
-              onChange={handleInputChange}
-              className="form-input"
-            />
+  return (
+    <PasswordProtection pageName="Portfolio">
+      <div className="make-portfolio">
+        <div className="editor-header">
+          <h1>Edit Portfolio Page</h1>
+          <div className="editor-actions">
+            <button
+              className="btn btn-secondary"
+              onClick={handleSave}
+              disabled={saving || loading}
+            >
+              <FaSave /> {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={addProject}
+            >
+              <FaPlus /> Add New Portfolio
+            </button>
+            <button className="btn btn-primary">
+              <FaEye /> Preview
+            </button>
           </div>
         </div>
+        {message && (
+          <div className={`message ${message.includes('Error') ? 'error' : 'success'}`}>
+            {message}
+          </div>
+        )}
+        {loading && <div className="loading">Loading data...</div>}
 
-        <div className="form-section">
-          <h2>Projects</h2>
-          {portfolioData.projects.map((project) => (
-            <div key={project.id} className="project-item">
-              <div className="project-header">
-                <h3>Project #{project.id}</h3>
-                <button 
-                  onClick={() => removeProject(project.id)}
-                  className="remove-btn"
-                >
-                  <FaTrash />
-                </button>
-              </div>
-              
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Project Title</label>
-                  <input
-                    type="text"
-                    value={project.title}
-                    onChange={(e) => {
-                      e.stopPropagation();
-                      handleProjectChange(project.id, 'title', e.target.value, e);
-                    }}
-                    onFocus={(e) => {
-                      e.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }}
-                    className="form-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Category</label>
-                  <select
-                    value={project.category || ''}
-                    onChange={(e) => {
-                      e.stopPropagation();
-                      const value = e.target.value;
-                      if (value === 'custom') {
-                        // Handle custom category
-                        handleProjectChange(project.id, 'category', '', e);
-                      } else {
-                        handleProjectChange(project.id, 'category', value, e);
-                      }
-                    }}
-                    onFocus={(e) => {
-                      e.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }}
-                    className="form-input form-select"
+        <div className="editor-content">
+          <div className="form-section">
+            <h2>Page Information</h2>
+            <div className="form-group">
+              <label>Page Title</label>
+              <input
+                type="text"
+                name="title"
+                value={portfolioData.title}
+                onChange={handleInputChange}
+                className="form-input"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Subtitle</label>
+              <input
+                type="text"
+                name="subtitle"
+                value={portfolioData.subtitle}
+                onChange={handleInputChange}
+                className="form-input"
+              />
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h2>Projects</h2>
+            {portfolioData.projects.map((project) => (
+              <div key={project.id} className="project-item">
+                <div className="project-header">
+                  <h3>Project #{project.id}</h3>
+                  <button
+                    onClick={() => removeProject(project.id)}
+                    className="remove-btn"
                   >
-                    <option value="">Select Category</option>
-                    {PORTFOLIO_CATEGORIES.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                    <option value="custom">+ Add Custom Category</option>
-                  </select>
-                  {project.category && !PORTFOLIO_CATEGORIES.includes(project.category) && (
+                    <FaTrash />
+                  </button>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Project Title</label>
                     <input
                       type="text"
-                      value={project.category}
+                      value={project.title}
                       onChange={(e) => {
                         e.stopPropagation();
-                        handleProjectChange(project.id, 'category', e.target.value, e);
+                        handleProjectChange(project.id, 'title', e.target.value, e);
+                      }}
+                      onFocus={(e) => {
+                        e.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                       }}
                       className="form-input"
-                      style={{ marginTop: '8px' }}
-                      placeholder="Enter custom category"
                     />
-                  )}
+                  </div>
+                  <div className="form-group">
+                    <label>Category</label>
+                    <select
+                      value={project.category || ''}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        const value = e.target.value;
+                        if (value === 'custom') {
+                          // Handle custom category
+                          handleProjectChange(project.id, 'category', '', e);
+                        } else {
+                          handleProjectChange(project.id, 'category', value, e);
+                        }
+                      }}
+                      onFocus={(e) => {
+                        e.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                      }}
+                      className="form-input form-select"
+                    >
+                      <option value="">Select Category</option>
+                      {PORTFOLIO_CATEGORIES.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                      <option value="custom">+ Add Custom Category</option>
+                    </select>
+                    {project.category && !PORTFOLIO_CATEGORIES.includes(project.category) && (
+                      <input
+                        type="text"
+                        value={project.category}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleProjectChange(project.id, 'category', e.target.value, e);
+                        }}
+                        className="form-input"
+                        style={{ marginTop: '8px' }}
+                        placeholder="Enter custom category"
+                      />
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label>Project Link</label>
+                    <input
+                      type="text"
+                      value={project.link}
+                      onChange={(e) => handleProjectChange(project.id, 'link', e.target.value, e)}
+                      className="form-input"
+                    />
+                  </div>
                 </div>
+
                 <div className="form-group">
-                  <label>Project Link</label>
-                  <input
-                    type="text"
-                    value={project.link}
-                    onChange={(e) => handleProjectChange(project.id, 'link', e.target.value, e)}
-                    className="form-input"
+                  <label>Short Description (for card view)</label>
+                  <textarea
+                    value={project.description}
+                    onChange={(e) => handleProjectChange(project.id, 'description', e.target.value, e)}
+                    rows="2"
+                    className="form-textarea"
                   />
                 </div>
-              </div>
-              
-              <div className="form-group">
-                <label>Short Description (for card view)</label>
-                <textarea
-                  value={project.description}
-                  onChange={(e) => handleProjectChange(project.id, 'description', e.target.value, e)}
-                  rows="2"
-                  className="form-textarea"
-                />
-              </div>
-              
-              <div className="form-group">
-                <label>Full Description / Blog (for detail page)</label>
-                <textarea
-                  value={project.fullDescription || ''}
-                  onChange={(e) => handleProjectChange(project.id, 'fullDescription', e.target.value, e)}
-                  rows="8"
-                  className="form-textarea"
-                  placeholder="Enter complete project description, blog content, or detailed information that will display on the project detail page..."
-                />
-                <small style={{ color: '#B0B0B0', fontSize: '12px', marginTop: '5px', display: 'block' }}>
-                  This full description will be displayed on the project detail page when users click on a project.
-                </small>
-              </div>
-              
-              <div className="form-group">
-                <label>Technologies (comma separated)</label>
+
+                <div className="form-group">
+                  <label>Full Description / Blog (for detail page)</label>
+                  <textarea
+                    value={project.fullDescription || ''}
+                    onChange={(e) => handleProjectChange(project.id, 'fullDescription', e.target.value, e)}
+                    rows="8"
+                    className="form-textarea"
+                    placeholder="Enter complete project description, blog content, or detailed information that will display on the project detail page..."
+                  />
+                  <small style={{ color: '#B0B0B0', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                    This full description will be displayed on the project detail page when users click on a project.
+                  </small>
+                </div>
+
+                <div className="form-group">
+                  <label>Technologies (comma separated)</label>
                   <input
                     type="text"
                     value={project.technologies.join(', ')}
                     onChange={(e) => handleProjectChange(project.id, 'technologies', e.target.value.split(', ').filter(t => t.trim()), e)}
                     className="form-input"
                   />
-              </div>
-              
-              <div className="form-group">
-                <GitHubImagePicker
-                  label={`Project Image - ${project.title}`}
-                  currentImage={project.image}
-                  onImageSelect={(imageUrl) => handleImageSelect(project.id, imageUrl)}
-                />
-              </div>
-            </div>
-          ))}
-          
-          <button onClick={addProject} className="add-project-btn">
-            <FaPlus /> Add New Project
-          </button>
-        </div>
-      </div>
-
-      {/* Modal for Adding New Project */}
-      {showModal && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Add New Project</h2>
-              <button className="modal-close-btn" onClick={closeModal}>
-                <FaTimes />
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="form-group">
-                <label>Project Title *</label>
-                <input
-                  type="text"
-                  value={newProject.title}
-                  onChange={(e) => handleNewProjectChange('title', e.target.value)}
-                  className="form-input"
-                  placeholder="Enter project title"
-                  autoFocus
-                />
-              </div>
-              
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Category</label>
-                  <select
-                    value={newProject.category || ''}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value === 'custom') {
-                        setShowCustomCategory(true);
-                        setCustomCategory('');
-                        handleNewProjectChange('category', '');
-                      } else {
-                        setShowCustomCategory(false);
-                        handleNewProjectChange('category', value);
-                      }
-                    }}
-                    className="form-input form-select"
-                  >
-                    <option value="">Select Category</option>
-                    {PORTFOLIO_CATEGORIES.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                    <option value="custom">+ Add Custom Category</option>
-                  </select>
-                  {showCustomCategory && (
-                    <input
-                      type="text"
-                      value={customCategory}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setCustomCategory(value);
-                        handleNewProjectChange('category', value);
-                      }}
-                      className="form-input"
-                      style={{ marginTop: '8px' }}
-                      placeholder="Enter custom category"
-                      autoFocus
-                    />
-                  )}
                 </div>
+
                 <div className="form-group">
-                  <label>Project Link</label>
-                  <input
-                    type="text"
-                    value={newProject.link}
-                    onChange={(e) => handleNewProjectChange('link', e.target.value)}
-                    className="form-input"
-                    placeholder="https://..."
+                  <GitHubImagePicker
+                    label={`Project Image - ${project.title}`}
+                    currentImage={project.image}
+                    onImageSelect={(imageUrl) => handleImageSelect(project.id, imageUrl)}
                   />
                 </div>
               </div>
-              
-              <div className="form-group">
-                <label>Short Description (for card view)</label>
-                <textarea
-                  value={newProject.description}
-                  onChange={(e) => handleNewProjectChange('description', e.target.value)}
-                  rows="3"
-                  className="form-textarea"
-                  placeholder="Brief description that appears on portfolio cards..."
-                />
-              </div>
-              
-              <div className="form-group">
-                <label>Full Description / Blog (for detail page)</label>
-                <textarea
-                  value={newProject.fullDescription}
-                  onChange={(e) => handleNewProjectChange('fullDescription', e.target.value)}
-                  rows="6"
-                  className="form-textarea"
-                  placeholder="Complete project description, blog content, or detailed information..."
-                />
-              </div>
-              
-              <div className="form-group">
-                <label>Technologies (comma separated)</label>
-                <input
-                  type="text"
-                  value={Array.isArray(newProject.technologies) ? newProject.technologies.join(', ') : newProject.technologies}
-                  onChange={(e) => handleNewProjectChange('technologies', e.target.value)}
-                  className="form-input"
-                  placeholder="React, Node.js, MongoDB"
-                />
-              </div>
-              
-              <div className="form-group">
-                <GitHubImagePicker
-                  label="Project Image"
-                  currentImage={newProject.image}
-                  onImageSelect={(imageUrl) => handleNewProjectChange('image', imageUrl)}
-                />
-              </div>
-              
-              {autoSaving && (
-                <div className="auto-save-indicator">
-                  <small>Saving to Supabase...</small>
-                </div>
-              )}
-            </div>
-            <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={closeModal}>
-                Cancel
-              </button>
-              <button 
-                className="btn btn-primary" 
-                onClick={handleSaveNewProject}
-                disabled={autoSaving || !newProject.title.trim()}
-              >
-                {autoSaving ? 'Saving...' : 'Save Project'}
-              </button>
-            </div>
+            ))}
+
+            <button onClick={addProject} className="add-project-btn">
+              <FaPlus /> Add New Project
+            </button>
           </div>
         </div>
-      )}
-    </div>
-  );
 
-  return (
-    <PasswordProtection pageName="Portfolio">
-      <PortfolioEditor />
+        {/* Modal for Adding New Project */}
+        {showModal && (
+          <div className="modal-overlay" onClick={closeModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Add New Project</h2>
+                <button className="modal-close-btn" onClick={closeModal}>
+                  <FaTimes />
+                </button>
+              </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Project Title *</label>
+                  <input
+                    type="text"
+                    value={newProject.title}
+                    onChange={(e) => handleNewProjectChange('title', e.target.value)}
+                    className="form-input"
+                    placeholder="Enter project title"
+                    autoFocus
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Category</label>
+                    <select
+                      value={newProject.category || ''}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === 'custom') {
+                          setShowCustomCategory(true);
+                          setCustomCategory('');
+                          handleNewProjectChange('category', '');
+                        } else {
+                          setShowCustomCategory(false);
+                          handleNewProjectChange('category', value);
+                        }
+                      }}
+                      className="form-input form-select"
+                    >
+                      <option value="">Select Category</option>
+                      {PORTFOLIO_CATEGORIES.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                      <option value="custom">+ Add Custom Category</option>
+                    </select>
+                    {showCustomCategory && (
+                      <input
+                        type="text"
+                        value={customCategory}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setCustomCategory(value);
+                          handleNewProjectChange('category', value);
+                        }}
+                        className="form-input"
+                        style={{ marginTop: '8px' }}
+                        placeholder="Enter custom category"
+                        autoFocus
+                      />
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label>Project Link</label>
+                    <input
+                      type="text"
+                      value={newProject.link}
+                      onChange={(e) => handleNewProjectChange('link', e.target.value)}
+                      className="form-input"
+                      placeholder="https://..."
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Short Description (for card view)</label>
+                  <textarea
+                    value={newProject.description}
+                    onChange={(e) => handleNewProjectChange('description', e.target.value)}
+                    rows="3"
+                    className="form-textarea"
+                    placeholder="Brief description that appears on portfolio cards..."
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Full Description / Blog (for detail page)</label>
+                  <textarea
+                    value={newProject.fullDescription}
+                    onChange={(e) => handleNewProjectChange('fullDescription', e.target.value)}
+                    rows="6"
+                    className="form-textarea"
+                    placeholder="Complete project description, blog content, or detailed information..."
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Technologies (comma separated)</label>
+                  <input
+                    type="text"
+                    value={Array.isArray(newProject.technologies) ? newProject.technologies.join(', ') : newProject.technologies}
+                    onChange={(e) => handleNewProjectChange('technologies', e.target.value)}
+                    className="form-input"
+                    placeholder="React, Node.js, MongoDB"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <GitHubImagePicker
+                    label="Project Image"
+                    currentImage={newProject.image}
+                    onImageSelect={(imageUrl) => handleNewProjectChange('image', imageUrl)}
+                  />
+                </div>
+
+                {autoSaving && (
+                  <div className="auto-save-indicator">
+                    <small>Saving to Supabase...</small>
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={closeModal}>
+                  Cancel
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleSaveNewProject}
+                  disabled={autoSaving || !newProject.title.trim()}
+                >
+                  {autoSaving ? 'Saving...' : 'Save Project'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </PasswordProtection>
   );
 };
