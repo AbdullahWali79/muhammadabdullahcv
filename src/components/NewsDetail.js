@@ -295,6 +295,19 @@ Remember, a design system is a tool to help your team work better together, not 
                 <span>{calculateReadTime(displayItem.content || displayItem.fullDescription || displayItem.description)}</span>
               </div>
             </div>
+
+            {displayItem.link && (
+              <div className="article-header-link">
+                <a 
+                  href={displayItem.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="article-source-link"
+                >
+                  <FaExternalLinkAlt /> Read Original Article
+                </a>
+              </div>
+            )}
           </div>
 
           {displayItem.image && displayItem.image !== '/api/placeholder/800/400' && !displayItem.image.includes('placeholder') && (
