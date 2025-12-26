@@ -28,7 +28,7 @@ function AppContent() {
   const [userData, setUserData] = useState({
     firstName: 'Muhammad',
     lastName: 'Abdullah',
-    title: 'AI Developer',
+    title: 'AI Automation & Custom Software Developer',
     dateOfBirth: '25-12-1990',
     nationality: 'Pakistan',
     phone: '+923046983794',
@@ -69,7 +69,7 @@ function AppContent() {
           setUserData({
             firstName: dbData.first_name || 'Muhammad',
             lastName: dbData.last_name || 'Abdullah',
-            title: dbData.title || 'AI Developer',
+            title: dbData.title || 'AI Automation & Custom Software Developer',
             dateOfBirth: dbData.date_of_birth || '25-12-1990',
             nationality: dbData.nationality || 'Pakistan',
             phone: dbData.phone || '+923046983794',

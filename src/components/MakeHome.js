@@ -7,7 +7,7 @@ import './MakeHome.css';
 const MakeHome = () => {
   const [homeData, setHomeData] = useState({
     title: 'Welcome to My Portfolio',
-    subtitle: 'AI Developer',
+    subtitle: 'AI Automation & Custom Software Developer',
     description: 'Consistency Makes a Man Perfect in Their Skill Set. - M. Abdullah',
     buttonText: 'Get Started',
     buttonLink: '#contact',
@@ -69,7 +69,7 @@ const MakeHome = () => {
         if (result.success && result.data) {
           setHomeData({
             title: result.data.title || 'Welcome to My Portfolio',
-            subtitle: result.data.subtitle || 'AI Developer',
+            subtitle: result.data.subtitle || 'AI Automation & Custom Software Developer',
             description: result.data.description || 'Consistency Makes a Man Perfect in Their Skill Set. - M. Abdullah',
             buttonText: result.data.button_text || 'Get Started',
             buttonLink: result.data.button_link || '#contact',
