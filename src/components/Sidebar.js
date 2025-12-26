@@ -43,10 +43,10 @@ const Sidebar = ({ userData, collapsed, setCollapsed }) => {
           )}
         </div>
         {!collapsed && (
-          <>
+          <div className="profile-info">
             <h2 className="name">{userData.firstName} {userData.lastName}</h2>
             <p className="title">{userData.title}</p>
-          </>
+          </div>
         )}
       </div>
       
