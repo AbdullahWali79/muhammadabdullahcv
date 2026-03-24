@@ -305,3 +305,35 @@ export const getContactData = async () => {
     return { success: false, error: error.message }
   }
 }
+
+// Prompts Data
+export const savePromptsData = async (promptsData) => {
+  try {
+    const { data, error } = await supabase
+      .from(TABLES.PROMPTS_DATA)
+      .upsert([{ id: 1, ...promptsData }], { onConflict: 'id' })
+    
+    if (error) throw error
+    return { success: true, data }
+  } catch (error) {
+    console.error('Error saving prompts data:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+export const getPromptsData = async () => {
+  try {
+    const { data, error } = await supabase
+      .from(TABLES.PROMPTS_DATA)
+      .select('*')
+      .eq('id', 1)
+      .single()
+    
+    if (error && error.code !== 'PGRST116') throw error
+    return { success: true, data: data || null }
+  } catch (error) {
+    console.error('Error fetching prompts data:', error)
+    return { success: false, error: error.message }
+  }
+}
+

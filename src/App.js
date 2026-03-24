@@ -11,6 +11,9 @@ import News from './components/News';
 import NewsDetail from './components/NewsDetail';
 import Contact from './components/Contact';
 import CVForm from './components/CVForm';
+import Prompts from './components/Prompts';
+import PromptDetail from './components/PromptDetail';
+import MakePrompts from './components/MakePrompts';
 import MakeHome from './components/MakeHome';
 import MakeAbout from './components/MakeAbout';
 import MakeService from './components/MakeService';
@@ -120,6 +123,11 @@ function AppContent() {
         return 'contact';
       case '/makecv':
         return 'make-cv';
+      case '/prompts':
+      case '/prompts/:id':
+        return 'prompts';
+      case '/makeprompts':
+        return 'make-prompts';
       case '/makehome':
         return 'make-home';
       case '/makeabout':
@@ -157,6 +165,8 @@ function AppContent() {
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/contact" element={<Contact userData={userData} />} />
+          <Route path="/prompts" element={<Prompts />} />
+          <Route path="/prompts/:id" element={<PromptDetail />} />
           <Route path="/makecv" element={
             <PasswordProtection pageName="CV Creation">
               <CVForm userData={userData} setUserData={setUserData} />
@@ -190,6 +200,11 @@ function AppContent() {
           <Route path="/makecontact" element={
             <PasswordProtection pageName="Contact Editor">
               <MakeContact />
+            </PasswordProtection>
+          } />
+          <Route path="/makeprompts" element={
+            <PasswordProtection pageName="Prompts Editor">
+              <MakePrompts />
             </PasswordProtection>
           } />
           <Route path="/security" element={

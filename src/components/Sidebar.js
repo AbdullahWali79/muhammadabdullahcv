@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaHome, FaUser, FaBriefcase, FaFolder, FaNewspaper, FaEnvelope, FaFileAlt, FaBars, FaTimes } from 'react-icons/fa';
+import { FaHome, FaUser, FaBriefcase, FaFolder, FaNewspaper, FaEnvelope, FaFileAlt, FaBars, FaTimes, FaRobot } from 'react-icons/fa';
 import './Sidebar.css';
 
 const Sidebar = ({ userData, collapsed, setCollapsed }) => {
@@ -12,6 +12,7 @@ const Sidebar = ({ userData, collapsed, setCollapsed }) => {
     { id: 'service', label: 'Service', icon: FaBriefcase, path: '/service' },
     { id: 'portfolio', label: 'Portfolio', icon: FaFolder, path: '/portfolio' },
     { id: 'news', label: 'News', icon: FaNewspaper, path: '/news' },
+    { id: 'prompts', label: 'Prompts', icon: FaRobot, path: '/prompts' },
     { id: 'contact', label: 'Contact', icon: FaEnvelope, path: '/contact' },
     { id: 'make-cv', label: 'Make CV', icon: FaFileAlt, path: '/makecv' }
   ];

@@ -14,5 +14,6 @@ export const TABLES = {
   SERVICE_DATA: 'service_data',
   PORTFOLIO_DATA: 'portfolio_data',
   NEWS_DATA: 'news_data',
-  CONTACT_DATA: 'contact_data'
+  CONTACT_DATA: 'contact_data',
+  PROMPTS_DATA: 'prompts_data'
 }
