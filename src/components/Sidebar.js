@@ -8,11 +8,11 @@ const Sidebar = ({ userData, collapsed, setCollapsed }) => {
   
   const allMenuItems = [
     { id: 'home', label: 'Home', icon: FaHome, path: '/' },
+    { id: 'prompts', label: 'Prompts', icon: FaRobot, path: '/prompts' },
     { id: 'about', label: 'About', icon: FaUser, path: '/about' },
     { id: 'service', label: 'Service', icon: FaBriefcase, path: '/service' },
     { id: 'portfolio', label: 'Portfolio', icon: FaFolder, path: '/portfolio' },
     { id: 'news', label: 'News', icon: FaNewspaper, path: '/news' },
-    { id: 'prompts', label: 'Prompts', icon: FaRobot, path: '/prompts' },
     { id: 'contact', label: 'Contact', icon: FaEnvelope, path: '/contact' },
     { id: 'make-cv', label: 'Make CV', icon: FaFileAlt, path: '/makecv' }
   ];
