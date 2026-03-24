@@ -150,6 +150,11 @@ const MakePrompts = () => {
 
           <div className="form-section">
             <h2>Prompts Library</h2>
+            <datalist id="category-suggestions">
+              {[...new Set(promptsData.prompts.map(p => p.category).filter(Boolean))].map((cat, index) => (
+                <option key={index} value={cat} />
+              ))}
+            </datalist>
             {promptsData.prompts.map((prompt) => (
               <div key={prompt.id} className="prompt-item">
                 <div className="prompt-header">
@@ -178,6 +183,7 @@ const MakePrompts = () => {
                     <label>Category</label>
                     <input
                       type="text"
+                      list="category-suggestions"
                       value={prompt.category}
                       onChange={(e) => handlePromptChange(prompt.id, 'category', e.target.value)}
                       className="form-input"
