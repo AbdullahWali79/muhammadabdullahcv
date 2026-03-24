@@ -103,6 +103,9 @@ const MakePrompts = () => {
         <div className="editor-header">
           <h1>Edit Prompts Page</h1>
           <div className="editor-actions">
+            <button className="btn btn-primary" onClick={addPrompt}>
+              <FaPlus /> Add New Prompt
+            </button>
             <button
               className="btn btn-secondary"
               onClick={handleSave}
