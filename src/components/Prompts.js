@@ -6,7 +6,7 @@ import './Prompts.css';
 
 // Helper to extract YouTube video ID to fetch thumbnail
 const getYouTubeThumbnail = (url) => {
-  if (!url) return 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg';
+  if (!url) return null;
   
   let videoId = '';
   // Match standard and short URLs
@@ -16,8 +16,8 @@ const getYouTubeThumbnail = (url) => {
   if (match && match[2].length === 11) {
     videoId = match[2];
   } else {
-    // If we can't parse it, return a default image
-    return 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg';
+    // If we can't parse it, return null
+    return null;
   }
 
   // Return the high-quality YouTube thumbnail
@@ -103,27 +103,37 @@ const Prompts = () => {
             </div>
             
             <div className="prompts-grid">
-              {filteredPrompts.map((prompt) => (
-                <div key={prompt.id} className="prompt-card" onClick={(e) => handleViewDetails(prompt.id, e)}>
-                  <div className="prompt-image">
-                    <img 
-                      src={getYouTubeThumbnail(prompt.youtubeUrl)} 
-                      alt={prompt.title}
-                      className="prompt-img"
-                    />
-                    <div className="prompt-overlay">
-                      <div className="action-btn">
-                        <FaPlayCircle style={{ fontSize: '28px' }} />
+              {filteredPrompts.map((prompt) => {
+                const thumbnailUrl = getYouTubeThumbnail(prompt.youtubeUrl);
+                return (
+                  <div key={prompt.id} className="prompt-card" onClick={(e) => handleViewDetails(prompt.id, e)}>
+                    <div className="prompt-image">
+                      {thumbnailUrl ? (
+                        <img 
+                          src={thumbnailUrl} 
+                          alt={prompt.title}
+                          className="prompt-img"
+                        />
+                      ) : (
+                        <div className="prompt-default-bg">
+                          <h3>Muhammad Abdullah</h3>
+                          <p>Prompt Engineer</p>
+                        </div>
+                      )}
+                      <div className="prompt-overlay">
+                        <div className="action-btn">
+                          <FaPlayCircle style={{ fontSize: '28px' }} />
+                        </div>
                       </div>
                     </div>
+                    <div className="prompt-content">
+                      <div className="prompt-category">{prompt.category}</div>
+                      <h3 className="prompt-title">{prompt.title}</h3>
+                      <p className="prompt-description">{prompt.description}</p>
+                    </div>
                   </div>
-                  <div className="prompt-content">
-                    <div className="prompt-category">{prompt.category}</div>
-                    <h3 className="prompt-title">{prompt.title}</h3>
-                    <p className="prompt-description">{prompt.description}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         ) : (
