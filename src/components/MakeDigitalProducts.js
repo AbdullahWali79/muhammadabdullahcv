@@ -239,7 +239,25 @@ const MakeDigitalProducts = () => {
             {isAddingProduct && (
               <div className="modal-overlay">
                 <div className="modal-content nested-form">
-                  <h4>{editingIndex !== null ? 'Edit Product' : 'Add New Product'}</h4>
+                  <div className="modal-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #3A4B4E', paddingBottom: '10px' }}>
+                    <h4 style={{ margin: 0, borderBottom: 'none', paddingBottom: 0 }}>{editingIndex !== null ? 'Edit Product' : 'Add New Product'}</h4>
+                    <div className="nested-form-actions" style={{ marginTop: 0 }}>
+                      <button 
+                        type="button" 
+                        className="save-item-btn"
+                        onClick={editingIndex !== null ? handleSaveEdit : handleAddProduct}
+                      >
+                        <i className="fas fa-save"></i> {editingIndex !== null ? 'Update' : 'Save'}
+                      </button>
+                      <button 
+                        type="button" 
+                        className="cancel-btn"
+                        onClick={handleCancel}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                   
                   <div className="form-group">
                     <label htmlFor="productTitle">Product Title</label>
@@ -318,23 +336,6 @@ const MakeDigitalProducts = () => {
                       className="form-control"
                       rows="3"
                     />
-                  </div>
-
-                  <div className="nested-form-actions" style={{marginTop: '20px'}}>
-                    <button 
-                      type="button" 
-                      className="save-item-btn"
-                      onClick={editingIndex !== null ? handleSaveEdit : handleAddProduct}
-                    >
-                      <i className="fas fa-save"></i> {editingIndex !== null ? 'Update' : 'Save'}
-                    </button>
-                    <button 
-                      type="button" 
-                      className="cancel-btn"
-                      onClick={handleCancel}
-                    >
-                      Cancel
-                    </button>
                   </div>
                 </div>
               </div>
