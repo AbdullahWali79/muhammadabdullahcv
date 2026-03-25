@@ -63,6 +63,19 @@ const DigitalProducts = ({ userData }) => {
     ? products 
     : products.filter(product => product.category === activeFilter);
 
+  // Helper to extract YouTube embed URL
+  const getYouTubeEmbedUrl = (url) => {
+    if (!url) return null;
+    let videoId = '';
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    if (match && match[2].length === 11) {
+      videoId = match[2];
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    return null;
+  };
+
   return (
     <div className="digital-products-page">
       <div className="products-container">
@@ -86,10 +99,23 @@ const DigitalProducts = ({ userData }) => {
             </div>
             
             <div className="products-grid">
-              {filteredProducts.map((product) => (
+              {filteredProducts.map((product) => {
+                const embedUrl = getYouTubeEmbedUrl(product.videoUrl);
+                return (
                 <div key={product.id} className="product-card">
                   <div className="product-image">
-                    {product.imageUrl ? (
+                    {embedUrl ? (
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        src={embedUrl}
+                        title={product.title}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                      ></iframe>
+                    ) : product.imageUrl ? (
                       <img 
                         src={product.imageUrl} 
                         alt={product.title}
@@ -114,7 +140,8 @@ const DigitalProducts = ({ userData }) => {
                     </button>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </>
         ) : (

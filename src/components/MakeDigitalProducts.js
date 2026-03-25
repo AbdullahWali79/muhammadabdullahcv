@@ -18,7 +18,8 @@ const MakeDigitalProducts = () => {
     category: '',
     description: '',
     price: '',
-    imageUrl: ''
+    imageUrl: '',
+    videoUrl: ''
   });
 
   const [editingIndex, setEditingIndex] = useState(null);
@@ -73,7 +74,8 @@ const MakeDigitalProducts = () => {
       category: '',
       description: '',
       price: '',
-      imageUrl: ''
+      imageUrl: '',
+      videoUrl: ''
     });
     setIsAddingProduct(false);
     setMessage({ type: 'success', text: 'Product added locally. Don\'t forget to save!' });
@@ -103,7 +105,8 @@ const MakeDigitalProducts = () => {
       category: '',
       description: '',
       price: '',
-      imageUrl: ''
+      imageUrl: '',
+      videoUrl: ''
     });
     setEditingIndex(null);
     setIsAddingProduct(false);
@@ -117,7 +120,8 @@ const MakeDigitalProducts = () => {
       category: p.category || '',
       description: p.description || '',
       price: p.price || '',
-      imageUrl: p.imageUrl || ''
+      imageUrl: p.imageUrl || '',
+      videoUrl: p.videoUrl || ''
     });
     setEditingIndex(index);
     setIsAddingProduct(true);
@@ -139,7 +143,8 @@ const MakeDigitalProducts = () => {
       category: '',
       description: '',
       price: '',
-      imageUrl: ''
+      imageUrl: '',
+      videoUrl: ''
     });
   };
 
@@ -280,6 +285,19 @@ const MakeDigitalProducts = () => {
                     value={newProduct.imageUrl}
                     onChange={handleProductChange}
                     placeholder="URL for the product cover image"
+                    className="form-control"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="productVideoUrl">YouTube Video URL (Optional)</label>
+                  <input
+                    type="text"
+                    id="productVideoUrl"
+                    name="videoUrl"
+                    value={newProduct.videoUrl}
+                    onChange={handleProductChange}
+                    placeholder="YouTube URL for product demonstration"
                     className="form-control"
                   />
                 </div>

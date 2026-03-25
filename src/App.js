@@ -133,6 +133,7 @@ function AppContent() {
       case '/digital-products':
         return 'digital-products';
       case '/makedigitalproducts':
+      case '/makedigital-products':
         return 'make-digital-products';
       case '/makehome':
         return 'make-home';
@@ -215,6 +216,11 @@ function AppContent() {
             </PasswordProtection>
           } />
           <Route path="/makedigitalproducts" element={
+            <PasswordProtection pageName="Digital Products Editor">
+              <MakeDigitalProducts />
+            </PasswordProtection>
+          } />
+          <Route path="/makedigital-products" element={
             <PasswordProtection pageName="Digital Products Editor">
               <MakeDigitalProducts />
             </PasswordProtection>
