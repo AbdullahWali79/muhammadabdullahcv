@@ -316,7 +316,7 @@ const MakeDigitalProducts = () => {
                       onChange={handleProductChange}
                       placeholder="Detailed description of the digital product..."
                       className="form-control"
-                      rows="4"
+                      rows="3"
                     />
                   </div>
 
@@ -326,7 +326,7 @@ const MakeDigitalProducts = () => {
                       className="save-item-btn"
                       onClick={editingIndex !== null ? handleSaveEdit : handleAddProduct}
                     >
-                      {editingIndex !== null ? 'Update Product' : 'Add Product'}
+                      <i className="fas fa-save"></i> {editingIndex !== null ? 'Update' : 'Save'}
                     </button>
                     <button 
                       type="button" 
