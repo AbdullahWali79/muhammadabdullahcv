@@ -137,7 +137,7 @@ const DigitalProducts = ({ userData }) => {
                     <div className="product-category">{product.category}</div>
                     <div className="product-header-row">
                       <h3 className="product-title">{product.title}</h3>
-                      <div className="product-price">{product.price}</div>
+                      {product.showPrice !== false && <div className="product-price">{product.price}</div>}
                     </div>
                     <p className="product-description">{product.description}</p>
                     <button className="buy-btn" onClick={(e) => handleBuyClick(product, e)}>

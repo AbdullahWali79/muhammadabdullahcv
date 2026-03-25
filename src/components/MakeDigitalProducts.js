@@ -19,6 +19,7 @@ const MakeDigitalProducts = () => {
     category: '',
     description: '',
     price: '',
+    showPrice: true,
     imageUrl: '',
     videoUrl: ''
   });
@@ -50,8 +51,8 @@ const MakeDigitalProducts = () => {
   };
 
   const handleProductChange = (e) => {
-    const { name, value } = e.target;
-    setNewProduct(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setNewProduct(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
   const handleAddProduct = () => {
@@ -75,6 +76,7 @@ const MakeDigitalProducts = () => {
       category: '',
       description: '',
       price: '',
+      showPrice: true,
       imageUrl: '',
       videoUrl: ''
     });
@@ -106,6 +108,7 @@ const MakeDigitalProducts = () => {
       category: '',
       description: '',
       price: '',
+      showPrice: true,
       imageUrl: '',
       videoUrl: ''
     });
@@ -121,6 +124,7 @@ const MakeDigitalProducts = () => {
       category: p.category || '',
       description: p.description || '',
       price: p.price || '',
+      showPrice: p.showPrice !== false,
       imageUrl: p.imageUrl || '',
       videoUrl: p.videoUrl || ''
     });
@@ -144,6 +148,7 @@ const MakeDigitalProducts = () => {
       category: '',
       description: '',
       price: '',
+      showPrice: true,
       imageUrl: '',
       videoUrl: ''
     });
@@ -285,17 +290,29 @@ const MakeDigitalProducts = () => {
                         className="form-control"
                       />
                     </div>
-                    <div className="form-group half-width">
+                    <div className="form-group half-width" style={{display: 'flex', flexDirection: 'column'}}>
                       <label htmlFor="productPrice">Price</label>
-                      <input
-                        type="text"
-                        id="productPrice"
-                        name="price"
-                        value={newProduct.price}
-                        onChange={handleProductChange}
-                        placeholder="e.g. $49.00 or PKR 2000"
-                        className="form-control"
-                      />
+                      <div style={{display: 'flex', gap: '15px', alignItems: 'center'}}>
+                        <input
+                          type="text"
+                          id="productPrice"
+                          name="price"
+                          value={newProduct.price}
+                          onChange={handleProductChange}
+                          placeholder="e.g. $49.00 or PKR 2000"
+                          className="form-control"
+                          style={{ flex: 1 }}
+                        />
+                        <label style={{display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', whiteSpace: 'nowrap', color: '#00CED1', fontSize: '14px'}}>
+                          <input 
+                            type="checkbox" 
+                            name="showPrice" 
+                            checked={newProduct.showPrice !== false} 
+                            onChange={handleProductChange} 
+                            style={{width: '18px', height: '18px', margin: 0, cursor: 'pointer'}}
+                          /> Show Price
+                        </label>
+                      </div>
                     </div>
                   </div>
 
