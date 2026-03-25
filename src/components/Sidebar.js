@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaHome, FaUser, FaBriefcase, FaFolder, FaNewspaper, FaEnvelope, FaFileAlt, FaBars, FaTimes, FaRobot } from 'react-icons/fa';
+import { FaHome, FaUser, FaBriefcase, FaFolder, FaNewspaper, FaEnvelope, FaFileAlt, FaBars, FaTimes, FaRobot, FaShoppingCart } from 'react-icons/fa';
 import './Sidebar.css';
 
 const Sidebar = ({ userData, collapsed, setCollapsed }) => {
@@ -8,6 +8,7 @@ const Sidebar = ({ userData, collapsed, setCollapsed }) => {
   
   const allMenuItems = [
     { id: 'home', label: 'Home', icon: FaHome, path: '/' },
+    { id: 'digital-products', label: 'Digital Products', icon: FaShoppingCart, path: '/digital-products' },
     { id: 'prompts', label: 'Prompts', icon: FaRobot, path: '/prompts' },
     { id: 'about', label: 'About', icon: FaUser, path: '/about' },
     { id: 'service', label: 'Service', icon: FaBriefcase, path: '/service' },

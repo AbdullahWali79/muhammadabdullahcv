@@ -14,6 +14,8 @@ import CVForm from './components/CVForm';
 import Prompts from './components/Prompts';
 import PromptDetail from './components/PromptDetail';
 import MakePrompts from './components/MakePrompts';
+import DigitalProducts from './components/DigitalProducts';
+import MakeDigitalProducts from './components/MakeDigitalProducts';
 import MakeHome from './components/MakeHome';
 import MakeAbout from './components/MakeAbout';
 import MakeService from './components/MakeService';
@@ -128,6 +130,10 @@ function AppContent() {
         return 'prompts';
       case '/makeprompts':
         return 'make-prompts';
+      case '/digital-products':
+        return 'digital-products';
+      case '/makedigitalproducts':
+        return 'make-digital-products';
       case '/makehome':
         return 'make-home';
       case '/makeabout':
@@ -167,6 +173,7 @@ function AppContent() {
           <Route path="/contact" element={<Contact userData={userData} />} />
           <Route path="/prompts" element={<Prompts />} />
           <Route path="/prompts/:id" element={<PromptDetail />} />
+          <Route path="/digital-products" element={<DigitalProducts userData={userData} />} />
           <Route path="/makecv" element={
             <PasswordProtection pageName="CV Creation">
               <CVForm userData={userData} setUserData={setUserData} />
@@ -205,6 +212,11 @@ function AppContent() {
           <Route path="/makeprompts" element={
             <PasswordProtection pageName="Prompts Editor">
               <MakePrompts />
+            </PasswordProtection>
+          } />
+          <Route path="/makedigitalproducts" element={
+            <PasswordProtection pageName="Digital Products Editor">
+              <MakeDigitalProducts />
             </PasswordProtection>
           } />
           <Route path="/security" element={

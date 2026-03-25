@@ -87,6 +87,16 @@ CREATE TABLE IF NOT EXISTS contact_data (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Digital Products Page Data
+CREATE TABLE IF NOT EXISTS digital_products_data (
+  id INTEGER PRIMARY KEY DEFAULT 1,
+  title VARCHAR(200),
+  subtitle VARCHAR(200),
+  products JSONB, -- Array of product objects
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Enable Row Level Security (RLS)
 ALTER TABLE user_data ENABLE ROW LEVEL SECURITY;
 ALTER TABLE home_data ENABLE ROW LEVEL SECURITY;
@@ -125,6 +135,12 @@ CREATE POLICY "Allow public read access" ON contact_data FOR SELECT USING (true)
 CREATE POLICY "Allow public insert access" ON contact_data FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow public update access" ON contact_data FOR UPDATE USING (true);
 
+-- Enable Row Level Security (RLS) for digital_products_data
+ALTER TABLE digital_products_data ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read access" ON digital_products_data FOR SELECT USING (true);
+CREATE POLICY "Allow public insert access" ON digital_products_data FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update access" ON digital_products_data FOR UPDATE USING (true);
+
 -- Security and Access Control Table
 CREATE TABLE IF NOT EXISTS security_settings (
   id INTEGER PRIMARY KEY DEFAULT 1,
@@ -136,7 +152,8 @@ CREATE TABLE IF NOT EXISTS security_settings (
     "makeportfolio": "7337",
     "makenews": "7337",
     "makecontact": "7337",
-    "makecv": "7337"
+    "makecv": "7337",
+    "makedigitalproducts": "7337"
   }',
   access_logs JSONB DEFAULT '[]',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -152,7 +169,8 @@ VALUES (1, '7337', '{
   "makeportfolio": "7337",
   "makenews": "7337",
   "makecontact": "7337",
-  "makecv": "7337"
+  "makecv": "7337",
+  "makedigitalproducts": "7337"
 }')
 ON CONFLICT (id) DO NOTHING;
 

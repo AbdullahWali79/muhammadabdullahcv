@@ -337,3 +337,33 @@ export const getPromptsData = async () => {
   }
 }
 
+// Digital Products Data
+export const saveDigitalProductsData = async (digitalProductsData) => {
+  try {
+    const { data, error } = await supabase
+      .from(TABLES.DIGITAL_PRODUCTS_DATA)
+      .upsert([{ id: 1, ...digitalProductsData }], { onConflict: 'id' })
+    
+    if (error) throw error
+    return { success: true, data }
+  } catch (error) {
+    console.error('Error saving digital products data:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+export const getDigitalProductsData = async () => {
+  try {
+    const { data, error } = await supabase
+      .from(TABLES.DIGITAL_PRODUCTS_DATA)
+      .select('*')
+      .eq('id', 1)
+      .single()
+    
+    if (error && error.code !== 'PGRST116') throw error
+    return { success: true, data: data || null }
+  } catch (error) {
+    console.error('Error fetching digital products data:', error)
+    return { success: false, error: error.message }
+  }
+}
