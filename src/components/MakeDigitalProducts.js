@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getDigitalProductsData, saveDigitalProductsData } from '../services/supabaseService';
 import './MakePrompts.css'; // We can reuse the styling from MakePrompts for simplicity
+import './MakeDigitalProducts.css'; // Specific styling for modal
 
 const MakeDigitalProducts = () => {
   const [data, setData] = useState({
@@ -177,9 +178,21 @@ const MakeDigitalProducts = () => {
   return (
     <div className="make-page">
       <div className="form-container">
-        <div className="form-header">
-          <h2>Edit Digital Products</h2>
-          <p>Manage your digital products, their prices, and descriptions.</p>
+        <div className="editor-header">
+          <h1>Edit Digital Products Page</h1>
+          <div className="editor-actions">
+            <button type="button" className="btn btn-primary" onClick={() => setIsAddingProduct(true)}>
+              <i className="fas fa-plus"></i> Add New Product
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleSubmit}
+              disabled={saving || loading}
+            >
+              <i className="fas fa-save"></i> {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
         </div>
 
         {message.text && (
@@ -188,7 +201,7 @@ const MakeDigitalProducts = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="editor-form">
+        <form onSubmit={handleSubmit} className="editor-form" id="digital-products-form">
           <div className="form-section">
             <h3>Page Header</h3>
             <div className="form-group">
@@ -221,115 +234,108 @@ const MakeDigitalProducts = () => {
           <div className="form-section">
             <div className="section-header-flex">
               <h3>Products List</h3>
-              {!isAddingProduct && (
-                <button 
-                  type="button" 
-                  className="add-btn"
-                  onClick={() => setIsAddingProduct(true)}
-                >
-                  <i className="fas fa-plus"></i> Add New Product
-                </button>
-              )}
             </div>
 
             {isAddingProduct && (
-              <div className="nested-form">
-                <h4>{editingIndex !== null ? 'Edit Product' : 'Add New Product'}</h4>
-                
-                <div className="form-group">
-                  <label htmlFor="productTitle">Product Title</label>
-                  <input
-                    type="text"
-                    id="productTitle"
-                    name="title"
-                    value={newProduct.title}
-                    onChange={handleProductChange}
-                    placeholder="e.g. Meta Ads Setup Guide"
-                    className="form-control"
-                  />
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group half-width">
-                    <label htmlFor="productCategory">Category</label>
+              <div className="modal-overlay">
+                <div className="modal-content nested-form">
+                  <h4>{editingIndex !== null ? 'Edit Product' : 'Add New Product'}</h4>
+                  
+                  <div className="form-group">
+                    <label htmlFor="productTitle">Product Title</label>
                     <input
                       type="text"
-                      id="productCategory"
-                      name="category"
-                      value={newProduct.category}
+                      id="productTitle"
+                      name="title"
+                      value={newProduct.title}
                       onChange={handleProductChange}
-                      placeholder="e.g. Marketing, Code, etc."
+                      placeholder="e.g. Meta Ads Setup Guide"
                       className="form-control"
                     />
                   </div>
-                  <div className="form-group half-width">
-                    <label htmlFor="productPrice">Price</label>
+
+                  <div className="form-row">
+                    <div className="form-group half-width">
+                      <label htmlFor="productCategory">Category</label>
+                      <input
+                        type="text"
+                        id="productCategory"
+                        name="category"
+                        value={newProduct.category}
+                        onChange={handleProductChange}
+                        placeholder="e.g. Marketing, Code, etc."
+                        className="form-control"
+                      />
+                    </div>
+                    <div className="form-group half-width">
+                      <label htmlFor="productPrice">Price</label>
+                      <input
+                        type="text"
+                        id="productPrice"
+                        name="price"
+                        value={newProduct.price}
+                        onChange={handleProductChange}
+                        placeholder="e.g. $49.00 or PKR 2000"
+                        className="form-control"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="productImageUrl">Image URL (Optional)</label>
                     <input
                       type="text"
-                      id="productPrice"
-                      name="price"
-                      value={newProduct.price}
+                      id="productImageUrl"
+                      name="imageUrl"
+                      value={newProduct.imageUrl}
                       onChange={handleProductChange}
-                      placeholder="e.g. $49.00 or PKR 2000"
+                      placeholder="URL for the product cover image"
                       className="form-control"
                     />
                   </div>
-                </div>
 
-                <div className="form-group">
-                  <label htmlFor="productImageUrl">Image URL (Optional)</label>
-                  <input
-                    type="text"
-                    id="productImageUrl"
-                    name="imageUrl"
-                    value={newProduct.imageUrl}
-                    onChange={handleProductChange}
-                    placeholder="URL for the product cover image"
-                    className="form-control"
-                  />
-                </div>
+                  <div className="form-group">
+                    <label htmlFor="productVideoUrl">YouTube Video URL (Optional)</label>
+                    <input
+                      type="text"
+                      id="productVideoUrl"
+                      name="videoUrl"
+                      value={newProduct.videoUrl}
+                      onChange={handleProductChange}
+                      placeholder="YouTube URL for product demonstration"
+                      className="form-control"
+                    />
+                  </div>
 
-                <div className="form-group">
-                  <label htmlFor="productVideoUrl">YouTube Video URL (Optional)</label>
-                  <input
-                    type="text"
-                    id="productVideoUrl"
-                    name="videoUrl"
-                    value={newProduct.videoUrl}
-                    onChange={handleProductChange}
-                    placeholder="YouTube URL for product demonstration"
-                    className="form-control"
-                  />
-                </div>
+                  <div className="form-group">
+                    <label htmlFor="productDescription">Description</label>
+                    <textarea
+                      id="productDescription"
+                      name="description"
+                      value={newProduct.description}
+                      onChange={handleProductChange}
+                      placeholder="Detailed description of the digital product..."
+                      className="form-control"
+                      rows="4"
+                    />
+                  </div>
 
-                <div className="form-group">
-                  <label htmlFor="productDescription">Description</label>
-                  <textarea
-                    id="productDescription"
-                    name="description"
-                    value={newProduct.description}
-                    onChange={handleProductChange}
-                    placeholder="Detailed description of the digital product..."
-                    className="form-control"
-                    rows="4"
-                  />
-                </div>
-
-                <div className="nested-form-actions">
-                  <button 
-                    type="button" 
-                    className="save-item-btn"
-                    onClick={editingIndex !== null ? handleSaveEdit : handleAddProduct}
-                  >
-                    {editingIndex !== null ? 'Update Product' : 'Add Product'}
-                  </button>
-                  <button 
-                    type="button" 
-                    className="cancel-btn"
-                    onClick={handleCancel}
-                  >
-                    Cancel
-                  </button>
+                  <div className="nested-form-actions" style={{marginTop: '20px'}}>
+                    <button 
+                      type="button" 
+                      className="save-item-btn"
+                      onClick={editingIndex !== null ? handleSaveEdit : handleAddProduct}
+                    >
+                      {editingIndex !== null ? 'Update Product' : 'Add Product'}
+                    </button>
+                    <button 
+                      type="button" 
+                      className="cancel-btn"
+                      onClick={handleCancel}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -361,11 +367,6 @@ const MakeDigitalProducts = () => {
             </div>
           </div>
 
-          <div className="form-actions">
-            <button type="submit" className="save-btn" disabled={saving}>
-              {saving ? 'Saving...' : 'Save All Changes'}
-            </button>
-          </div>
         </form>
       </div>
     </div>
