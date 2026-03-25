@@ -16,10 +16,22 @@
 }
 
 .products-header h1 {
-  color: #00CED1;
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-  font-family: monospace;
+  font-size: 3rem;
+  margin-bottom: 15px;
+  font-family: inherit;
+  font-weight: 800;
+  background: linear-gradient(-45deg, #00CED1, #008B8B, #00CED1, #25D366);
+  background-size: 300% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: gradientText 4s ease infinite;
+}
+
+@keyframes gradientText {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .products-header p {
@@ -59,8 +71,11 @@
 }
 
 .product-card {
-  background: #2a2a2a;
-  border-radius: 10px;
+  background: rgba(42, 42, 42, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 206, 209, 0.1);
+  border-radius: 12px;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
@@ -68,8 +83,24 @@
 }
 
 .product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 206, 209, 0.2);
+  border-color: rgba(0, 206, 209, 0.4);
+}
+
+.product-badge {
+  position: absolute;
+  top: 15px;
+  right: -30px;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: white;
+  padding: 5px 30px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  transform: rotate(45deg);
+  z-index: 10;
+  box-shadow: 0 2px 10px rgba(255, 65, 108, 0.4);
+  letter-spacing: 1px;
 }
 
 .product-image {
@@ -179,6 +210,19 @@
   transition: all 0.3s ease;
   width: 100%;
   margin-top: auto;
+  animation: pulseBtn 2.5s infinite;
+}
+
+@keyframes pulseBtn {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+  }
 }
 
 .buy-btn:hover {

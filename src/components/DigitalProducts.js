@@ -99,10 +99,15 @@ const DigitalProducts = ({ userData }) => {
             </div>
             
             <div className="products-grid">
-              {filteredProducts.map((product) => {
+              {filteredProducts.map((product, index) => {
                 const embedUrl = getYouTubeEmbedUrl(product.videoUrl);
+                const isHot = index === 0; // The first product gets a "HOT" badge
+                const isPremium = index === 1 || product.price?.includes('$'); // Others might get Premium
+                
                 return (
-                <div key={product.id} className="product-card">
+                <div key={product.id} className="product-card" style={{ position: 'relative' }}>
+                  {isHot && <div className="product-badge">HOT 🔥</div>}
+                  {!isHot && isPremium && <div className="product-badge" style={{ background: 'linear-gradient(135deg, #FFD700, #FDB931)' }}>PREMIUM 💎</div>}
                   <div className="product-image">
                     {embedUrl ? (
                       <iframe
