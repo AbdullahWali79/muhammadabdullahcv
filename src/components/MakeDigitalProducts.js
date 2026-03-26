@@ -298,20 +298,21 @@ const MakeDigitalProducts = () => {
                         {isFullscreen ? '🗗' : '🗖'}
                       </button>
                       <div className="nested-form-actions" style={{ marginTop: 0 }}>
-                      <button 
-                        type="button" 
-                        className="save-item-btn"
-                        onClick={editingIndex !== null ? handleSaveEdit : handleAddProduct}
-                      >
-                        <i className="fas fa-save"></i> {editingIndex !== null ? 'Update' : 'Save'}
-                      </button>
-                      <button 
-                        type="button" 
-                        className="cancel-btn"
-                        onClick={handleCancel}
-                      >
-                        Cancel
-                      </button>
+                        <button 
+                          type="button" 
+                          className="save-item-btn"
+                          onClick={editingIndex !== null ? handleSaveEdit : handleAddProduct}
+                        >
+                          <i className="fas fa-save"></i> {editingIndex !== null ? 'Update' : 'Save'}
+                        </button>
+                        <button 
+                          type="button" 
+                          className="cancel-btn"
+                          onClick={handleCancel}
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </div>
                   </div>
                   
