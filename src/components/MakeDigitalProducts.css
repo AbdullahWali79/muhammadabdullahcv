@@ -25,6 +25,25 @@
   animation: modalFadeIn 0.3s ease-out;
 }
 
+.nested-form {
+  max-height: calc(90vh - 120px);
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.nested-form::-webkit-scrollbar {
+  width: 10px;
+}
+
+.nested-form::-webkit-scrollbar-thumb {
+  background: rgba(0, 206, 209, 0.35);
+  border-radius: 5px;
+}
+
+.nested-form::-webkit-scrollbar-track {
+  background: rgba(58, 75, 78, 0.4);
+}
+
 @keyframes modalFadeIn {
   from {
     opacity: 0;
