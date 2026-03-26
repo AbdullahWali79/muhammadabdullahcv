@@ -10,6 +10,7 @@
   align-items: center;
   z-index: 1000;
   backdrop-filter: blur(4px);
+  overflow-y: auto;
 }
 
 .modal-content {
@@ -20,9 +21,31 @@
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   animation: modalFadeIn 0.3s ease-out;
+}
+
+.nested-form {
+  width: 100%;
+  max-height: calc(90vh - 120px);
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.nested-form::-webkit-scrollbar {
+  width: 8px;
+}
+
+.nested-form::-webkit-scrollbar-thumb {
+  background: rgba(0, 206, 209, 0.45);
+  border-radius: 4px;
+}
+
+.nested-form::-webkit-scrollbar-track {
+  background: rgba(58, 75, 78, 0.3);
 }
 
 .nested-form {
