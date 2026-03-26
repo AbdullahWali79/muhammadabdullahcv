@@ -26,6 +26,11 @@ const MakeDigitalProducts = () => {
   });
 
   const [editingIndex, setEditingIndex] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(prev => !prev);
+  };
 
   useEffect(() => {
     loadData();
@@ -112,6 +117,7 @@ const MakeDigitalProducts = () => {
       sourceUrl: ''
     });
     setIsAddingProduct(false);
+    setIsFullscreen(false);
     setMessage({ type: 'success', text: 'Product added locally. Don\'t forget to save!' });
   };
 
@@ -146,6 +152,7 @@ const MakeDigitalProducts = () => {
     });
     setEditingIndex(null);
     setIsAddingProduct(false);
+    setIsFullscreen(false);
     setMessage({ type: 'success', text: 'Product updated locally. Don\'t forget to save!' });
   };
 
@@ -176,6 +183,7 @@ const MakeDigitalProducts = () => {
   const handleCancel = () => {
     setIsAddingProduct(false);
     setEditingIndex(null);
+    setIsFullscreen(false);
     setNewProduct({
       title: '',
       category: '',
@@ -277,10 +285,19 @@ const MakeDigitalProducts = () => {
 
             {isAddingProduct && (
               <div className="modal-overlay">
-                <div className="modal-content nested-form">
+                <div className={`modal-content nested-form ${isFullscreen ? 'fullscreen-modal' : ''}`}>
                   <div className="modal-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #3A4B4E', paddingBottom: '10px' }}>
                     <h4 style={{ margin: 0, borderBottom: 'none', paddingBottom: 0 }}>{editingIndex !== null ? 'Edit Product' : 'Add New Product'}</h4>
-                    <div className="nested-form-actions" style={{ marginTop: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <button
+                        type="button"
+                        className="fullscreen-btn"
+                        onClick={toggleFullscreen}
+                        title={isFullscreen ? 'Exit full screen' : 'Full screen'}
+                      >
+                        {isFullscreen ? '🗗' : '🗖'}
+                      </button>
+                      <div className="nested-form-actions" style={{ marginTop: 0 }}>
                       <button 
                         type="button" 
                         className="save-item-btn"
