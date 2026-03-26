@@ -21,7 +21,8 @@ const MakeDigitalProducts = () => {
     price: '',
     showPrice: true,
     imageUrl: '',
-    videoUrl: ''
+    videoUrl: '',
+    sourceUrl: ''
   });
 
   const [editingIndex, setEditingIndex] = useState(null);
@@ -55,6 +56,35 @@ const MakeDigitalProducts = () => {
     setNewProduct(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
+  const fetchProductMetadata = async (url) => {
+    if (!url || !/^https?:\/\//i.test(url)) {
+      setMessage({ type: 'error', text: 'Please enter a valid URL (including https://).' });
+      return;
+    }
+
+    try {
+      setMessage({ type: '', text: 'Fetching metadata from URL...' });
+      const response = await fetch(`/api/fetch-url-meta?url=${encodeURIComponent(url)}`);
+      if (!response.ok) {
+        throw new Error(`Metadata fetch failed: ${response.statusText}`);
+      }
+
+      const meta = await response.json();
+      const updated = {
+        ...newProduct,
+        title: meta.title || newProduct.title,
+        description: meta.description || newProduct.description,
+        imageUrl: meta.image || newProduct.imageUrl,
+        sourceUrl: url
+      };
+      setNewProduct(updated);
+      setMessage({ type: 'success', text: 'Metadata loaded. Review and save the product!' });
+    } catch (error) {
+      console.error('URL metadata fetch error', error);
+      setMessage({ type: 'error', text: 'Could not fetch metadata from the URL. Please enter manually.' });
+    }
+  };
+
   const handleAddProduct = () => {
     if (!newProduct.title.trim() || !newProduct.description.trim()) {
       setMessage({ type: 'error', text: 'Title and description are required for a product!' });
@@ -78,7 +108,8 @@ const MakeDigitalProducts = () => {
       price: '',
       showPrice: true,
       imageUrl: '',
-      videoUrl: ''
+      videoUrl: '',
+      sourceUrl: ''
     });
     setIsAddingProduct(false);
     setMessage({ type: 'success', text: 'Product added locally. Don\'t forget to save!' });
@@ -110,7 +141,8 @@ const MakeDigitalProducts = () => {
       price: '',
       showPrice: true,
       imageUrl: '',
-      videoUrl: ''
+      videoUrl: '',
+      sourceUrl: ''
     });
     setEditingIndex(null);
     setIsAddingProduct(false);
@@ -126,7 +158,8 @@ const MakeDigitalProducts = () => {
       price: p.price || '',
       showPrice: p.showPrice !== false,
       imageUrl: p.imageUrl || '',
-      videoUrl: p.videoUrl || ''
+      videoUrl: p.videoUrl || '',
+      sourceUrl: p.sourceUrl || ''
     });
     setEditingIndex(index);
     setIsAddingProduct(true);
@@ -150,7 +183,8 @@ const MakeDigitalProducts = () => {
       price: '',
       showPrice: true,
       imageUrl: '',
-      videoUrl: ''
+      videoUrl: '',
+      sourceUrl: ''
     });
   };
 
@@ -327,6 +361,31 @@ const MakeDigitalProducts = () => {
                       placeholder="URL for the product cover image"
                       className="form-control"
                     />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="productSourceUrl">Product Page URL (Optional)</label>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                      <input
+                        type="text"
+                        id="productSourceUrl"
+                        name="sourceUrl"
+                        value={newProduct.sourceUrl}
+                        onChange={handleProductChange}
+                        placeholder="https://example.com/new-product"
+                        className="form-control"
+                        style={{ flex: 1 }}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => fetchProductMetadata(newProduct.sourceUrl)}
+                        style={{ flexShrink: 0 }}
+                      >
+                        Fetch Metadata
+                      </button>
+                    </div>
+                    <small style={{ color: '#aaa' }}>Auto-fill title/description/image from the URL (if open graph tags are present).</small>
                   </div>
 
                   <div className="form-group">
