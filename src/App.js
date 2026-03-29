@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { getUserData } from './services/supabaseService';
 import Sidebar from './components/Sidebar';
@@ -22,14 +22,19 @@ import MakeService from './components/MakeService';
 import MakePortfolio from './components/MakePortfolio';
 import MakeNews from './components/MakeNews';
 import MakeContact from './components/MakeContact';
+import MakeFreelancingTasks from './components/MakeFreelancingTasks';
+import MakeSettings from './components/MakeSettings';
 import SecurityManager from './components/SecurityManager';
+import FreelancingTasks from './components/FreelancingTasks';
 import './components/Mobile.css';
 import './components/MobileTable.css';
 import PasswordProtection from './components/PasswordProtection';
+import { applyThemeSettings, getSiteSettings } from './utils/siteSettings';
 import './App.css';
 
 function AppContent() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [settingsVersion, setSettingsVersion] = useState(0);
   const [userData, setUserData] = useState({
     firstName: 'Muhammad',
     lastName: 'Abdullah',
@@ -103,7 +108,24 @@ function AppContent() {
     loadUserData();
   }, []);
 
+  useEffect(() => {
+    applyThemeSettings(getSiteSettings());
+
+    const handleSettingsUpdated = () => {
+      applyThemeSettings(getSiteSettings());
+      setSettingsVersion((prev) => prev + 1);
+    };
+
+    window.addEventListener('site-settings-updated', handleSettingsUpdated);
+    return () => {
+      window.removeEventListener('site-settings-updated', handleSettingsUpdated);
+    };
+  }, []);
+
   const location = useLocation();
+  const currentSettings = useMemo(() => getSiteSettings(), [settingsVersion]);
+  const backgroundModeClass = `app-bg-${currentSettings.theme.backgroundMode || 'solid'}`;
+  const backgroundMotionClass = currentSettings.theme.motionEnabled ? 'app-bg-motion' : 'app-bg-static';
   const getActiveSection = () => {
     const path = location.pathname;
     switch (path) {
@@ -149,13 +171,17 @@ function AppContent() {
         return 'make-contact';
       case '/security':
         return 'security';
+      case '/makesettings':
+      case '/make-settings':
+      case '/settings':
+        return 'make-settings';
       default:
         return 'home';
     }
   };
 
   return (
-    <div className="app">
+    <div className={`app ${backgroundModeClass} ${backgroundMotionClass}`}>
       <Sidebar 
         activeSection={getActiveSection()} 
         userData={userData}
@@ -163,74 +189,97 @@ function AppContent() {
         setCollapsed={setSidebarCollapsed}
       />
       <main className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-        <Routes>
-          <Route path="/" element={<Home userData={userData} />} />
-          <Route path="/about" element={<About userData={userData} />} />
-          <Route path="/service" element={<Service />} />
-          <Route path="/portfolio" element={<Portfolio />} />
-          <Route path="/portfolio/:id" element={<PortfolioDetail />} />
-          <Route path="/news" element={<News />} />
-          <Route path="/news/:id" element={<NewsDetail />} />
-          <Route path="/contact" element={<Contact userData={userData} />} />
-          <Route path="/prompts" element={<Prompts />} />
-          <Route path="/prompts/:id" element={<PromptDetail />} />
-          <Route path="/digital-products" element={<DigitalProducts userData={userData} />} />
-          <Route path="/makecv" element={
-            <PasswordProtection pageName="CV Creation">
-              <CVForm userData={userData} setUserData={setUserData} />
-            </PasswordProtection>
-          } />
-          <Route path="/makehome" element={
-            <PasswordProtection pageName="Home Editor">
-              <MakeHome />
-            </PasswordProtection>
-          } />
-          <Route path="/makeabout" element={
-            <PasswordProtection pageName="About Editor">
-              <MakeAbout />
-            </PasswordProtection>
-          } />
-          <Route path="/makeservice" element={
-            <PasswordProtection pageName="Service Editor">
-              <MakeService />
-            </PasswordProtection>
-          } />
-          <Route path="/makeportfolio" element={
-            <PasswordProtection pageName="Portfolio Editor">
-              <MakePortfolio />
-            </PasswordProtection>
-          } />
-          <Route path="/makenews" element={
-            <PasswordProtection pageName="News Editor">
-              <MakeNews />
-            </PasswordProtection>
-          } />
-          <Route path="/makecontact" element={
-            <PasswordProtection pageName="Contact Editor">
-              <MakeContact />
-            </PasswordProtection>
-          } />
-          <Route path="/makeprompts" element={
-            <PasswordProtection pageName="Prompts Editor">
-              <MakePrompts />
-            </PasswordProtection>
-          } />
-          <Route path="/makedigitalproducts" element={
-            <PasswordProtection pageName="Digital Products Editor">
-              <MakeDigitalProducts />
-            </PasswordProtection>
-          } />
-          <Route path="/makedigital-products" element={
-            <PasswordProtection pageName="Digital Products Editor">
-              <MakeDigitalProducts />
-            </PasswordProtection>
-          } />
-          <Route path="/security" element={
-            <PasswordProtection pageName="Security Manager">
-              <SecurityManager />
-            </PasswordProtection>
-          } />
-        </Routes>
+        <div className="route-shell">
+          <Routes>
+            <Route path="/" element={<Home userData={userData} />} />
+            <Route path="/about" element={<About userData={userData} />} />
+            <Route path="/service" element={<Service />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/portfolio/:id" element={<PortfolioDetail />} />
+            <Route path="/news" element={<News />} />
+            <Route path="/news/:id" element={<NewsDetail />} />
+            <Route path="/contact" element={<Contact userData={userData} />} />
+            <Route path="/prompts" element={<Prompts />} />
+            <Route path="/prompts/:id" element={<PromptDetail />} />
+            <Route path="/digital-products" element={<DigitalProducts userData={userData} />} />
+            <Route path="/makecv" element={
+              <PasswordProtection pageName="CV Creation">
+                <CVForm userData={userData} setUserData={setUserData} />
+              </PasswordProtection>
+            } />
+            <Route path="/makehome" element={
+              <PasswordProtection pageName="Home Editor">
+                <MakeHome />
+              </PasswordProtection>
+            } />
+            <Route path="/makeabout" element={
+              <PasswordProtection pageName="About Editor">
+                <MakeAbout />
+              </PasswordProtection>
+            } />
+            <Route path="/makeservice" element={
+              <PasswordProtection pageName="Service Editor">
+                <MakeService />
+              </PasswordProtection>
+            } />
+            <Route path="/makeportfolio" element={
+              <PasswordProtection pageName="Portfolio Editor">
+                <MakePortfolio />
+              </PasswordProtection>
+            } />
+            <Route path="/makenews" element={
+              <PasswordProtection pageName="News Editor">
+                <MakeNews />
+              </PasswordProtection>
+            } />
+            <Route path="/freelancing-tasks" element={<FreelancingTasks />} />
+            <Route path="/makecontact" element={
+              <PasswordProtection pageName="Contact Editor">
+                <MakeContact />
+              </PasswordProtection>
+            } />
+            <Route path="/makeprompts" element={
+              <PasswordProtection pageName="Prompts Editor">
+                <MakePrompts />
+              </PasswordProtection>
+            } />
+            <Route path="/makedigitalproducts" element={
+              <PasswordProtection pageName="Digital Products Editor">
+                <MakeDigitalProducts />
+              </PasswordProtection>
+            } />
+            <Route path="/makedigital-products" element={
+              <PasswordProtection pageName="Digital Products Editor">
+                <MakeDigitalProducts />
+              </PasswordProtection>
+            } />
+            <Route path="/makefreelancing-tasks" element={
+              <PasswordProtection pageName="Freelancing Tasks Editor">
+                <MakeFreelancingTasks />
+              </PasswordProtection>
+            } />
+            <Route path="/security" element={
+              <PasswordProtection pageName="Security Manager">
+                <SecurityManager />
+              </PasswordProtection>
+            } />
+            <Route path="/makesettings" element={
+              <PasswordProtection pageName="Site Settings">
+                <MakeSettings />
+              </PasswordProtection>
+            } />
+            <Route path="/make-settings" element={
+              <PasswordProtection pageName="Site Settings">
+                <MakeSettings />
+              </PasswordProtection>
+            } />
+            <Route path="/settings" element={
+              <PasswordProtection pageName="Site Settings">
+                <MakeSettings />
+              </PasswordProtection>
+            } />
+          </Routes>
+        </div>
       </main>
     </div>
   );

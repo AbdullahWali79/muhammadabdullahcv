@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getDigitalProductsData, saveDigitalProductsData } from '../services/supabaseService';
+import { formatCurrency } from '../utils/currency';
 import './MakePrompts.css'; // We can reuse the styling from MakePrompts for simplicity
 import './MakeDigitalProducts.css'; // Specific styling for modal
 
@@ -219,7 +220,7 @@ const MakeDigitalProducts = () => {
   };
 
   if (loading) {
-    return <div className="loading" style={{ color: '#00CED1' }}>Loading Digital Products Form...</div>;
+    return <div className="loading" style={{ color: 'var(--site-accent-color)' }}>Loading Digital Products Form...</div>;
   }
 
   return (
@@ -286,7 +287,7 @@ const MakeDigitalProducts = () => {
             {isAddingProduct && (
               <div className="modal-overlay">
                 <div className={`modal-content nested-form ${isFullscreen ? 'fullscreen-modal' : ''}`}>
-                  <div className="modal-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #3A4B4E', paddingBottom: '10px' }}>
+                  <div className="modal-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid var(--site-sidebar-border-color)', paddingBottom: '10px' }}>
                     <h4 style={{ margin: 0, borderBottom: 'none', paddingBottom: 0 }}>{editingIndex !== null ? 'Edit Product' : 'Add New Product'}</h4>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <button
@@ -351,11 +352,11 @@ const MakeDigitalProducts = () => {
                           name="price"
                           value={newProduct.price}
                           onChange={handleProductChange}
-                          placeholder="e.g. $49.00 or PKR 2000"
+                          placeholder="e.g. Rs 14000 or Rs 2000"
                           className="form-control"
                           style={{ flex: 1 }}
                         />
-                        <label style={{display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', whiteSpace: 'nowrap', color: '#00CED1', fontSize: '14px'}}>
+                        <label style={{display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', whiteSpace: 'nowrap', color: 'var(--site-accent-color)', fontSize: '14px'}}>
                           <input 
                             type="checkbox" 
                             name="showPrice" 
@@ -453,7 +454,7 @@ const MakeDigitalProducts = () => {
                       </div>
                     </div>
                     <div className="item-details">
-                      <p><strong>Price:</strong> {product.price}</p>
+                      <p><strong>Price:</strong> {formatCurrency(product.price, 'digital-products')}</p>
                       <p className="item-desc">{product.description && product.description.substring(0, 100)}...</p>
                     </div>
                   </div>
@@ -469,3 +470,4 @@ const MakeDigitalProducts = () => {
 };
 
 export default MakeDigitalProducts;
+

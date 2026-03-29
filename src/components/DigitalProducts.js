@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { getDigitalProductsData } from '../services/supabaseService';
-import { FaShoppingCart, FaWhatsapp } from 'react-icons/fa';
+import { FaWhatsapp } from 'react-icons/fa';
+import { formatCurrency } from '../utils/currency';
 import './DigitalProducts.css';
 
 const DigitalProducts = ({ userData }) => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [productsData, setProductsData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [expandedProductId, setExpandedProductId] = useState(null);
 
   useEffect(() => {
     const loadProductsData = async () => {
@@ -31,20 +33,30 @@ const DigitalProducts = ({ userData }) => {
     
     // Format the phone number (remove +, spaces, hyphens)
     const phone = (userData?.phone || '+923046983794').replace(/[^0-9]/g, '');
+    const formattedPrice = formatCurrency(product.price, 'digital-products', 'price not listed');
     
     // Construct the message
-    const message = `Hello, I'm interested in buying your digital product: "${product.title}" listed for ${product.price}.`;
+    const message = `Hello, I'm interested in buying your digital product: "${product.title}" listed for ${formattedPrice}.`;
     const encodedMessage = encodeURIComponent(message);
     
     // Redirect to WhatsApp
     window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
   };
 
+  const handleFilterClick = (category) => {
+    setActiveFilter(category);
+    setExpandedProductId(null);
+  };
+
+  const handleToggleExpand = (productId) => {
+    setExpandedProductId((prev) => (prev === productId ? null : productId));
+  };
+
   if (loading) {
     return (
       <div className="digital-products-page">
         <div className="products-container">
-          <div className="loading" style={{ color: '#00CED1', textAlign: 'center', marginTop: '50px' }}>Loading...</div>
+          <div className="loading" style={{ color: 'var(--site-accent-color)', textAlign: 'center', marginTop: '50px' }}>Loading...</div>
         </div>
       </div>
     );
@@ -101,13 +113,17 @@ const DigitalProducts = ({ userData }) => {
             <div className="products-grid">
               {filteredProducts.map((product, index) => {
                 const embedUrl = getYouTubeEmbedUrl(product.videoUrl);
+                const formattedPrice = formatCurrency(product.price, 'digital-products', '');
+                const productKey = product.id || `${product.title}-${index}`;
                 const isHot = index === 0; // The first product gets a "HOT" badge
-                const isPremium = index === 1 || product.price?.includes('$'); // Others might get Premium
+                const isPremiumPrice = Boolean(formattedPrice && /\d/.test(formattedPrice));
+                const isPremium = index === 1 || isPremiumPrice; // Others might get Premium
+                const isExpanded = expandedProductId === productKey;
                 
                 return (
-                <div key={product.id} className="product-card" style={{ position: 'relative' }}>
-                  {isHot && <div className="product-badge">HOT 🔥</div>}
-                  {!isHot && isPremium && <div className="product-badge" style={{ background: 'linear-gradient(135deg, #FFD700, #FDB931)' }}>PREMIUM 💎</div>}
+                <div key={productKey} className="product-card" style={{ position: 'relative' }}>
+                  {isHot && <div className="product-badge">HOT</div>}
+                  {!isHot && isPremium && <div className="product-badge premium">PREMIUM</div>}
                   <div className="product-image">
                     {embedUrl ? (
                       <iframe
@@ -124,6 +140,8 @@ const DigitalProducts = ({ userData }) => {
                       <img 
                         src={product.imageUrl} 
                         alt={product.title}
+                        loading="lazy"
+                        decoding="async"
                         className="product-img"
                       />
                     ) : (
@@ -137,12 +155,23 @@ const DigitalProducts = ({ userData }) => {
                     <div className="product-category">{product.category}</div>
                     <div className="product-header-row">
                       <h3 className="product-title">{product.title}</h3>
-                      {product.showPrice !== false && <div className="product-price">{product.price}</div>}
+                      {product.showPrice !== false && <div className="product-price">{formattedPrice}</div>}
                     </div>
-                    <p className="product-description">{product.description}</p>
-                    <button className="buy-btn" onClick={(e) => handleBuyClick(product, e)}>
-                      <FaWhatsapp className="btn-icon" /> Buy Now
+                    <button
+                      className="expand-btn"
+                      onClick={() => handleToggleExpand(productKey)}
+                      type="button"
+                      aria-expanded={isExpanded}
+                    >
+                      {isExpanded ? 'Hide Details' : 'View Details'}
                     </button>
+
+                    <div className={`product-expandable ${isExpanded ? 'open' : ''}`}>
+                      <p className="product-description">{product.description}</p>
+                      <button className="buy-btn" onClick={(e) => handleBuyClick(product, e)}>
+                        <FaWhatsapp className="btn-icon" /> Buy Now
+                      </button>
+                    </div>
                   </div>
                 </div>
                 );
@@ -150,7 +179,7 @@ const DigitalProducts = ({ userData }) => {
             </div>
           </>
         ) : (
-          <div style={{ textAlign: 'center', color: '#B0B0B0', marginTop: '50px' }}>
+          <div style={{ textAlign: 'center', color: 'var(--site-sidebar-muted-text-color)', marginTop: '50px' }}>
             <p>No digital products available yet. Please check back later.</p>
           </div>
         )}
@@ -160,3 +189,5 @@ const DigitalProducts = ({ userData }) => {
 };
 
 export default DigitalProducts;
+
+
