@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PasswordProtection from './PasswordProtection';
 import GitHubImagePicker from './GitHubImagePicker';
-import { FaSave, FaEye, FaPlus, FaTrash, FaTimes } from 'react-icons/fa';
+import { FaSave, FaEye, FaPlus, FaTrash, FaTimes, FaSyncAlt } from 'react-icons/fa';
 import { savePortfolioData, getPortfolioData } from '../services/supabaseService';
 import './MakePortfolio.css';
 
@@ -71,6 +71,7 @@ const MakePortfolio = () => {
   const [showCustomCategory, setShowCustomCategory] = useState(false);
   const [customCategory, setCustomCategory] = useState('');
   const [autoSaving, setAutoSaving] = useState(false);
+  const [fetchingMetaFor, setFetchingMetaFor] = useState(null);
   const inputRefs = useRef({});
 
   // Load data from database on component mount
@@ -179,6 +180,69 @@ const MakePortfolio = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const normalizeProjectUrl = (url) => {
+    const trimmedUrl = (url || '').trim();
+    if (!trimmedUrl || trimmedUrl === '#') return '';
+    return /^https?:\/\//i.test(trimmedUrl) ? trimmedUrl : `https://${trimmedUrl}`;
+  };
+
+  const applyFetchedProjectMeta = (currentProject, meta) => ({
+    ...currentProject,
+    link: meta.url || currentProject.link,
+    title: currentProject.title?.trim() ? currentProject.title : (meta.title || currentProject.title),
+    description: currentProject.description?.trim() ? currentProject.description : (meta.description || currentProject.description),
+    fullDescription: currentProject.fullDescription?.trim() ? currentProject.fullDescription : (meta.description || currentProject.fullDescription),
+    image: meta.image || currentProject.image
+  });
+
+  const fetchProjectMeta = async (projectId = 'new') => {
+    const targetProject = projectId === 'new'
+      ? newProject
+      : portfolioData.projects.find(project => project.id === projectId);
+    const normalizedUrl = normalizeProjectUrl(targetProject?.link);
+
+    if (!normalizedUrl) {
+      setMessage('Please enter a valid live project URL first.');
+      setTimeout(() => setMessage(''), 2500);
+      return;
+    }
+
+    setFetchingMetaFor(projectId);
+    setMessage('Fetching project details from live URL...');
+
+    try {
+      const response = await fetch(`/api/fetch-url-meta?url=${encodeURIComponent(normalizedUrl)}`);
+      const meta = await response.json();
+
+      if (!response.ok || !meta.success) {
+        throw new Error(meta.message || 'Unable to fetch project details.');
+      }
+
+      if (projectId === 'new') {
+        setNewProject(prev => applyFetchedProjectMeta({ ...prev, link: normalizedUrl }, meta));
+      } else {
+        setPortfolioData(prev => ({
+          ...prev,
+          projects: prev.projects.map(project =>
+            project.id === projectId
+              ? applyFetchedProjectMeta({ ...project, link: normalizedUrl }, meta)
+              : project
+          )
+        }));
+      }
+
+      setMessage(meta.image
+        ? 'Project details and featured image fetched successfully.'
+        : 'Project details fetched, but no featured image was found.');
+    } catch (error) {
+      console.error('Error fetching project metadata:', error);
+      setMessage(`Error: ${error.message}`);
+    } finally {
+      setFetchingMetaFor(null);
+      setTimeout(() => setMessage(''), 3500);
+    }
   };
 
   const handleSaveNewProject = async () => {
@@ -382,12 +446,24 @@ const MakePortfolio = () => {
                   </div>
                   <div className="form-group">
                     <label>Project Link</label>
-                    <input
-                      type="text"
-                      value={project.link}
-                      onChange={(e) => handleProjectChange(project.id, 'link', e.target.value, e)}
-                      className="form-input"
-                    />
+                    <div className="metadata-fetch-row">
+                      <input
+                        type="text"
+                        value={project.link}
+                        onChange={(e) => handleProjectChange(project.id, 'link', e.target.value, e)}
+                        className="form-input"
+                      />
+                      <button
+                        type="button"
+                        className="metadata-fetch-btn"
+                        onClick={() => fetchProjectMeta(project.id)}
+                        disabled={fetchingMetaFor === project.id}
+                        title="Fetch title, description and featured image from link"
+                      >
+                        <FaSyncAlt />
+                        {fetchingMetaFor === project.id ? 'Fetching...' : 'Fetch'}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -506,13 +582,25 @@ const MakePortfolio = () => {
                   </div>
                   <div className="form-group">
                     <label>Project Link</label>
-                    <input
-                      type="text"
-                      value={newProject.link}
-                      onChange={(e) => handleNewProjectChange('link', e.target.value)}
-                      className="form-input"
-                      placeholder="https://..."
-                    />
+                    <div className="metadata-fetch-row">
+                      <input
+                        type="text"
+                        value={newProject.link}
+                        onChange={(e) => handleNewProjectChange('link', e.target.value)}
+                        className="form-input"
+                        placeholder="https://..."
+                      />
+                      <button
+                        type="button"
+                        className="metadata-fetch-btn"
+                        onClick={() => fetchProjectMeta('new')}
+                        disabled={fetchingMetaFor === 'new'}
+                        title="Fetch title, description and featured image from link"
+                      >
+                        <FaSyncAlt />
+                        {fetchingMetaFor === 'new' ? 'Fetching...' : 'Fetch'}
+                      </button>
+                    </div>
                   </div>
                 </div>
 

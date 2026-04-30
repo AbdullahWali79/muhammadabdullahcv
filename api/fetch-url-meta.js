@@ -1,18 +1,25 @@
 const { URL } = require('url');
 
+const decodeHtml = (value = '') => value
+  .replace(/&amp;/g, '&')
+  .replace(/&quot;/g, '"')
+  .replace(/&#39;/g, "'")
+  .replace(/&lt;/g, '<')
+  .replace(/&gt;/g, '>');
+
 const parseMetaTag = (html, attributeNames = [], name) => {
   for (const attr of attributeNames) {
     const regex = new RegExp(`<meta[^>]+(?:property|name)\\s*=\\s*['\"]${attr}['\"][^>]*content\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>`, 'i');
     const match = html.match(regex);
     if (match && match[1]) {
-      return match[1].trim();
+      return decodeHtml(match[1].trim());
     }
 
     // Support attributes in reverse order in the tag
     const regexAlt = new RegExp(`<meta[^>]+content\\s*=\\s*['\"]([^'\"]+)['\"][^>]+(?:property|name)\\s*=\\s*['\"]${attr}['\"][^>]*>`, 'i');
     const matchAlt = html.match(regexAlt);
     if (matchAlt && matchAlt[1]) {
-      return matchAlt[1].trim();
+      return decodeHtml(matchAlt[1].trim());
     }
   }
 
@@ -20,7 +27,33 @@ const parseMetaTag = (html, attributeNames = [], name) => {
     const regex = new RegExp(`<meta[^>]+name\\s*=\\s*['\"]${name}['\"][^>]*content\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>`, 'i');
     const match = html.match(regex);
     if (match && match[1]) {
-      return match[1].trim();
+      return decodeHtml(match[1].trim());
+    }
+  }
+
+  return '';
+};
+
+const resolveImageUrl = (image, pageUrl) => {
+  if (!image) return '';
+
+  try {
+    return new URL(decodeHtml(image), pageUrl).href;
+  } catch (e) {
+    return decodeHtml(image);
+  }
+};
+
+const extractImageFromHtmlBlock = (block, pageUrl) => {
+  const imagePatterns = [
+    /<img[^>]+(?:src|data-src|data-lazy-src)=['"]([^'"]+)['"][^>]*>/i,
+    /background(?:-image)?\s*:\s*url\((?:['"])?([^'")]+)(?:['"])?\)/i
+  ];
+
+  for (const pattern of imagePatterns) {
+    const match = block.match(pattern);
+    if (match && match[1]) {
+      return resolveImageUrl(match[1], pageUrl);
     }
   }
 
@@ -30,22 +63,18 @@ const parseMetaTag = (html, attributeNames = [], name) => {
 const extractImageUrl = (html, pageUrl) => {
   let image = parseMetaTag(html, ['og:image', 'twitter:image', 'image_src'], 'image');
   if (image) {
-    try {
-      const resolved = new URL(image, pageUrl).href;
-      return resolved;
-    } catch (e) {
-      return image;
-    }
+    return resolveImageUrl(image, pageUrl);
+  }
+
+  const heroSectionMatch = html.match(/<(header|section|main|div)\b[^>]*(?:class|id)=['"][^'"]*(?:hero|banner|header|home|intro)[^'"]*['"][\s\S]*?<\/\1>/i);
+  if (heroSectionMatch) {
+    const heroImage = extractImageFromHtmlBlock(heroSectionMatch[0], pageUrl);
+    if (heroImage) return heroImage;
   }
 
   const imgMatch = html.match(/<img[^>]+src=['\"]([^'\"]+)['\"][^>]*>/i);
   if (imgMatch && imgMatch[1]) {
-    try {
-      const resolved = new URL(imgMatch[1], pageUrl).href;
-      return resolved;
-    } catch (e) {
-      return imgMatch[1];
-    }
+    return resolveImageUrl(imgMatch[1], pageUrl);
   }
 
   return '';
@@ -77,7 +106,7 @@ module.exports = async (req, res) => {
     let title = parseMetaTag(html, ['og:title', 'twitter:title'], null);
     if (!title) {
       const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
-      title = titleMatch ? titleMatch[1].trim() : '';
+      title = titleMatch ? decodeHtml(titleMatch[1].trim()) : '';
     }
 
     let description = parseMetaTag(html, ['og:description', 'twitter:description'], 'description');
